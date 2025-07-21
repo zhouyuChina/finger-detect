@@ -1,0 +1,100 @@
+<!--record-gallery.wxml-->
+<view class="container">
+  <!-- 导航栏 -->
+  <view class="nav-bar">
+    <view class="nav-left" bindtap="onBack">
+      <text class="nav-icon">←</text>
+    </view>
+    <view class="nav-title">{{currentRecord.part}} - 检测历史</view>
+    <view class="nav-right">
+      <text class="nav-icon" bindtap="onShare">📤</text>
+    </view>
+  </view>
+
+  <!-- 大图片展示区域 -->
+  <view class="main-image-section">
+    <view wx:if="{{photoList.length === 0}}" class="loading-container">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    <swiper wx:else class="main-swiper" current="{{currentIndex}}" bindchange="onSwiperChange">
+      <swiper-item wx:for="{{photoList}}" wx:key="id">
+        <view class="main-image-container">
+          <image 
+            src="{{item.imagePath}}" 
+            mode="aspectFit" 
+            class="main-image"
+            catchtap="onImageTap"
+            data-index="{{index}}"
+            binderror="onImageError"
+            bindload="onImageLoad"
+          />
+          <view class="image-info">
+            <text class="image-date">{{item.date}}</text>
+            <text class="image-desc">{{item.description}}</text>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+    
+    <!-- 左右切换按钮 -->
+    <view class="navigation-buttons" wx:if="{{photoList.length > 1}}">
+      <view wx:if="{{currentIndex > 0}}" class="nav-btn prev-btn" catchtap="onPrevImage">
+        <text class="nav-icon">‹</text>
+      </view>
+      <view wx:else class="nav-btn prev-btn disabled" catchtap="onPrevImage">
+        <text class="nav-icon">‹</text>
+      </view>
+      <view wx:if="{{currentIndex < photoList.length - 1}}" class="nav-btn next-btn" catchtap="onNextImage">
+        <text class="nav-icon">›</text>
+      </view>
+      <view wx:else class="nav-btn next-btn disabled" catchtap="onNextImage">
+        <text class="nav-icon">›</text>
+      </view>
+    </view>
+    
+    <!-- 图片指示器 -->
+    <view class="image-indicator" wx:if="{{photoList.length > 0}}">
+      <text class="indicator-text">{{currentIndex + 1}} / {{photoList.length}}</text>
+    </view>
+  </view>
+
+  <!-- 小图片列表 -->
+  <view class="thumbnail-section">
+    <scroll-view 
+      class="thumbnail-list" 
+      scroll-x="true" 
+      scroll-with-animation="true"
+      scroll-left="{{scrollLeft}}"
+      enhanced="true"
+      show-scrollbar="false"
+      bindscroll="onThumbnailScroll"
+    >
+      <view class="thumbnail-container">
+        <view 
+          class="thumbnail-item {{index === currentIndex ? 'active' : ''}}" 
+          wx:for="{{photoList}}" 
+          wx:key="id"
+          bindtap="onThumbnailTap"
+          data-index="{{index}}"
+        >
+          <image 
+            src="{{item.imagePath}}" 
+            mode="aspectFill" 
+            class="thumbnail-image"
+          />
+          <view class="thumbnail-overlay" wx:if="{{index === currentIndex}}">
+            <text class="overlay-icon">✓</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <button class="action-btn primary" bindtap="onNewPhoto">
+      <text>新增拍照</text>
+    </button>
+  </view>
+</view> 

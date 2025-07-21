@@ -1,0 +1,75 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 轮播图区域 - 使用简单背景色 -->
+  <view class="banner">
+    <swiper 
+      class="banner-swiper" 
+      indicator-dots="{{true}}"
+      autoplay="{{true}}"
+      interval="{{3000}}"
+      circular="{{true}}"
+      indicator-color="rgba(255, 255, 255, 0.5)"
+      indicator-active-color="rgba(255, 255, 255, 0.8)"
+    >
+      <swiper-item wx:for="{{bannerList}}" wx:key="index">
+        <view class="banner-item" style="background: {{item.background}}">
+          <view class="banner-content">
+            <text class="banner-title">{{item.title}}</text>
+            <text class="banner-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 主要功能区域 -->
+  <view class="main-actions">
+    <button 
+      class="photo-btn"
+      bindtap="onPhotoDetection"
+    >
+      拍照检测
+    </button>
+    <!-- <text class="action-desc">早检测，早知道</text> -->
+  </view>
+
+  <!-- 消息列表 -->
+  <view class="message-section">
+    <view class="section-header">
+      <text class="section-title">健康资讯</text>
+      <view class="header-actions">
+        <text class="unread-count" wx:if="{{unreadCount > 0}}">{{unreadCount}}条未读</text>
+        <text class="view-all" bindtap="onViewAll">查看全部</text>
+      </view>
+    </view>
+    
+    <view class="message-list">
+      <view 
+        class="message-item {{item.isRead ? 'read' : 'unread'}}"
+        wx:for="{{messages}}" 
+        wx:key="id"
+        bindtap="onMessageTap"
+        data-index="{{index}}"
+      >
+        <view class="message-icon">
+          <view class="icon-bg {{item.type}}">
+            <text class="icon-text">{{item.type === 'system' ? '系' : item.type === 'notice' ? '通' : '贴'}}</text>
+          </view>
+          <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
+        </view>
+        
+        <view class="message-content">
+          <view class="message-header">
+            <text class="message-title">{{item.title}}</text>
+            <text class="message-time">{{item.time}}</text>
+          </view>
+          <text class="message-body">{{item.content}}</text>
+          <view class="message-tags">
+            <text class="priority-tag {{item.priority}}" wx:if="{{item.priority === 'high'}}">重要</text>
+            <text class="type-tag">{{item.type === 'system' ? '系统' : item.type === 'notice' ? '通知' : '小贴士'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

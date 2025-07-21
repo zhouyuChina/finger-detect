@@ -1,0 +1,89 @@
+/* records.wxss */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 0;
+  display: block;
+}
+
+/* 搜索区域 */
+.search-section {
+  background-color: #fff;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+/* 筛选区域 */
+.filter-section {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  position: relative;
+  z-index: 10;
+}
+
+.tab-content {
+  padding: 20rpx;
+  min-height: 200rpx;
+}
+
+.record-stats {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20rpx;
+  padding: 0 10rpx;
+}
+
+.stats-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.stats-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 记录列表 */
+.record-list {
+  background-color: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.record-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.record-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 单元格描述容器 */
+.cell-description {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+/* 检测部位样式 */
+.detection-part {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 更新时间样式 */
+.update-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+
+
+ 

@@ -1,0 +1,114 @@
+<!--my-profile.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的档案</text>
+    <text class="page-subtitle">管理所有用户档案</text>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-section">
+    <t-search 
+      placeholder="搜索用户姓名" 
+      bind:submit="onSearch"
+      bind:change="onSearchChange"
+      value="{{searchValue}}"
+    />
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-section">
+    <view class="stats-item">
+      <text class="stats-number">{{totalProfiles}}</text>
+      <text class="stats-label">总档案数</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{activeProfiles}}</text>
+      <text class="stats-label">活跃档案</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{recentUpdates}}</text>
+      <text class="stats-label">最近更新</text>
+    </view>
+  </view>
+
+  <!-- 用户列表 -->
+  <view class="profile-list">
+    <view 
+      class="profile-item" 
+      wx:for="{{filteredProfiles}}" 
+      wx:key="id"
+      bindtap="onProfileClick"
+      data-id="{{item.id}}"
+    >
+      <view class="profile-avatar">
+        <t-avatar 
+          image="{{item.avatar}}" 
+          size="large"
+        />
+      </view>
+      
+      <view class="profile-info">
+        <view class="profile-name">{{item.name}}</view>
+        <view class="profile-details">
+          <text class="detail-item">{{item.gender}} | {{item.age}}岁</text>
+          <text class="detail-item">{{item.relationship}}</text>
+        </view>
+        <view class="profile-meta">
+          <text class="meta-item">档案ID: {{item.profileId}}</text>
+          <text class="meta-item">更新时间: {{item.updateTime}}</text>
+        </view>
+      </view>
+      
+      <view class="profile-actions">
+        <view class="action-buttons">
+          <button 
+            class="action-btn btn-edit" 
+            catchtap="onEditProfile" 
+            data-id="{{item.id}}"
+          >编辑</button>
+          <button 
+            class="action-btn btn-delete" 
+            catchtap="onDeleteProfile" 
+            data-id="{{item.id}}"
+          >删除</button>
+        </view>
+        <view class="profile-status">
+          <t-tag 
+            theme="{{item.status === 'active' ? 'success' : 'default'}}" 
+            size="small"
+          >
+            {{item.status === 'active' ? '活跃' : '非活跃'}}
+          </t-tag>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <t-empty 
+    wx:if="{{filteredProfiles.length === 0}}"
+    description="暂无档案记录"
+  >
+    <t-button 
+      slot="action" 
+      theme="primary" 
+      size="small"
+      bindtap="onAddProfile"
+    >
+      添加档案
+    </t-button>
+  </t-empty>
+
+  <!-- 添加档案按钮 -->
+  <view class="add-profile-btn" wx:if="{{filteredProfiles.length > 0}}">
+    <t-button 
+      theme="primary" 
+      size="large"
+      bindtap="onAddProfile"
+      icon="add"
+    >
+      添加新档案
+    </t-button>
+  </view>
+</view> 

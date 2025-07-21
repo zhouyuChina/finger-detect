@@ -1,0 +1,357 @@
+<!--create-profile.wxml-->
+<view class="container">
+  <!-- 步骤指示器 -->
+  <view class="step-indicator">
+    <view 
+      class="step-item {{currentStep >= 1 ? 'active' : ''}}" 
+    >
+      <view class="step-icon">✏️</view>
+      <text class="step-title">档案信息</text>
+    </view>
+    <view class="step-line"></view>
+    <view 
+      class="step-item {{currentStep >= 2 ? 'active' : ''}}" 
+    >
+      <view class="step-icon">📷</view>
+      <text class="step-title">拍照检测</text>
+    </view>
+    <view class="step-line"></view>
+    <view 
+      class="step-item {{currentStep >= 3 ? 'active' : ''}}" 
+    >
+      <view class="step-icon">✅</view>
+      <text class="step-title">完成</text>
+    </view>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <view class="content-area">
+    <!-- 第一步：档案信息 -->
+    <view class="step-content" wx:if="{{currentStep === 1}}">
+      <view class="section-title">档案信息</view>
+      
+      <!-- 用户选择区域 -->
+      <view class="user-selection-area">
+        <view class="selection-placeholder" bindtap="showUserSelector">
+          <text class="placeholder-text">请选择用户</text>
+          <text class="placeholder-arrow">></text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 第二步：选择档案 -->
+    <view class="step-content" wx:if="{{currentStep === 2}}">
+      <view class="section-title">请选择档案</view>
+      
+      <!-- 档案列表 -->
+      <view class="profile-list" wx:if="{{selectedUserProfiles.length > 0}}">
+        <view 
+          class="profile-item" 
+          wx:for="{{selectedUserProfiles}}" 
+          wx:key="id"
+          bindtap="selectProfile"
+          data-profile="{{item}}"
+        >
+          <view class="profile-info">
+            <view class="profile-name">{{item.name}}</view>
+            <view class="profile-desc">{{item.bodyPart}} - {{item.detailPart}}</view>
+          </view>
+          <view class="profile-arrow">></view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:if="{{selectedUserProfiles.length === 0}}">
+        <text class="empty-text">暂无档案，请新增档案</text>
+      </view>
+
+      <!-- 新增档案 -->
+      <view class="add-profile-section">
+        <view class="add-profile-btn" bindtap="addNewProfile">
+          <text class="add-icon">➕</text>
+          <text class="add-text">新增档案</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button 
+      class="btn btn-prev" 
+      wx:if="{{currentStep > 1}}"
+      bindtap="prevStep"
+    >上一步</button>
+    <button 
+      class="btn btn-next" 
+      wx:if="{{currentStep === 1 && selectedUser}}"
+      bindtap="nextStep"
+    >下一步</button>
+  </view>
+
+  <!-- 用户选择弹窗 -->
+  <t-popup
+    visible="{{showUserSelector}}"
+    placement="bottom"
+    bind:close="closeUserSelector"
+  >
+    <view class="user-selector-content">
+      <view class="selector-header">
+        <text class="selector-cancel" bindtap="closeUserSelector">取消</text>
+        <text class="selector-title">请选择</text>
+        <text class="selector-confirm" bindtap="confirmUserSelection">确定</text>
+      </view>
+      
+      <scroll-view class="selector-options" scroll-y="true">
+        <view class="selector-option" bindtap="selectMyself">
+          <text class="option-text">本人</text>
+        </view>
+        <view 
+          class="selector-option" 
+          wx:for="{{otherUsers}}" 
+          wx:key="id"
+          bindtap="selectUser"
+          data-user="{{item}}"
+        >
+          <text class="option-text">{{item.nickname}}</text>
+        </view>
+        <view class="selector-option add-option" bindtap="addNewUser">
+          <text class="option-text">新增档案</text>
+        </view>
+      </scroll-view>
+    </view>
+  </t-popup>
+
+  <!-- 用户信息输入弹窗 - 第一步：出生年份 -->
+  <t-popup
+    visible="{{showBirthYearPopup}}"
+    placement="bottom"
+    bind:close="closeBirthYearPopup"
+  >
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">新增用户</text>
+        <text class="popup-close" bindtap="closeBirthYearPopup">✕</text>
+      </view>
+      
+      <view class="form-content">
+        <view class="form-item">
+          <text class="form-label">出生年份</text>
+          <view class="selection-placeholder" bindtap="showBirthYearSelector">
+            <text class="placeholder-text">{{userForm.birthYear || '请选择出生年份'}}</text>
+            <text class="placeholder-arrow">></text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="popup-actions">
+        <button class="popup-btn cancel-btn" bindtap="closeBirthYearPopup">取消</button>
+        <button class="popup-btn confirm-btn" bindtap="nextUserStep">下一步</button>
+      </view>
+    </view>
+  </t-popup>
+
+  <!-- 用户信息输入弹窗 - 第二步：地址 -->
+  <t-popup
+    visible="{{showAddressPopup}}"
+    placement="bottom"
+    bind:close="closeAddressPopup"
+  >
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">新增用户</text>
+        <text class="popup-close" bindtap="closeAddressPopup">✕</text>
+      </view>
+      
+      <view class="form-content">
+        <view class="form-item">
+          <text class="form-label">省份</text>
+          <view class="selection-placeholder" bindtap="showProvinceSelector">
+            <text class="placeholder-text">{{userForm.province || '请选择省份'}}</text>
+            <text class="placeholder-arrow">></text>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">城市</text>
+          <view class="selection-placeholder" bindtap="showCitySelector">
+            <text class="placeholder-text">{{userForm.city || '请选择城市'}}</text>
+            <text class="placeholder-arrow">></text>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">区县</text>
+          <view class="selection-placeholder" bindtap="showDistrictSelector">
+            <text class="placeholder-text">{{userForm.district || '请选择区县'}}</text>
+            <text class="placeholder-arrow">></text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="popup-actions">
+        <button class="popup-btn cancel-btn" bindtap="prevUserStep">上一步</button>
+        <button class="popup-btn confirm-btn" bindtap="saveUserInfo">确定</button>
+      </view>
+    </view>
+  </t-popup>
+
+  <!-- 出生年份选择弹窗 -->
+  <t-popup
+    visible="{{showBirthYearSelector}}"
+    placement="bottom"
+    bind:close="closeBirthYearSelector"
+  >
+    <view class="user-selector-content">
+      <view class="selector-header">
+        <text class="selector-cancel" bindtap="closeBirthYearSelector">取消</text>
+        <text class="selector-title">请选择出生年份</text>
+        <text class="selector-confirm" bindtap="confirmBirthYear">确定</text>
+      </view>
+      
+      <scroll-view class="selector-options" scroll-y="true">
+        <view 
+          class="selector-option" 
+          wx:for="{{birthYearOptions}}" 
+          wx:key="*this"
+          bindtap="selectBirthYear"
+          data-year="{{item}}"
+        >
+          <text class="option-text">{{item}}年</text>
+        </view>
+      </scroll-view>
+    </view>
+  </t-popup>
+
+  <!-- 省份选择弹窗 -->
+  <t-popup
+    visible="{{showProvinceSelector}}"
+    placement="bottom"
+    bind:close="closeProvinceSelector"
+  >
+    <view class="user-selector-content">
+      <view class="selector-header">
+        <text class="selector-cancel" bindtap="closeProvinceSelector">取消</text>
+        <text class="selector-title">请选择省份</text>
+        <text class="selector-confirm" bindtap="confirmProvince">确定</text>
+      </view>
+      
+      <scroll-view class="selector-options" scroll-y="true">
+        <view 
+          class="selector-option" 
+          wx:for="{{provinceOptions}}" 
+          wx:key="*this"
+          bindtap="selectProvince"
+          data-province="{{item}}"
+        >
+          <text class="option-text">{{item}}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </t-popup>
+
+  <!-- 城市选择弹窗 -->
+  <t-popup
+    visible="{{showCitySelector}}"
+    placement="bottom"
+    bind:close="closeCitySelector"
+  >
+    <view class="user-selector-content">
+      <view class="selector-header">
+        <text class="selector-cancel" bindtap="closeCitySelector">取消</text>
+        <text class="selector-title">请选择城市</text>
+        <text class="selector-confirm" bindtap="confirmCity">确定</text>
+      </view>
+      
+      <scroll-view class="selector-options" scroll-y="true">
+        <view 
+          class="selector-option" 
+          wx:for="{{cityOptions}}" 
+          wx:key="*this"
+          bindtap="selectCity"
+          data-city="{{item}}"
+        >
+          <text class="option-text">{{item}}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </t-popup>
+
+  <!-- 区县选择弹窗 -->
+  <t-popup
+    visible="{{showDistrictSelector}}"
+    placement="bottom"
+    bind:close="closeDistrictSelector"
+  >
+    <view class="user-selector-content">
+      <view class="selector-header">
+        <text class="selector-cancel" bindtap="closeDistrictSelector">取消</text>
+        <text class="selector-title">请选择区县</text>
+        <text class="selector-confirm" bindtap="confirmDistrict">确定</text>
+      </view>
+      
+      <scroll-view class="selector-options" scroll-y="true">
+        <view 
+          class="selector-option" 
+          wx:for="{{districtOptions}}" 
+          wx:key="*this"
+          bindtap="selectDistrict"
+          data-district="{{item}}"
+        >
+          <text class="option-text">{{item}}</text>
+        </view>
+      </scroll-view>
+    </view>
+  </t-popup>
+
+  <!-- 身体部位选择弹窗 -->
+  <t-popup
+    visible="{{showBodyPartPopup}}"
+    placement="bottom"
+    bind:close="closeBodyPartPopup"
+  >
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">选择身体部位</text>
+        <text class="popup-close" bindtap="closeBodyPartPopup">✕</text>
+      </view>
+      
+      <view class="body-part-grid">
+        <view 
+          class="body-part-item" 
+          wx:for="{{bodyParts}}" 
+          wx:key="value"
+          bindtap="selectBodyPart"
+          data-part="{{item}}"
+        >
+          <text class="part-icon">{{item.icon}}</text>
+          <text class="part-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+  </t-popup>
+
+  <!-- 详细部位选择弹窗 -->
+  <t-popup
+    visible="{{showDetailPartPopup}}"
+    placement="bottom"
+    bind:close="closeDetailPartPopup"
+  >
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">选择{{selectedBodyPart.name}}</text>
+        <text class="popup-close" bindtap="closeDetailPartPopup">✕</text>
+      </view>
+      
+      <view class="detail-part-grid">
+        <view 
+          class="detail-part-item" 
+          wx:for="{{detailParts}}" 
+          wx:key="value"
+          bindtap="selectDetailPart"
+          data-part="{{item}}"
+        >
+          <text class="part-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+  </t-popup>
+</view> 

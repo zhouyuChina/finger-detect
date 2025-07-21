@@ -1,0 +1,26 @@
+<!--user-records.wxml-->
+<view class="container">
+
+  <!-- 档案列表 -->
+  <view class="records-list">
+    <view class="record-item" wx:for="{{userRecords}}" wx:key="id">
+      <view class="record-header">
+        <view class="date-tag" wx:if="{{item.date}}">
+          <text>{{item.date}}</text>
+        </view>
+        <text class="record-description">{{item.description}}</text>
+      </view>
+      <view class="record-image">
+        <view class="image-placeholder" wx:if="{{!item.hasImage}}">
+          <text class="placeholder-icon">🏔️</text>
+        </view>
+        <image wx:else src="{{item.imagePath}}" mode="aspectFill" class="record-image" bindtap="onViewImage" data-id="{{item.id}}" />
+      </view>
+      <view class="record-action">
+        <button class="action-btn" bindtap="onStartPhoto" data-part="{{item.part}}" data-id="{{item.id}}">
+          <text>查看详情</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</view> 

@@ -1,0 +1,537 @@
+/* create-profile.wxss */
+page {
+  background-color: #f5f5f5;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 步骤指示器 */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.step-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-bottom: 16rpx;
+  transition: all 0.3s ease;
+  border: 2rpx solid #e0e0e0;
+}
+
+.step-item.active .step-icon {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+  color: #ffffff;
+}
+
+.step-title {
+  font-size: 26rpx;
+  color: #999;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-title {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+.step-line {
+  position: absolute;
+  top: 40rpx;
+  left: 50%;
+  width: 100%;
+  height: 2rpx;
+  background-color: #e0e0e0;
+  z-index: 1;
+}
+
+/* 主要内容区域 */
+.content-area {
+  flex: 1;
+  padding: 40rpx 30rpx;
+}
+
+.step-content {
+  height: 100%;
+}
+
+.section-title {
+  font-size: 36rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+/* 用户选择区域 */
+.user-selection-area {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  margin-bottom: 30rpx;
+}
+
+.selection-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  transition: background-color 0.3s ease;
+}
+
+.selection-placeholder:active {
+  background-color: #f8f9fa;
+}
+
+.placeholder-text {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.placeholder-arrow {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 用户选择器弹窗 */
+.user-selector-content {
+  background-color: #ffffff;
+  border-radius: 20rpx 20rpx 0 0;
+  padding: 0;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  background-color: #f8f8f8;
+}
+
+.selector-cancel {
+  font-size: 32rpx;
+  color: #666;
+  padding: 10rpx;
+}
+
+.selector-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.selector-confirm {
+  font-size: 32rpx;
+  color: #2B81E8;
+  font-weight: 500;
+  padding: 10rpx;
+}
+
+.selector-options {
+  padding: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.selector-option {
+  padding: 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.selector-option:last-child {
+  border-bottom: none;
+}
+
+.selector-option:active {
+  background-color: #f5f5f5;
+}
+
+.option-text {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.add-option .option-text {
+  color: #2B81E8;
+}
+
+/* 表单中的选择器样式 */
+.form-content .selection-placeholder {
+  background-color: #f8f9fa;
+  border: 1rpx solid #e9ecef;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-top: 10rpx;
+}
+
+.form-content .placeholder-text {
+  color: #333;
+  font-size: 28rpx;
+}
+
+.form-content .placeholder-text:empty::before {
+  content: '请选择';
+  color: #999;
+}
+
+/* 用户列表 */
+.user-list {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.user-item:last-child {
+  border-bottom: none;
+}
+
+.user-item:active {
+  background-color: #f8f9fa;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.user-desc {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.user-arrow {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.add-user {
+  background-color: #f8f9fa;
+}
+
+.add-user .user-name {
+  color: #2B81E8;
+}
+
+/* 档案列表 */
+.profile-list {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  margin-bottom: 30rpx;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.profile-item:last-child {
+  border-bottom: none;
+}
+
+.profile-item:active {
+  background-color: #f8f9fa;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.profile-desc {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.profile-arrow {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60rpx 0;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 新增档案区域 */
+.add-profile-section {
+  margin-top: 30rpx;
+}
+
+.add-profile-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  border: 2rpx dashed #2B81E8;
+  transition: all 0.3s ease;
+}
+
+.add-profile-btn:active {
+  background-color: #f0f8ff;
+}
+
+.add-icon {
+  font-size: 32rpx;
+  color: #2B81E8;
+  margin-right: 10rpx;
+}
+
+.add-text {
+  font-size: 32rpx;
+  color: #2B81E8;
+  font-weight: 500;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  padding: 40rpx 30rpx;
+  display: flex;
+  gap: 20rpx;
+  background-color: #ffffff;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.btn-prev {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.btn-next, .btn-complete {
+  background-color: #2B81E8;
+  color: #ffffff;
+}
+
+/* 弹窗样式 */
+.popup-content {
+  background-color: #ffffff;
+  border-radius: 20rpx 20rpx 0 0;
+  padding: 0;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  background-color: #f8f8f8;
+}
+
+.popup-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.popup-close {
+  font-size: 40rpx;
+  color: #999;
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 表单样式 */
+.form-content {
+  padding: 30rpx;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  width: 120rpx;
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+  padding: 0;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 20rpx;
+  padding: 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.popup-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.confirm-btn {
+  background-color: #2B81E8;
+  color: #ffffff;
+}
+
+/* 身体部位选择 */
+.body-part-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  padding: 30rpx;
+}
+
+.body-part-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.body-part-item:active {
+  background-color: #e6f3ff;
+  border-color: #2B81E8;
+}
+
+.part-icon {
+  font-size: 48rpx;
+  margin-bottom: 16rpx;
+}
+
+.part-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 详细部位选择 */
+.detail-part-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  padding: 30rpx;
+}
+
+.detail-part-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.detail-part-item:active {
+  background-color: #e6f3ff;
+  border-color: #2B81E8;
+}
+
+.detail-part-item .part-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+} 

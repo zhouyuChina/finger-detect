@@ -1,0 +1,85 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/about/about",
+    "pages/profile/profile",
+    "pages/records/records",
+    "pages/create-profile/create-profile",
+    "pages/photo-detection/photo-detection",
+    "pages/detection-result/detection-result",
+    "pages/message/message",
+    "pages/message-detail/message-detail",
+    "pages/user-records/user-records",
+    "pages/record-gallery/record-gallery",
+    "pages/my-profile/my-profile"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "首页",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#2B81E8",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/records/records",
+        "text": "恢复记录",
+        "iconPath": "images/record.png",
+        "selectedIconPath": "images/record-active.png"
+      },
+      {
+        "pagePath": "pages/message/message",
+        "text": "消息中心",
+        "iconPath": "images/message.png",
+        "selectedIconPath": "images/message-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "t-button": "miniprogram_npm/button/button",
+    "t-cell": "miniprogram_npm/cell/cell",
+    "t-cell-group": "miniprogram_npm/cell-group/cell-group",
+    "t-dialog": "miniprogram_npm/dialog/dialog",
+    "t-popup": "miniprogram_npm/popup/popup",
+    "t-input": "miniprogram_npm/input/input",
+    "t-textarea": "miniprogram_npm/textarea/textarea",
+    "t-avatar": "miniprogram_npm/avatar/avatar",
+    "t-tag": "miniprogram_npm/tag/tag",
+    "t-divider": "miniprogram_npm/divider/divider",
+    "t-empty": "miniprogram_npm/empty/empty",
+    "t-loading": "miniprogram_npm/loading/loading",
+    "t-toast": "miniprogram_npm/toast/toast",
+    "t-message": "miniprogram_npm/message/message",
+    "t-grid": "miniprogram_npm/grid/grid",
+    "t-grid-item": "miniprogram_npm/grid-item/grid-item",
+    "t-tabs": "miniprogram_npm/tabs/tabs",
+    "t-tab-panel": "miniprogram_npm/tab-panel/tab-panel",
+    "t-search": "miniprogram_npm/search/search",
+    "t-badge": "miniprogram_npm/badge/badge",
+    "t-switch": "miniprogram_npm/switch/switch",
+    "t-result": "miniprogram_npm/result/result",
+    "t-notice-bar": "miniprogram_npm/notice-bar/notice-bar",
+    "t-action-sheet": "miniprogram_npm/action-sheet/action-sheet",
+    "t-image": "miniprogram_npm/image/image",
+    "t-link": "miniprogram_npm/link/link"
+  }
+}

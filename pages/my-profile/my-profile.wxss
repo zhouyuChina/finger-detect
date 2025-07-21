@@ -1,0 +1,186 @@
+/* my-profile.wxss */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* 页面标题 */
+.page-header {
+  background-color: #fff;
+  padding: 40rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.page-subtitle {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+}
+
+/* 搜索栏 */
+.search-section {
+  padding: 0 40rpx 20rpx;
+  background-color: #fff;
+}
+
+/* 统计信息 */
+.stats-section {
+  background-color: #fff;
+  padding: 30rpx 40rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-around;
+}
+
+.stats-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stats-number {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2B81E8;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.stats-label {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+}
+
+/* 档案列表 */
+.profile-list {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.profile-item:last-child {
+  border-bottom: none;
+}
+
+.profile-item:active {
+  background-color: #f8f9fa;
+}
+
+.profile-avatar {
+  margin-right: 30rpx;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.profile-details {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 10rpx;
+}
+
+.detail-item {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5rpx;
+}
+
+.meta-item {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15rpx;
+  margin-left: 20rpx;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10rpx;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  border: none;
+  min-width: 60rpx;
+}
+
+.btn-edit {
+  background-color: #e6f3ff;
+  color: #2B81E8;
+}
+
+.btn-delete {
+  background-color: #ffe6e6;
+  color: #e34d59;
+}
+
+.profile-status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 添加档案按钮 */
+.add-profile-btn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+/* 空状态样式 */
+.t-empty {
+  margin-top: 100rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .profile-details {
+    flex-direction: column;
+    gap: 5rpx;
+  }
+  
+  .profile-meta {
+    flex-direction: row;
+    gap: 20rpx;
+  }
+} 

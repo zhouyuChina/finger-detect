@@ -1,0 +1,101 @@
+<!--profile.wxml-->
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-section">
+    <view class="user-info">
+      <t-avatar 
+        image="{{userInfo.avatar}}" 
+        size="large"
+        shape="round"
+      />
+      <view class="user-details">
+        <text class="user-name">{{userInfo.name}}</text>
+        <text class="user-phone">{{userInfo.phone}}</text>
+      </view>
+    </view>
+    <t-button 
+      theme="primary"
+      bindtap="onEditProfile"
+      size="extra-small"
+    >
+      留言反馈
+    </t-button>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-section">
+    <view class="stats-grid">
+      <view class="stats-item" bindtap="onViewRecords">
+        <text class="stats-number">{{stats.totalRecords}}</text>
+        <text class="stats-label">拍照记录</text>
+      </view>
+      <view class="stats-item" bindtap="onViewReports">
+        <text class="stats-number">{{stats.totalReports}}</text>
+        <text class="stats-label">报告记录</text>
+      </view>
+      <view class="stats-item" bindtap="onViewFamily">
+        <text class="stats-number">{{stats.familyMembers}}</text>
+        <text class="stats-label">建档记录</text>
+      </view>
+      <view class="stats-item" bindtap="onViewPoints">
+        <text class="stats-number">{{stats.points}}</text>
+        <text class="stats-label">系统消息</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 菜单列表 -->
+  <view class="menu-section">
+    <t-cell-group theme="card">
+      <t-cell 
+        title="我的档案" 
+        description="管理个人健康档案"
+        bindtap="onMyProfile"
+      >
+        <text slot="note" class="arrow-icon">›</text>
+      </t-cell>
+      <t-cell 
+        title="检测记录" 
+        description="查看历史检测记录"
+        bindtap="onMyRecords"
+      >
+        <text slot="note" class="arrow-icon">›</text>
+      </t-cell>
+      <t-cell 
+        title="我的优惠卷" 
+        description="查看详细的优惠卷信息"
+        bindtap="onMyReports"
+      >
+        <text slot="note" class="arrow-icon">›</text>
+      </t-cell>
+      <t-cell 
+        title="系统消息" 
+        description="查看系统消息"
+        bindtap="onFamilyMembers"
+      >
+        <text slot="note" class="arrow-icon">›</text>
+      </t-cell>
+      <t-cell 
+        title="关于我们" 
+        description="了解更多产品信息"
+        bindtap="onAboutUs"
+      >
+        <text slot="note" class="arrow-icon">›</text>
+      </t-cell>
+    </t-cell-group>
+  </view>
+
+  <!-- 分享有礼 -->
+  <view class="share-section">
+    <t-cell 
+      title="分享有礼" 
+      description="邀请好友获得积分奖励"
+      hover
+      bindtap="onShare"
+    >
+      <view slot="note" class="note-container">
+        <t-tag theme="warning" size="small">有奖励</t-tag>
+      </view>
+    </t-cell>
+  </view>
+</view> 

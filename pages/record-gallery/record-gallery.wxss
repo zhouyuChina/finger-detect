@@ -1,0 +1,290 @@
+/* record-gallery.wxss */
+.container {
+  background-color: #000;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 导航栏 */
+.nav-bar {
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  position: absolute;
+  top: 74rpx;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-icon {
+  font-size: 36rpx;
+  color: #fff;
+  padding: 10rpx;
+}
+
+.nav-title {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 大图片展示区域 */
+.main-image-section {
+  flex: 1;
+  position: absolute;
+  top: 182rpx;
+  width: 100vw;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  background-color: #000;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #333;
+  border-top: 4rpx solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+
+.loading-text {
+  color: #fff;
+  font-size: 28rpx;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.main-swiper {
+  width: 100vw;
+  height: 64vh;
+}
+
+.main-image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+}
+
+.image-info {
+  position: absolute;
+  bottom: 0rpx;
+  left: 20rpx;
+  right: 20rpx;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20rpx;
+  border-radius: 12rpx;
+}
+
+.image-date {
+  display: block;
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.image-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #ccc;
+}
+
+/* 左右切换按钮 */
+.navigation-buttons {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40rpx;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.nav-btn {
+  width: 80rpx;
+  height: 80rpx;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:active {
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: scale(0.95);
+}
+
+.nav-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.nav-icon {
+  font-size: 48rpx;
+  color: #fff;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* 图片指示器 */
+.image-indicator {
+  position: absolute;
+  top: 20rpx;
+  right: 60rpx;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.indicator-text {
+  font-size: 24rpx;
+  color: #fff;
+}
+
+/* 小图片列表 */
+.thumbnail-section {
+  position: absolute;
+  bottom: 184rpx;
+  z-index: 1000;
+  background-color: #111;
+  padding: 20rpx;
+  border-top: 1rpx solid #333;
+}
+
+.thumbnail-list {
+  width: 100vw;
+  height: 130rpx;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.thumbnail-container {
+  display: flex;
+  gap: 15rpx;
+  white-space: nowrap;
+  flex-direction: row;
+}
+
+.thumbnail-item {
+  position: relative;
+  flex-shrink: 0;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  border: 3rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.thumbnail-item.active {
+  border-color: #007aff;
+  transform: scale(1.05);
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 122, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-icon {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* 操作按钮 */
+.action-section {
+  position: absolute;
+  bottom: 38rpx;
+  background-color: #111;
+  padding: 30rpx 20rpx;
+  display: flex;
+  gap: 20rpx;
+  border-top: 1rpx solid #333;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 25rpx;
+  border-radius: 12rpx;
+  border: none;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.action-btn.primary {
+  background-color: #007aff;
+  color: #fff;
+}
+
+.action-btn.secondary {
+  background-color: #333;
+  color: #fff;
+}
+
+.action-btn:active {
+  opacity: 0.8;
+}
+
+.btn-icon {
+  font-size: 32rpx;
+}

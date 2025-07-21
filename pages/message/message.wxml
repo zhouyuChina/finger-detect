@@ -1,0 +1,22 @@
+<!--message.wxml-->
+<view class="container">
+  <!-- 消息列表 -->
+  <view class="message-list">
+    <view class="message-item" wx:for="{{messageList}}" wx:key="id" bindtap="onMessageClick" data-id="{{item.id}}">
+      <view class="message-title">{{item.title}}</view>
+      <view class="message-image">
+        <image src="{{item.image}}" mode="aspectFill" />
+      </view>
+      <view class="message-metrics">
+        <view class="metric-item">
+          <text class="metric-icon">阅读量：</text>
+          <text class="metric-text">{{item.views}}</text>
+        </view>
+        <view class="metric-item">
+          <text class="metric-icon">发布时间：</text>
+          <text class="metric-text">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

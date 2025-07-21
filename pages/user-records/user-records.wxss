@@ -1,0 +1,157 @@
+/* user-records.wxss */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* 导航栏 */
+.nav-bar {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.nav-icon {
+  font-size: 32rpx;
+  color: #333;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 筛选区域 */
+.filter-section {
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  background-color: #f0f0f0;
+  padding: 15rpx 25rpx;
+  border-radius: 25rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.filter-icon {
+  font-size: 24rpx;
+  color: #007aff;
+}
+
+/* 档案列表 */
+.records-list {
+  width: 94vw;
+  padding: 20rpx;
+}
+
+.record-item {
+  background-color: #fff;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.record-header {
+  margin-bottom: 20rpx;
+}
+
+.date-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  background-color: #f0f0f0;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+  margin-right: 30rpx;
+}
+
+.tag-icon {
+  font-size: 20rpx;
+  color: #007aff;
+}
+
+.record-description {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 图片区域 */
+.record-image {
+  margin: 20rpx 0;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 400rpx;
+  background-color: #f8f9fa;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx dashed #ddd;
+}
+
+.placeholder-icon {
+  font-size: 80rpx;
+  color: #ccc;
+}
+
+.record-image image {
+  width: 100%;
+  height: 400rpx;
+  border-radius: 8rpx;
+  background-color: #f8f9fa;
+}
+
+/* 操作按钮 */
+.record-action {
+  margin-top: 20rpx;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  background-color: #007aff;
+  color: #fff;
+  border: none;
+  border-radius: 25rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  width: 100%;
+}
+
+.action-btn:active {
+  background-color: #0056b3;
+}
+
+.btn-icon {
+  font-size: 24rpx;
+} 

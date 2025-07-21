@@ -1,0 +1,51 @@
+<!--photo-detection.wxml-->
+<view class="container">
+  <!-- 步骤指示器 -->
+  <view class="step-indicator">
+    <view 
+      class="step-item {{item.active ? 'active' : ''}}" 
+      wx:for="{{steps}}" 
+      wx:key="id"
+    >
+      <view class="step-icon">{{item.icon}}</view>
+      <text class="step-title">{{item.title}}</text>
+      <view class="step-line" wx:if="{{index < steps.length - 1}}"></view>
+    </view>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <view class="content-area">
+    <view class="photo-section">
+      <view class="photo-title">请拍照进行检测</view>
+      
+      <!-- 拍照区域 -->
+      <view class="photo-area">
+        <view class="photo-placeholder" wx:if="{{!photoTaken}}">
+          <view class="camera-icon">📷</view>
+          <text class="placeholder-text">点击拍照</text>
+        </view>
+        
+        <image 
+          class="photo-preview" 
+          wx:if="{{photoTaken}}" 
+          src="{{photoPath}}" 
+          mode="aspectFit"
+        ></image>
+      </view>
+
+      <!-- 拍照按钮 -->
+      <view class="photo-actions">
+        <button 
+          class="btn btn-photo" 
+          wx:if="{{!photoTaken}}"
+          bindtap="takePhoto"
+        >拍照</button>
+        
+        <view class="btn-group" wx:if="{{photoTaken}}">
+          <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button>
+          <button class="btn btn-detect" bindtap="startDetection">开始检测</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

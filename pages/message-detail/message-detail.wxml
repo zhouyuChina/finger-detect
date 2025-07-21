@@ -1,0 +1,27 @@
+<!--message-detail.wxml-->
+<view class="container">
+  <!-- 文章标题 -->
+  <view class="article-header">
+    <view class="article-title">{{articleDetail.title}}</view>
+    <view class="article-meta">
+      <text class="publish-time">发布时间：{{articleDetail.publishTime}}</text>
+      <text class="read-count">阅读量：{{articleDetail.readCount}}</text>
+    </view>
+  </view>
+
+  <!-- 文章内容 -->
+  <view class="article-content">
+    <view class="content-text">{{articleDetail.content}}</view>
+    
+    <!-- 文章图片 -->
+    <view class="article-image" wx:if="{{articleDetail.image}}">
+      <image src="{{articleDetail.image}}" mode="widthFix" />
+    </view>
+    
+    <!-- 文章标签 -->
+    <view class="article-tags" wx:if="{{articleDetail.tags.length > 0}}">
+      <text class="tag" wx:for="{{articleDetail.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+</view> 
