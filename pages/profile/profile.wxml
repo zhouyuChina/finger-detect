@@ -62,9 +62,9 @@
         <text slot="note" class="arrow-icon">›</text>
       </t-cell>
       <t-cell 
-        title="我的优惠卷" 
-        description="查看详细的优惠卷信息"
-        bindtap="onMyReports"
+        title="我的优惠券" 
+        description="查看详细的优惠券信息"
+        bindtap="onMyCoupons"
       >
         <text slot="note" class="arrow-icon">›</text>
       </t-cell>

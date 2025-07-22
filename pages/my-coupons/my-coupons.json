@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的优惠券",
+  "usingComponents": {
+    "t-button": "../../miniprogram_npm/button/button",
+    "t-empty": "../../miniprogram_npm/empty/empty",
+    "t-icon": "../../miniprogram_npm/icon/icon"
+  }
+} 

@@ -1,0 +1,276 @@
+/* my-coupons.wxss */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 顶部标签页 */
+.tabs-section {
+  background-color: #fff;
+  display: flex;
+  padding: 0 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 30rpx 0;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tab-item.active {
+  color: #e34d59;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background-color: #e34d59;
+  border-radius: 2rpx;
+}
+
+.tab-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #666;
+}
+
+.tab-item.active .tab-text {
+  color: #e34d59;
+  font-weight: 600;
+}
+
+/* 兑换码输入区域 */
+.redeem-section {
+  background-color: #fff;
+  padding: 30rpx 40rpx;
+  margin-bottom: 20rpx;
+}
+
+.redeem-input-container {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+}
+
+.redeem-input {
+  flex: 1;
+  height: 80rpx;
+  padding: 0 30rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.redeem-input:focus {
+  border-color: #e34d59;
+  background-color: #fff;
+}
+
+.redeem-btn {
+  width: 120rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  background-color: #666;
+  color: #fff;
+}
+
+/* 优惠券列表 */
+.coupons-list {
+  padding: 0 40rpx;
+}
+
+.coupon-item {
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  gap: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.coupon-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8rpx;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  border-radius: 4rpx;
+}
+
+/* 优惠券图片 */
+.coupon-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background-color: #fff5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.coupon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 优惠券信息 */
+.coupon-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.coupon-value {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #e34d59;
+  margin-bottom: 10rpx;
+  line-height: 1;
+}
+
+.coupon-condition {
+  font-size: 28rpx;
+  color: #e34d59;
+  margin-bottom: 8rpx;
+  font-weight: 500;
+}
+
+.coupon-description {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.4;
+}
+
+/* 操作按钮 */
+.coupon-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.claim-btn {
+  width: 80rpx;
+  height: 160rpx;
+  border-radius: 40rpx;
+  background: linear-gradient(135deg, #e34d59, #ff6b6b);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  box-shadow: 0 4rpx 12rpx rgba(227, 77, 89, 0.3);
+  border: none;
+  padding: 0;
+}
+
+.btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.btn-text {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 500;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  line-height: 1.2;
+  transform: rotate(180deg);
+}
+
+.status-overlay {
+  width: 80rpx;
+  height: 160rpx;
+  border-radius: 40rpx;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #e0e0e0;
+}
+
+.status-text {
+  font-size: 20rpx;
+  color: #999;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  line-height: 1.2;
+}
+
+/* 已领取状态遮罩 */
+.claimed-overlay {
+  position: absolute;
+  top: 50%;
+  right: 30rpx;
+  transform: translateY(-50%);
+  width: 80rpx;
+  height: 80rpx;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.claimed-text {
+  font-size: 24rpx;
+  color: #fff;
+  font-weight: 600;
+  transform: rotate(-45deg);
+}
+
+/* 空状态样式 */
+.t-empty {
+  margin-top: 100rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .coupon-item {
+    padding: 20rpx;
+    gap: 20rpx;
+  }
+  
+  .coupon-image {
+    width: 100rpx;
+    height: 100rpx;
+  }
+  
+  .coupon-value {
+    font-size: 40rpx;
+  }
+  
+  .claim-btn {
+    width: 60rpx;
+    height: 120rpx;
+  }
+  
+  .btn-text {
+    font-size: 18rpx;
+  }
+} 

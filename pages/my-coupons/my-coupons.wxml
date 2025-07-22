@@ -1,0 +1,104 @@
+<!--my-coupons.wxml-->
+<view class="container">
+  <!-- 顶部标签页 -->
+  <view class="tabs-section">
+    <view class="tab-item {{activeTab === 'unused' ? 'active' : ''}}" bindtap="switchTab" data-tab="unused">
+      <text class="tab-text">未使用</text>
+    </view>
+    <view class="tab-item {{activeTab === 'used' ? 'active' : ''}}" bindtap="switchTab" data-tab="used">
+      <text class="tab-text">已使用</text>
+    </view>
+    <view class="tab-item {{activeTab === 'expired' ? 'active' : ''}}" bindtap="switchTab" data-tab="expired">
+      <text class="tab-text">已过期</text>
+    </view>
+  </view>
+
+  <!-- 兑换码输入区域 -->
+  <view class="redeem-section">
+    <view class="redeem-input-container">
+      <input 
+        class="redeem-input" 
+        placeholder="请输入兑换码" 
+        value="{{redeemCode}}"
+        bindinput="onRedeemInput"
+      />
+      <t-button 
+        class="redeem-btn" 
+        theme="light" 
+        size="small"
+        bindtap="redeemCoupon"
+      >
+        兑换
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 优惠券列表 -->
+  <view class="coupons-list">
+    <view 
+      class="coupon-item" 
+      wx:for="{{filteredCoupons}}" 
+      wx:key="id"
+      bindtap="onCouponClick"
+      data-id="{{item.id}}"
+    >
+      <!-- 优惠券图片 -->
+      <view class="coupon-image">
+        <image 
+          class="coupon-img" 
+          src="{{item.image || '/images/banner1.png'}}" 
+          mode="aspectFill"
+        />
+      </view>
+
+      <!-- 优惠券信息 -->
+      <view class="coupon-info">
+        <view class="coupon-value">¥ {{item.value}}</view>
+        <view class="coupon-condition">{{item.condition}}</view>
+        <view class="coupon-description">{{item.description}}</view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="coupon-action">
+        <t-button 
+          wx:if="{{item.status === 'unused'}}"
+          class="claim-btn" 
+          theme="primary" 
+          size="small"
+          bindtap="claimCoupon"
+          data-id="{{item.id}}"
+          catchtap="claimCoupon"
+        >
+          <view class="btn-content">
+            <t-icon name="lightning" size="24rpx" color="#fff" />
+            <text class="btn-text">立即领取</text>
+          </view>
+        </t-button>
+        <view wx:else class="status-overlay">
+          <text class="status-text">{{item.statusText}}</text>
+        </view>
+      </view>
+
+      <!-- 已领取状态遮罩 -->
+      <view wx:if="{{item.status === 'claimed'}}" class="claimed-overlay">
+        <text class="claimed-text">已领</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <t-empty 
+    wx:if="{{filteredCoupons.length === 0}}"
+    description="暂无优惠券"
+    icon="coupon"
+  >
+    <t-button 
+      slot="action" 
+      theme="primary" 
+      size="medium"
+      bindtap="goToHome"
+    >
+      去首页看看
+    </t-button>
+  </t-empty>
+</view> 

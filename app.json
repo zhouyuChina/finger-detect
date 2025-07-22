@@ -12,7 +12,8 @@
     "pages/message-detail/message-detail",
     "pages/user-records/user-records",
     "pages/record-gallery/record-gallery",
-    "pages/my-profile/my-profile"
+    "pages/my-profile/my-profile",
+    "pages/my-coupons/my-coupons"
   ],
   "window": {
     "navigationBarTextStyle": "black",

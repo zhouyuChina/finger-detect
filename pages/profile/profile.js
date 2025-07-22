@@ -76,6 +76,13 @@ Page({
     })
   },
 
+  // 我的优惠券
+  onMyCoupons() {
+    wx.navigateTo({
+      url: '/pages/my-coupons/my-coupons'
+    })
+  },
+
   // 我的健康报告
   onMyReports() {
     wx.showToast({
