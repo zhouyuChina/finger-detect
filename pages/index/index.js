@@ -6,17 +6,17 @@ Page({
       {
         title: '健康检测服务',
         desc: '专业医疗级检测服务',
-        background: 'url(/images/banner1.png) no-repeat center center'
+        background: 'linear-gradient(135deg, #4CAF50, #45a049)'
       },
       {
         title: 'AI智能分析',
         desc: '快速准确的智能诊断',
-        background: 'url(/images/banner2.png) no-repeat center center'
+        background: 'linear-gradient(135deg, #2196F3, #1976D2)'
       },
       {
         title: '专业检测报告',
         desc: '详细健康评估报告',
-        background: 'url(/images/banner3.png) no-repeat center center'
+        background: 'linear-gradient(135deg, #FF9800, #F57C00)'
       }
     ],
 

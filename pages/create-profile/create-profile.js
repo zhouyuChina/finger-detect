@@ -131,8 +131,6 @@ Page({
   onLoad() {
     // 页面加载时检查本人信息
     this.checkMyselfInfo();
-    // 自动显示用户选择器
-    this.setData({ showUserSelector: true });
     
     // 生成出生年份选项（1950-2020）
     const currentYear = new Date().getFullYear();
@@ -141,6 +139,12 @@ Page({
       birthYearOptions.push(year);
     }
     this.setData({ birthYearOptions });
+    
+    // 延迟显示用户选择器，确保页面完全加载
+    setTimeout(() => {
+      this.setData({ showUserSelector: true });
+      console.log('弹窗状态:', this.data.showUserSelector);
+    }, 500);
   },
 
   // 检查本人信息

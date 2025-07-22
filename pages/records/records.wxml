@@ -29,16 +29,13 @@
               wx:for="{{filteredRecords}}" 
               wx:key="id"
               title="{{item.name}}"
+              description="更新时间：{{item.updateTime}}"
               image="{{item.avatar}}"
               hover
               bindtap="onRecordClick"
               data-id="{{item.id}}"
               right-icon="chevron-right"
             >
-              <view slot="description" class="cell-description">
-                <text class="detection-part">{{item.detectionPart}}</text>
-                <text class="update-time">{{item.updateTime}}</text>
-              </view>
               <view slot="note" class="record-meta">
                 <t-tag 
                   theme="{{item.type === 'mine' ? 'primary' : 'default'}}" 
@@ -65,16 +62,13 @@
               wx:for="{{myRecords}}" 
               wx:key="id"
               title="{{item.name}}"
+              description="更新时间：{{item.updateTime}}"
               image="{{item.avatar}}"
               hover
               bindtap="onRecordClick"
               data-id="{{item.id}}"
               right-icon="chevron-right"
             >
-              <view slot="description" class="cell-description">
-                <text class="detection-part">{{item.detectionPart}}</text>
-                <text class="update-time">{{item.updateTime}}</text>
-              </view>
               <view slot="note" class="record-meta">
                 <t-tag theme="primary" size="small">我的</t-tag>
               </view>
@@ -96,16 +90,13 @@
               wx:for="{{otherRecords}}" 
               wx:key="id"
               title="{{item.name}}"
+              description="更新时间：{{item.updateTime}}"
               image="{{item.avatar}}"
               hover
               bindtap="onRecordClick"
               data-id="{{item.id}}"
               right-icon="chevron-right"
             >
-              <view slot="description" class="cell-description">
-                <text class="detection-part">{{item.detectionPart}}</text>
-                <text class="update-time">{{item.updateTime}}</text>
-              </view>
               <view slot="note" class="record-meta">
                 <t-tag theme="default" size="small">其他</t-tag>
               </view>

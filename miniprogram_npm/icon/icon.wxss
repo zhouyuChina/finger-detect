@@ -2,7 +2,7 @@
 .t-icon--image{width:100%;height:100%;}
 .t-icon__image{vertical-align:top;width:100%;height:100%;}
 .t-icon-base{font-style:normal;font-weight:400;font-variant:normal;text-transform:none;line-height:1;text-align:center;display:block;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
-.t-icon{font-family:inherit!important;}
+.t-icon{font-family:t!important;}
 .t-icon-accessibility-filled:before{content:'\E001';}
 .t-icon-accessibility:before{content:'\E002';}
 .t-icon-activity-filled:before{content:'\E003';}

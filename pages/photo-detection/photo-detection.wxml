@@ -3,13 +3,22 @@
   <!-- 步骤指示器 -->
   <view class="step-indicator">
     <view 
-      class="step-item {{item.active ? 'active' : ''}}" 
-      wx:for="{{steps}}" 
-      wx:key="id"
+      class="step-item {{currentStep >= 1 ? 'active' : ''}}" 
     >
-      <view class="step-icon">{{item.icon}}</view>
-      <text class="step-title">{{item.title}}</text>
-      <view class="step-line" wx:if="{{index < steps.length - 1}}"></view>
+      <view class="step-icon">✏️</view>
+      <text class="step-title">档案信息</text>
+    </view>
+    <view 
+      class="step-item {{currentStep >= 2 ? 'active' : ''}}" 
+    >
+      <view class="step-icon">📷</view>
+      <text class="step-title">拍照检测</text>
+    </view>
+    <view 
+      class="step-item {{currentStep >= 3 ? 'active' : ''}}" 
+    >
+      <view class="step-icon">✅</view>
+      <text class="step-title">完成</text>
     </view>
   </view>
 

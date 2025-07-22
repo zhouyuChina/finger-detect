@@ -7,76 +7,67 @@ Page({
     currentIndex: 0,
     scrollLeft: 0,
     currentRecord: {},
+    // 照片列表
     photoList: [
       {
         id: 1,
-        imagePath: 'https://picsum.photos/400/600?random=1',
-        date: '2025年7月2日 15:30',
-        description: '检测结果：正常',
-        analysis: '各项指标均在正常范围内'
+        imagePath: '/images/banner1.png',
+        uploadTime: '2024-07-20 10:30',
+        status: 'normal'
       },
       {
         id: 2,
-        imagePath: 'https://picsum.photos/400/600?random=2',
-        date: '2025年6月28日 14:20',
-        description: '检测结果：轻微异常',
-        analysis: '建议定期复查'
+        imagePath: '/images/banner2.png',
+        uploadTime: '2024-07-19 15:20',
+        status: 'normal'
       },
       {
         id: 3,
-        imagePath: 'https://picsum.photos/400/600?random=3',
-        date: '2025年6月25日 10:15',
-        description: '检测结果：正常',
-        analysis: '恢复情况良好'
+        imagePath: '/images/banner3.png',
+        uploadTime: '2024-07-18 09:15',
+        status: 'normal'
       },
       {
         id: 4,
-        imagePath: 'https://picsum.photos/400/600?random=4',
-        date: '2025年6月20日 16:45',
-        description: '检测结果：正常',
-        analysis: '治疗效果显著'
+        imagePath: '/images/default-avatar.png',
+        uploadTime: '2024-07-17 14:45',
+        status: 'normal'
       },
       {
         id: 5,
-        imagePath: 'https://picsum.photos/400/600?random=5',
-        date: '2025年6月15日 09:30',
-        description: '检测结果：异常',
-        analysis: '需要进一步治疗'
+        imagePath: '/images/profile-avatar.png',
+        uploadTime: '2024-07-16 11:30',
+        status: 'normal'
       },
       {
         id: 6,
-        imagePath: 'https://picsum.photos/400/600?random=6',
-        date: '2025年6月10日 11:20',
-        description: '检测结果：正常',
-        analysis: '恢复进展良好'
+        imagePath: '/images/banner1.png',
+        uploadTime: '2024-07-15 16:20',
+        status: 'normal'
       },
       {
         id: 7,
-        imagePath: 'https://picsum.photos/400/600?random=7',
-        date: '2025年6月5日 16:30',
-        description: '检测结果：轻微异常',
-        analysis: '需要继续观察'
+        imagePath: '/images/banner2.png',
+        uploadTime: '2024-07-14 13:10',
+        status: 'normal'
       },
       {
         id: 8,
-        imagePath: 'https://picsum.photos/400/600?random=8',
-        date: '2025年5月30日 13:45',
-        description: '检测结果：正常',
-        analysis: '治疗效果良好'
+        imagePath: '/images/banner3.png',
+        uploadTime: '2024-07-13 08:45',
+        status: 'normal'
       },
       {
         id: 9,
-        imagePath: 'https://picsum.photos/400/600?random=9',
-        date: '2025年5月25日 09:15',
-        description: '检测结果：轻微异常',
-        analysis: '需要继续观察'
+        imagePath: '/images/default-avatar.png',
+        uploadTime: '2024-07-12 12:30',
+        status: 'normal'
       },
       {
         id: 10,
-        imagePath: 'https://picsum.photos/400/600?random=10',
-        date: '2025年5月20日 14:30',
-        description: '检测结果：正常',
-        analysis: '恢复情况良好'
+        imagePath: '/images/profile-avatar.png',
+        uploadTime: '2024-07-11 17:15',
+        status: 'normal'
       }
     ]
   },
@@ -151,70 +142,70 @@ Page({
     const baseData = [
       {
         id: 1,
-        imagePath: 'https://picsum.photos/400/600?random=1',
+        imagePath: '/images/banner1.png',
         date: '2025年7月2日 15:30',
         description: '检测结果：正常',
         analysis: '各项指标均在正常范围内'
       },
       {
         id: 2,
-        imagePath: 'https://picsum.photos/400/600?random=2',
+        imagePath: '/images/banner2.png',
         date: '2025年6月28日 14:20',
         description: '检测结果：轻微异常',
         analysis: '建议定期复查'
       },
       {
         id: 3,
-        imagePath: 'https://picsum.photos/400/600?random=3',
+        imagePath: '/images/banner3.png',
         date: '2025年6月25日 10:15',
         description: '检测结果：正常',
         analysis: '恢复情况良好'
       },
       {
         id: 4,
-        imagePath: 'https://picsum.photos/400/600?random=4',
+        imagePath: '/images/default-avatar.png',
         date: '2025年6月20日 16:45',
         description: '检测结果：正常',
         analysis: '治疗效果显著'
       },
       {
         id: 5,
-        imagePath: 'https://picsum.photos/400/600?random=5',
+        imagePath: '/images/profile-avatar.png',
         date: '2025年6月15日 09:30',
         description: '检测结果：异常',
         analysis: '需要进一步治疗'
       },
       {
         id: 6,
-        imagePath: 'https://picsum.photos/400/600?random=6',
+        imagePath: '/images/banner1.png',
         date: '2025年6月10日 11:20',
         description: '检测结果：正常',
         analysis: '恢复进展良好'
       },
       {
         id: 7,
-        imagePath: 'https://picsum.photos/400/600?random=7',
+        imagePath: '/images/banner2.png',
         date: '2025年6月5日 16:30',
         description: '检测结果：轻微异常',
         analysis: '需要继续观察'
       },
       {
         id: 8,
-        imagePath: 'https://picsum.photos/400/600?random=8',
+        imagePath: '/images/banner3.png',
         date: '2025年5月30日 13:45',
         description: '检测结果：正常',
         analysis: '治疗效果良好'
       },
       {
         id: 9,
-        imagePath: 'https://picsum.photos/400/600?random=9',
+        imagePath: '/images/default-avatar.png',
         date: '2025年5月25日 09:15',
         description: '检测结果：轻微异常',
         analysis: '需要继续观察'
       },
       {
         id: 10,
-        imagePath: 'https://picsum.photos/400/600?random=10',
+        imagePath: '/images/profile-avatar.png',
         date: '2025年5月20日 14:30',
         description: '检测结果：正常',
         analysis: '恢复情况良好'
@@ -364,7 +355,7 @@ Page({
     
     // 设置默认图片
     const photoList = this.data.photoList
-    photoList[index].imagePath = 'https://picsum.photos/400/600?random=' + (index + 100)
+    photoList[index].imagePath = '/images/default-avatar.png'
     
     this.setData({
       photoList: photoList

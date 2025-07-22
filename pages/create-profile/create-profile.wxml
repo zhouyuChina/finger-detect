@@ -8,14 +8,12 @@
       <view class="step-icon">✏️</view>
       <text class="step-title">档案信息</text>
     </view>
-    <view class="step-line"></view>
     <view 
       class="step-item {{currentStep >= 2 ? 'active' : ''}}" 
     >
       <view class="step-icon">📷</view>
       <text class="step-title">拍照检测</text>
     </view>
-    <view class="step-line"></view>
     <view 
       class="step-item {{currentStep >= 3 ? 'active' : ''}}" 
     >
@@ -121,6 +119,36 @@
       </scroll-view>
     </view>
   </t-popup>
+
+  <!-- 简单的自定义弹窗 -->
+  <view class="custom-popup" wx:if="{{showUserSelector}}">
+    <view class="custom-overlay" bindtap="closeUserSelector"></view>
+    <view class="custom-popup-content">
+      <view class="selector-header">
+        <text class="selector-cancel" bindtap="closeUserSelector">取消</text>
+        <text class="selector-title">请选择</text>
+        <text class="selector-confirm" bindtap="confirmUserSelection">确定</text>
+      </view>
+      
+      <scroll-view class="selector-options" scroll-y="true">
+        <view class="selector-option" bindtap="selectMyself">
+          <text class="option-text">本人</text>
+        </view>
+        <view 
+          class="selector-option" 
+          wx:for="{{otherUsers}}" 
+          wx:key="id"
+          bindtap="selectUser"
+          data-user="{{item}}"
+        >
+          <text class="option-text">{{item.nickname}}</text>
+        </view>
+        <view class="selector-option add-option" bindtap="addNewUser">
+          <text class="option-text">新增档案</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
 
   <!-- 用户信息输入弹窗 - 第一步：出生年份 -->
   <t-popup

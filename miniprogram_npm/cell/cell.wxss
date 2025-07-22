@@ -3,7 +3,7 @@
 .t-cell--borderless::after{display:none;}
 .t-cell__description{font-size:var(--td-cell-description-font-size,var(--td-font-size-base,28rpx));line-height:var(--td-cell-description-line-height,44rpx);color:var(--td-cell-description-color,var(--td-text-color-secondary,var(--td-font-gray-2,rgba(0,0,0,.6))));}
 .t-cell__description-text{margin-top:calc(var(--td-spacer,16rpx)/ 2);}
-.t-cell__note{display:flex;align-items:top;justify-content:flex-end;color:var(--td-cell-note-color,var(--td-text-color-placeholder,var(--td-font-gray-3,rgba(0,0,0,.4))));font-size:var(--td-cell-note-font-size,var(--td-font-size-m,32rpx));}
+.t-cell__note{display:flex;align-items:center;justify-content:flex-end;color:var(--td-cell-note-color,var(--td-text-color-placeholder,var(--td-font-gray-3,rgba(0,0,0,.4))));font-size:var(--td-cell-note-font-size,var(--td-font-size-m,32rpx));}
 .t-cell__title{margin-right:var(--td-spacer-2,32rpx);}
 .t-cell__note,.t-cell__title{flex:1 1 auto;}
 .t-cell__note:empty,.t-cell__title:empty{display:none;}

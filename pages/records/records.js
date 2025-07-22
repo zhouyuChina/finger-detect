@@ -133,10 +133,10 @@ Page({
     // 根据搜索关键词筛选
     let filtered = recordList
     if (searchValue) {
-      filtered = recordList.filter(item => 
-        item.name.includes(searchValue) || 
-        item.detectionPart.includes(searchValue)
-      )
+              filtered = recordList.filter(item => 
+          item.name.includes(searchValue) || 
+          item.updateTime.includes(searchValue)
+        )
     }
     
     // 根据标签页筛选 - 始终计算所有分类的数据

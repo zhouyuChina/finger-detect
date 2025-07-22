@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "档案信息"
+  "navigationBarTitleText": "档案信息",
+  "usingComponents": {
+    "t-popup": "../../miniprogram_npm/popup/popup"
+  }
 } 
