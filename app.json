@@ -64,6 +64,8 @@
     "t-tag": "miniprogram_npm/tag/tag",
     "t-empty": "miniprogram_npm/empty/empty",
     "t-popup": "miniprogram_npm/popup/popup",
-    "t-overlay": "miniprogram_npm/overlay/overlay"
+    "t-overlay": "miniprogram_npm/overlay/overlay",
+    "t-avatar": "miniprogram_npm/avatar/avatar",
+    "t-icon": "miniprogram_npm/icon/icon"
   }
 }

@@ -8,26 +8,28 @@ Page({
       { id: 3, title: "完成", icon: "✅", active: true }
     ],
     detectionResult: {
-      status: "正常",
-      details: "检测结果显示各项指标均在正常范围内",
-      recommendations: [
-        "建议定期进行健康检测",
-        "保持良好的生活习惯",
-        "适量运动，注意休息"
-      ]
+      imagePath: '/images/banner1.png', // 检测照片路径
+      description: '这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,',
+      suggestions: '处于这种情况下常见的治愈时长为一个月,处于这种情况下常见的治愈时长为一个月,处于这种情况下常见的治愈时长为一个月,处于这种情况下常见的治愈时长为一个月,'
     }
   },
 
-  onLoad() {
-    // 页面加载
+  onLoad(options) {
+    // 如果有传递的图片路径，使用传递的路径
+    if (options.imagePath) {
+      this.setData({
+        'detectionResult.imagePath': decodeURIComponent(options.imagePath)
+      });
+    }
   },
 
-  // 查看详细报告
-  viewDetailedReport() {
-    wx.showToast({
-      title: '详细报告功能开发中',
-      icon: 'none'
-    })
+  // 预览图片
+  previewImage() {
+    const imagePath = this.data.detectionResult.imagePath;
+    wx.previewImage({
+      current: imagePath,
+      urls: [imagePath]
+    });
   },
 
   // 保存到档案
@@ -35,13 +37,13 @@ Page({
     wx.showToast({
       title: '已保存到档案',
       icon: 'success'
-    })
+    });
   },
 
   // 返回首页
   backToHome() {
     wx.reLaunch({
       url: '/pages/index/index'
-    })
+    });
   }
-}) 
+}); 

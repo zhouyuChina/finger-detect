@@ -15,35 +15,37 @@
 
   <!-- 主要内容区域 -->
   <view class="content-area">
-    <view class="result-section">
-      <!-- 成功图标 -->
-      <view class="success-icon">✅</view>
-      
-      <!-- 检测结果 -->
-      <view class="result-title">检测完成</view>
-      <view class="result-status">{{detectionResult.status}}</view>
-      <view class="result-details">{{detectionResult.details}}</view>
+    <!-- 第一部分：照片显示区域 -->
+    <view class="image-section">
+      <view class="image-container">
+        <image 
+          class="detection-image" 
+          src="{{detectionResult.imagePath || '/images/default-avatar.png'}}" 
+          mode="aspectFill"
+          bindtap="previewImage"
+        />
+      </view>
+    </view>
 
-      <!-- 建议列表 -->
-      <view class="recommendations">
-        <view class="recommendations-title">健康建议</view>
-        <view class="recommendation-list">
-          <view 
-            class="recommendation-item" 
-            wx:for="{{detectionResult.recommendations}}" 
-            wx:key="*this"
-          >
-            <text class="recommendation-dot">•</text>
-            <text class="recommendation-text">{{item}}</text>
-          </view>
-        </view>
+    <!-- 第二部分：描述内容 -->
+    <view class="description-section">
+      <view class="section-title">描述:</view>
+      <view class="description-content">
+        <text class="description-text">{{detectionResult.description}}</text>
+      </view>
+    </view>
+
+    <!-- 第三部分：产品使用建议 -->
+    <view class="suggestions-section">
+      <view class="section-title">产品的使用建议:</view>
+      <view class="suggestions-content">
+        <text class="suggestions-text">{{detectionResult.suggestions}}</text>
       </view>
     </view>
   </view>
 
   <!-- 操作按钮 -->
   <view class="action-buttons">
-    <button class="btn btn-report" bindtap="viewDetailedReport">查看详细报告</button>
     <button class="btn btn-save" bindtap="saveToProfile">保存到档案</button>
     <button class="btn btn-home" bindtap="backToHome">返回首页</button>
   </view>

@@ -32,7 +32,7 @@
       <view class="user-selection-area">
         <view class="selection-placeholder" bindtap="showUserSelector">
           <text class="placeholder-text">请选择用户</text>
-          <text class="placeholder-arrow">></text>
+       -->
         </view>
       </view>
     </view>
@@ -101,17 +101,19 @@
       </view>
       
       <scroll-view class="selector-options" scroll-y="true">
-        <view class="selector-option" bindtap="selectMyself">
+        <view class="selector-option {{selectedUser && selectedUser.id === 'myself' ? 'selected' : ''}}" bindtap="selectMyself">
           <text class="option-text">本人</text>
+          <text class="option-check" wx:if="{{selectedUser && selectedUser.id === 'myself'}}">✅</text>
         </view>
         <view 
-          class="selector-option" 
+          class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
           wx:for="{{otherUsers}}" 
           wx:key="id"
           bindtap="selectUser"
           data-user="{{item}}"
         >
           <text class="option-text">{{item.nickname}}</text>
+          <text class="option-check" wx:if="{{selectedUser && selectedUser.id === item.id}}">✅</text>
         </view>
         <view class="selector-option add-option" bindtap="addNewUser">
           <text class="option-text">新增档案</text>
@@ -131,17 +133,19 @@
       </view>
       
       <scroll-view class="selector-options" scroll-y="true">
-        <view class="selector-option" bindtap="selectMyself">
+        <view class="selector-option {{selectedUser && selectedUser.id === 'myself' ? 'selected' : ''}}" bindtap="selectMyself">
           <text class="option-text">本人</text>
+          <text class="option-check" wx:if="{{selectedUser && selectedUser.id === 'myself'}}">✅</text>
         </view>
         <view 
-          class="selector-option" 
+          class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
           wx:for="{{otherUsers}}" 
           wx:key="id"
           bindtap="selectUser"
           data-user="{{item}}"
         >
           <text class="option-text">{{item.nickname}}</text>
+          <text class="option-check" wx:if="{{selectedUser && selectedUser.id === item.id}}">✅</text>
         </view>
         <view class="selector-option add-option" bindtap="addNewUser">
           <text class="option-text">新增档案</text>
@@ -167,7 +171,6 @@
           <text class="form-label">出生年份</text>
           <view class="selection-placeholder" bindtap="showBirthYearSelector">
             <text class="placeholder-text">{{userForm.birthYear || '请选择出生年份'}}</text>
-            <text class="placeholder-arrow">></text>
           </view>
         </view>
       </view>
@@ -196,21 +199,19 @@
           <text class="form-label">省份</text>
           <view class="selection-placeholder" bindtap="showProvinceSelector">
             <text class="placeholder-text">{{userForm.province || '请选择省份'}}</text>
-            <text class="placeholder-arrow">></text>
+
           </view>
         </view>
         <view class="form-item">
           <text class="form-label">城市</text>
           <view class="selection-placeholder" bindtap="showCitySelector">
             <text class="placeholder-text">{{userForm.city || '请选择城市'}}</text>
-            <text class="placeholder-arrow">></text>
           </view>
         </view>
         <view class="form-item">
           <text class="form-label">区县</text>
           <view class="selection-placeholder" bindtap="showDistrictSelector">
             <text class="placeholder-text">{{userForm.district || '请选择区县'}}</text>
-            <text class="placeholder-arrow">></text>
           </view>
         </view>
       </view>

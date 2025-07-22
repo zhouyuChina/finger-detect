@@ -1,3 +1,13 @@
 {
-  "navigationBarTitleText": "我的档案"
+  "navigationBarTitleText": "我的档案",
+  "usingComponents": {
+    "t-search": "../../miniprogram_npm/search/search",
+    "t-avatar": "../../miniprogram_npm/avatar/avatar",
+    "t-tag": "../../miniprogram_npm/tag/tag",
+    "t-empty": "../../miniprogram_npm/empty/empty",
+    "t-button": "../../miniprogram_npm/button/button",
+    "t-cell": "../../miniprogram_npm/cell/cell",
+    "t-cell-group": "../../miniprogram_npm/cell-group/cell-group",
+    "t-icon": "../../miniprogram_npm/icon/icon"
+  }
 } 

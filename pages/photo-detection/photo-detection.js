@@ -70,7 +70,7 @@ Page({
       // 跳转到完成页面
       setTimeout(() => {
         wx.navigateTo({
-          url: '/pages/detection-result/detection-result'
+          url: `/pages/detection-result/detection-result?imagePath=${encodeURIComponent(this.data.photoPath)}`
         })
       }, 1500)
     }, 3000)

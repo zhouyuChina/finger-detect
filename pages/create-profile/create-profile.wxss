@@ -130,11 +130,6 @@ page {
   font-weight: 500;
 }
 
-.placeholder-arrow {
-  font-size: 28rpx;
-  color: #999;
-}
-
 /* 用户选择器弹窗 */
 .user-selector-content {
   background-color: #ffffff;
@@ -185,6 +180,9 @@ page {
   text-align: center;
   border-bottom: 1rpx solid #f0f0f0;
   transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .selector-option:last-child {
@@ -199,10 +197,33 @@ page {
   font-size: 32rpx;
   color: #333;
   font-weight: 500;
+  flex: 1;
+  text-align: center;
+}
+
+.option-check {
+  font-size: 32rpx;
+  color: #4CAF50;
+  margin-left: 20rpx;
+  flex-shrink: 0;
+  font-weight: bold;
+  position: absolute;
+  right: 80rpx;
+}
+
+.selector-option.selected {
+  background-color: #f0f8ff;
+}
+
+.selector-option.selected .option-text {
+  color: #4CAF50;
+  font-weight: 600;
 }
 
 .add-option .option-text {
   color: #2B81E8;
+  flex: 1;
+  text-align: center;
 }
 
 /* 表单中的选择器样式 */

@@ -189,6 +189,7 @@ Page({
       this.setData({
         selectedUser: { id: 'myself', ...this.data.myselfInfo }
       });
+      console.log('选择了本人:', this.data.selectedUser);
     } else {
       // 如果没有信息，弹出设置弹窗
       this.setData({
@@ -205,6 +206,7 @@ Page({
     this.setData({
       selectedUser: user
     });
+    console.log('选择了用户:', user);
   },
 
   // 新增用户
