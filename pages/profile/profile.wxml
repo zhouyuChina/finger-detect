@@ -37,10 +37,6 @@
         <text class="stats-number">{{stats.familyMembers}}</text>
         <text class="stats-label">建档记录</text>
       </view>
-      <view class="stats-item" bindtap="onViewPoints">
-        <text class="stats-number">{{stats.points}}</text>
-        <text class="stats-label">积分</text>
-      </view>
       <view class="stats-item" bindtap="onSystemMessages">
         <text class="stats-number">{{stats.unreadMessages}}</text>
         <text class="stats-label">未读消息</text>

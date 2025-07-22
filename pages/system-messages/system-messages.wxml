@@ -24,7 +24,6 @@
         bindtap="onMessageClick"
         data-id="{{item.id}}"
         hover
-        arrow
       >
         <view slot="left-icon" class="message-icon">
           <view class="icon-container {{item.type}}">
@@ -50,9 +49,6 @@
         
         <view slot="note" class="message-meta">
           <text class="time-text">{{item.time}}</text>
-          <view wx:if="{{item.type === 'unread'}}" class="unread-indicator">
-            <t-tag theme="danger" size="small" variant="light">未读</t-tag>
-          </view>
         </view>
       </t-cell>
     </t-cell-group>
@@ -110,7 +106,7 @@
             wx:key="index"
             wx:for-item="action"
             theme="{{action.theme || 'primary'}}" 
-            size="medium"
+            size="small"
             bindtap="onActionClick"
             data-action="{{action}}"
           >
@@ -123,7 +119,7 @@
       <view class="popup-actions">
         <t-button 
           theme="light" 
-          size="large"
+          size="small"
           bindtap="closeDetailPopup"
         >
           关闭
@@ -131,7 +127,7 @@
         <t-button 
           wx:if="{{currentMessage.type === 'unread'}}"
           theme="primary" 
-          size="large"
+          size="small"
           bindtap="markAsRead"
         >
           标记已读

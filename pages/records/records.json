@@ -1,3 +1,12 @@
 {
-  "navigationBarTitleText": "恢复记录中心"
+  "navigationBarTitleText": "检测记录",
+  "usingComponents": {
+    "t-search": "../../miniprogram_npm/search/search",
+    "t-cell": "../../miniprogram_npm/cell/cell",
+    "t-cell-group": "../../miniprogram_npm/cell-group/cell-group",
+    "t-button": "../../miniprogram_npm/button/button",
+    "t-empty": "../../miniprogram_npm/empty/empty",
+    "t-popup": "../../miniprogram_npm/popup/popup",
+    "t-icon": "../../miniprogram_npm/icon/icon"
+  }
 } 

@@ -35,7 +35,7 @@
       },
       {
         "pagePath": "pages/records/records",
-        "text": "恢复记录",
+        "text": "检测记录",
         "iconPath": "images/record.png",
         "selectedIconPath": "images/record-active.png"
       },

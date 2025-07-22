@@ -2,16 +2,20 @@
 .container {
   background-color: #f5f5f5;
   min-height: 100vh;
+  padding: 0;
+  justify-content: start;
 }
 
 /* 页面头部 */
 .page-header {
   background-color: #fff;
-  padding: 40rpx;
+  padding: 20rpx 30rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1rpx solid #f0f0f0;
+  width: calc(100vw - 60rpx);
+  margin-top: 20rpx;
 }
 
 .page-title {
@@ -106,6 +110,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8rpx;
+  width: 138rpx;
 }
 
 .time-text {
@@ -130,8 +135,8 @@
 .popup-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 40rpx;
+  align-items: center;
+  padding: 20rpx;
   border-bottom: 1rpx solid #f0f0f0;
   background-color: #fff;
 }
@@ -238,26 +243,3 @@
 .t-empty {
   margin-top: 100rpx;
 }
-
-/* 响应式设计 */
-@media (max-width: 750rpx) {
-  .popup-header {
-    padding: 30rpx 20rpx;
-  }
-  
-  .popup-content {
-    padding: 30rpx 20rpx;
-  }
-  
-  .popup-actions {
-    padding: 30rpx 20rpx;
-  }
-  
-  .message-actions {
-    flex-direction: column;
-  }
-  
-  .popup-actions {
-    flex-direction: column;
-  }
-} 

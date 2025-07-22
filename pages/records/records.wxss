@@ -1,54 +1,84 @@
 /* records.wxss */
 .container {
+  padding: 0;
   background-color: #f5f5f5;
   min-height: 100vh;
-  padding: 0;
-  display: block;
 }
 
 /* 搜索区域 */
 .search-section {
-  background-color: #fff;
   padding: 20rpx;
+  background-color: #fff;
   border-bottom: 1rpx solid #f0f0f0;
+  width: calc(100vw - 40rpx);
 }
 
-/* 筛选区域 */
-.filter-section {
-  background-color: #fff;
-  margin-bottom: 20rpx;
-  position: relative;
-  z-index: 10;
-}
-
-.tab-content {
+/* 记录区域 */
+.records-section {
   padding: 20rpx;
-  min-height: 200rpx;
 }
 
-.record-stats {
+.records-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20rpx;
   padding: 0 10rpx;
 }
 
-.stats-text {
-  font-size: 28rpx;
+.header-title {
+  font-size: 36rpx;
+  font-weight: 600;
   color: #333;
-  font-weight: 500;
-  margin-bottom: 8rpx;
 }
 
-.stats-desc {
-  font-size: 24rpx;
-  color: #999;
+.header-count {
+  font-size: 28rpx;
+  color: #666;
 }
 
 /* 记录列表 */
-.record-list {
+.records-list {
   background-color: #fff;
   border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.record-icon {
+  margin-right: 20rpx;
+}
+
+.icon-container {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(43, 129, 232, 0.1);
+}
+
+.record-title {
+  margin-bottom: 8rpx;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.record-preview {
+  margin-bottom: 8rpx;
+}
+
+.preview-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
@@ -57,31 +87,203 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8rpx;
+  width: 140rpx;
+  text-align: right;
 }
 
-.record-time {
+.time-text {
   font-size: 24rpx;
   color: #999;
 }
 
-/* 单元格描述容器 */
-.cell-description {
+.record-actions {
   display: flex;
-  flex-direction: column;
-  gap: 8rpx;
+  justify-content: flex-end;
+  width: 100rpx;
 }
 
-/* 检测部位样式 */
-.detection-part {
+/* 详情弹窗样式 */
+.detail-popup {
+  width: 600rpx;
+  max-height: 90vh;
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  background-color: #fff;
+}
+
+.popup-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.popup-close {
+  font-size: 48rpx;
+  color: #999;
+  font-weight: 300;
+  padding: 10rpx;
+  border-radius: 50%;
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+.popup-close:active {
+  background-color: #e0e0e0;
+}
+
+.popup-content {
+  padding: 40rpx;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* 图片区域 */
+.image-section {
+  margin-bottom: 30rpx;
+}
+
+.image-container {
+  width: 100%;
+  height: 600rpx;
+  background-color: #f5f5f5;
+  border: 2rpx solid #2196F3;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.detection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 描述区域 */
+.description-section {
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.description-content {
+  background-color: #f9f9f9;
+  border-radius: 8rpx;
+  padding: 20rpx;
+}
+
+.description-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* 建议区域 */
+.suggestions-section {
+  margin-bottom: 30rpx;
+}
+
+.suggestions-content {
+  background-color: #f9f9f9;
+  border-radius: 8rpx;
+  padding: 20rpx;
+}
+
+.suggestions-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* 报告信息 */
+.report-info {
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+  padding: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-value {
   font-size: 28rpx;
   color: #333;
   font-weight: 500;
 }
 
-/* 更新时间样式 */
-.update-time {
-  font-size: 24rpx;
-  color: #999;
+/* 弹窗操作按钮 */
+.popup-actions {
+  display: flex;
+  gap: 20rpx;
+  padding: 40rpx;
+  border-top: 1rpx solid #f0f0f0;
+  background-color: #fff;
+}
+
+.popup-actions .t-button {
+  flex: 1;
+}
+
+/* 空状态样式 */
+.t-empty {
+  margin-top: 100rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .popup-header {
+    padding: 30rpx 20rpx;
+  }
+  
+  .popup-content {
+    padding: 30rpx 20rpx;
+  }
+  
+  .popup-actions {
+    padding: 30rpx 20rpx;
+  }
+  
+  .popup-actions {
+    flex-direction: column;
+  }
+  
+  .image-container {
+    height: 250rpx;
+  }
 }
 
 

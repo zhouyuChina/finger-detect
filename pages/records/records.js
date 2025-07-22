@@ -2,98 +2,50 @@
 Page({
   data: {
     searchValue: '',
-    activeTab: 'all',
-    totalCount: 0,
-    lastDetectionTime: '2024-07-20 15:30',
+    showDetailPopup: false,
+    currentRecord: {},
     
-    // 原始数据 - 档案列表
-    recordList: [
+    // 检测记录数据
+    detectionRecords: [
       {
         id: 1,
-        name: "张三",
-        avatar: "/images/profile-avatar.png",
-        type: "mine",
-        updateTime: "2024-07-20",
-        recordCount: 12,
+        imagePath: '/images/banner1.png',
+        description: '这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,这里是文字描述,',
+        suggestions: '处于这种情况下常见的治愈时长为一个月,处于这种情况下常见的治愈时长为一个月,处于这种情况下常见的治愈时长为一个月,处于这种情况下常见的治愈时长为一个月,',
+        createTime: '2024-01-15 14:30'
       },
       {
         id: 2,
-        name: "李四",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-19",
-        recordCount: 8,
+        imagePath: '/images/banner2.png',
+        description: '检测结果显示各项指标正常，建议保持良好的生活习惯，定期进行健康检测。',
+        suggestions: '建议每天保持8小时睡眠，适量运动，均衡饮食，定期体检。',
+        createTime: '2024-01-14 16:45'
       },
       {
         id: 3,
-        name: "王五",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-18",
-        recordCount: 15,
+        imagePath: '/images/banner3.png',
+        description: '检测发现轻微异常，建议进一步观察和调整生活习惯。',
+        suggestions: '建议减少熬夜，增加运动量，注意饮食健康，必要时咨询专业医生。',
+        createTime: '2024-01-13 09:20'
       },
       {
         id: 4,
-        name: "赵六",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-17",
-        recordCount: 6,     
+        imagePath: '/images/banner1.png',
+        description: '检测结果显示皮肤状态良好，建议继续保持当前的护理习惯。',
+        suggestions: '建议使用温和的洁面产品，定期补水保湿，避免过度清洁。',
+        createTime: '2024-01-12 10:15'
       },
       {
         id: 5,
-        name: "孙七",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-16",
-        recordCount: 10,
-      },
-      {
-        id: 6,
-        name: "周八",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-15",
-        recordCount: 7,
-      },
-      {
-        id: 7,
-        name: "吴九",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-14",
-        recordCount: 9,
-      },
-      {
-        id: 8,
-        name: "郑十",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-13",
-        recordCount: 5,
-      },
-      {
-        id: 9,
-        name: "谢芳",
-        avatar: "/images/profile-avatar.png",
-        type: "mine",
-        updateTime: "2024-07-12",
-        recordCount: 18,
-      },
-      {
-        id: 10,
-        name: "陈明",
-        avatar: "/images/profile-avatar.png",
-        type: "others",
-        updateTime: "2024-07-11",
-        recordCount: 11,
+        imagePath: '/images/banner2.png',
+        description: '检测发现需要关注的问题，建议及时调整生活习惯和护理方式。',
+        suggestions: '建议减少刺激性食物的摄入，增加维生素C的补充，保持充足睡眠。',
+        createTime: '2024-01-11 13:25'
       }
     ],
     
     // 筛选后的数据
-    filteredRecords: [],
-    myRecords: [],
-    otherRecords: []
+    filteredRecords: []
   },
 
   onLoad() {
@@ -118,56 +70,121 @@ Page({
     this.filterRecords()
   },
 
-  // 标签页切换
-  onTabChange(e) {
-    const value = e.detail.value
-    this.setData({
-      activeTab: value
-    })
-  },
-
   // 筛选记录
   filterRecords() {
-    const { recordList, searchValue, activeTab } = this.data
+    const { detectionRecords, searchValue } = this.data
     
     // 根据搜索关键词筛选
-    let filtered = recordList
+    let filtered = detectionRecords
     if (searchValue) {
-              filtered = recordList.filter(item => 
-          item.name.includes(searchValue) || 
-          item.updateTime.includes(searchValue)
-        )
+      filtered = detectionRecords.filter(item => 
+        item.description.includes(searchValue) || 
+        item.createTime.includes(searchValue) ||
+        item.id.toString().includes(searchValue)
+      )
     }
-    
-    // 根据标签页筛选 - 始终计算所有分类的数据
-    let myRecords = filtered.filter(item => item.type === 'mine')
-    let otherRecords = filtered.filter(item => item.type === 'others')
     
     this.setData({
-      filteredRecords: filtered,
-      myRecords: myRecords,
-      otherRecords: otherRecords,
-      totalCount: filtered.length
+      filteredRecords: filtered
     })
   },
 
-  // 创建档案
-  onCreateProfile() {
-    wx.navigateTo({
-      url: '/pages/create-profile/create-profile'
-    })
-  },
-
-  // 档案项点击 - 查看历史记录
+  // 点击检测记录
   onRecordClick(e) {
-    const { id } = e.currentTarget.dataset
-    const record = this.data.recordList.find(item => item.id === id)
+    const id = e.currentTarget.dataset.id;
+    const record = this.data.detectionRecords.find(r => r.id === id);
     
-    if (record) {
-      // 直接跳转到用户档案页面
-      wx.navigateTo({
-        url: `/pages/user-records/user-records?id=${id}&name=${record.name}`
-      })
-    }
+    if (!record) return;
+
+    this.setData({
+      currentRecord: record,
+      showDetailPopup: true
+    });
+  },
+
+  // 详情弹窗状态变化
+  onDetailPopupChange(e) {
+    this.setData({
+      showDetailPopup: e.detail.visible
+    });
+  },
+
+  // 关闭详情弹窗
+  closeDetailPopup() {
+    this.setData({
+      showDetailPopup: false
+    });
+  },
+
+  // 删除检测记录
+  deleteRecord(e) {
+    const id = e.currentTarget.dataset.id;
+    const record = this.data.detectionRecords.find(r => r.id === id);
+    
+    if (!record) return;
+
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除检测报告 #${id} 吗？此操作不可恢复。`,
+      confirmText: '删除',
+      confirmColor: '#e34d59',
+      success: (res) => {
+        if (res.confirm) {
+          const records = this.data.detectionRecords.filter(r => r.id !== id);
+          this.setData({ 
+            detectionRecords: records
+          });
+          this.filterRecords(); // 重新筛选
+          
+          wx.showToast({
+            title: '删除成功',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
+  // 删除当前记录
+  deleteCurrentRecord() {
+    const { currentRecord } = this.data;
+    
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除检测报告 #${currentRecord.id} 吗？此操作不可恢复。`,
+      confirmText: '删除',
+      confirmColor: '#e34d59',
+      success: (res) => {
+        if (res.confirm) {
+          const records = this.data.detectionRecords.filter(r => r.id !== currentRecord.id);
+          this.setData({ 
+            detectionRecords: records,
+            showDetailPopup: false
+          });
+          this.filterRecords(); // 重新筛选
+          
+          wx.showToast({
+            title: '删除成功',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
+  // 预览图片
+  previewImage() {
+    const imagePath = this.data.currentRecord.imagePath;
+    wx.previewImage({
+      current: imagePath,
+      urls: [imagePath]
+    });
+  },
+
+  // 跳转到检测页面
+  goToDetection() {
+    wx.navigateTo({
+      url: '/pages/photo-detection/photo-detection'
+    });
   }
 }) 

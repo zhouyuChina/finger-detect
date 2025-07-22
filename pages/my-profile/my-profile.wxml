@@ -150,14 +150,14 @@
       <view class="popup-actions">
         <t-button 
           theme="light" 
-          size="large"
+          size="small"
           bindtap="closeEditPopup"
         >
           取消
         </t-button>
         <t-button 
           theme="primary" 
-          size="large"
+          size="small"
           bindtap="saveProfile"
         >
           保存
