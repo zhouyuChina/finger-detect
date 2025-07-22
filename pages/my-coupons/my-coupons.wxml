@@ -22,14 +22,16 @@
         value="{{redeemCode}}"
         bindinput="onRedeemInput"
       />
-      <t-button 
-        class="redeem-btn" 
-        theme="light" 
-        size="small"
-        bindtap="redeemCoupon"
-      >
+      <view class="redeem-btn" >
+        <t-button 
+          theme="light" 
+          size="small"
+          bindtap="redeemCoupon"
+        >
         兑换
       </t-button>
+      </view>
+      
     </view>
   </view>
 
@@ -69,9 +71,7 @@
           data-id="{{item.id}}"
           catchtap="claimCoupon"
         >
-          <view class="btn-content">
-            <t-icon name="lightning" size="24rpx" color="#fff" />
-            <text class="btn-text">立即领取</text>
+          <view class="btn-content">立即领取
           </view>
         </t-button>
         <view wx:else class="status-overlay">

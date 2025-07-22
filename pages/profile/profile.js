@@ -10,7 +10,8 @@ Page({
       totalRecords: 12,
       totalReports: 8,
       familyMembers: 3,
-      points: 12
+      points: 12,
+      unreadMessages: 2
     },
     settings: {
       notifications: true
@@ -80,6 +81,13 @@ Page({
   onMyCoupons() {
     wx.navigateTo({
       url: '/pages/my-coupons/my-coupons'
+    })
+  },
+
+  // 系统消息
+  onSystemMessages() {
+    wx.navigateTo({
+      url: '/pages/system-messages/system-messages'
     })
   },
 

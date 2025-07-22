@@ -13,7 +13,8 @@
     "pages/user-records/user-records",
     "pages/record-gallery/record-gallery",
     "pages/my-profile/my-profile",
-    "pages/my-coupons/my-coupons"
+    "pages/my-coupons/my-coupons",
+    "pages/system-messages/system-messages"
   ],
   "window": {
     "navigationBarTextStyle": "black",

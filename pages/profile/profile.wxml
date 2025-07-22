@@ -39,7 +39,11 @@
       </view>
       <view class="stats-item" bindtap="onViewPoints">
         <text class="stats-number">{{stats.points}}</text>
-        <text class="stats-label">系统消息</text>
+        <text class="stats-label">积分</text>
+      </view>
+      <view class="stats-item" bindtap="onSystemMessages">
+        <text class="stats-number">{{stats.unreadMessages}}</text>
+        <text class="stats-label">未读消息</text>
       </view>
     </view>
   </view>
@@ -71,7 +75,7 @@
       <t-cell 
         title="系统消息" 
         description="查看系统消息"
-        bindtap="onFamilyMembers"
+        bindtap="onSystemMessages"
       >
         <text slot="note" class="arrow-icon">›</text>
       </t-cell>

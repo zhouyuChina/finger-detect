@@ -1,0 +1,142 @@
+<!--system-messages.wxml-->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <text class="page-title">系统消息</text>
+    <view class="header-actions">
+      <t-button 
+        theme="light" 
+        size="small"
+        bindtap="markAllAsRead"
+        disabled="{{!hasUnreadMessages}}"
+      >
+        一键已读
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 消息列表 -->
+  <view class="messages-list">
+    <t-cell-group>
+      <t-cell 
+        wx:for="{{messages}}" 
+        wx:key="id"
+        bindtap="onMessageClick"
+        data-id="{{item.id}}"
+        hover
+        arrow
+      >
+        <view slot="left-icon" class="message-icon">
+          <view class="icon-container {{item.type}}">
+            <t-icon 
+              name="{{item.icon}}" 
+              size="48rpx" 
+              color="{{item.type === 'unread' ? '#e34d59' : '#999'}}"
+            />
+          </view>
+          <view wx:if="{{item.type === 'unread'}}" class="unread-dot"></view>
+        </view>
+        
+        <view slot="title" class="message-title">
+          <text class="title-text {{item.type === 'unread' ? 'unread' : ''}}">{{item.title}}</text>
+          <view wx:if="{{item.isImportant}}" class="important-tag">
+            <t-tag theme="danger" size="small">重要</t-tag>
+          </view>
+        </view>
+        
+        <view slot="description" class="message-preview">
+          <text class="preview-text">{{item.preview}}</text>
+        </view>
+        
+        <view slot="note" class="message-meta">
+          <text class="time-text">{{item.time}}</text>
+          <view wx:if="{{item.type === 'unread'}}" class="unread-indicator">
+            <t-tag theme="danger" size="small" variant="light">未读</t-tag>
+          </view>
+        </view>
+      </t-cell>
+    </t-cell-group>
+  </view>
+
+  <!-- 空状态 -->
+  <t-empty 
+    wx:if="{{messages.length === 0}}"
+    description="暂无系统消息"
+    icon="notification"
+  >
+    <t-button 
+      slot="action" 
+      theme="primary" 
+      size="medium"
+      bindtap="goToHome"
+    >
+      返回首页
+    </t-button>
+  </t-empty>
+
+  <!-- 消息详情弹窗 -->
+  <t-popup 
+    visible="{{showDetailPopup}}" 
+    placement="center" 
+    bind:visible-change="onDetailPopupChange"
+    close-on-overlay-click="{{true}}"
+  >
+    <view class="detail-popup">
+      <!-- 弹窗头部 -->
+      <view class="popup-header">
+        <view class="popup-title-section">
+          <text class="popup-title">{{currentMessage.title}}</text>
+          <view wx:if="{{currentMessage.isImportant}}" class="important-tag">
+            <t-tag theme="danger" size="small">重要</t-tag>
+          </view>
+        </view>
+        <text class="popup-close" bindtap="closeDetailPopup">×</text>
+      </view>
+
+      <!-- 消息内容 -->
+      <view class="popup-content">
+        <view class="message-info">
+          <text class="message-time">{{currentMessage.time}}</text>
+          <text class="message-type">{{currentMessage.typeText}}</text>
+        </view>
+        
+        <view class="message-body">
+          <text class="message-content">{{currentMessage.content}}</text>
+        </view>
+        
+        <view wx:if="{{currentMessage.actions && currentMessage.actions.length > 0}}" class="message-actions">
+          <t-button 
+            wx:for="{{currentMessage.actions}}" 
+            wx:key="index"
+            wx:for-item="action"
+            theme="{{action.theme || 'primary'}}" 
+            size="medium"
+            bindtap="onActionClick"
+            data-action="{{action}}"
+          >
+            {{action.text}}
+          </t-button>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="popup-actions">
+        <t-button 
+          theme="light" 
+          size="large"
+          bindtap="closeDetailPopup"
+        >
+          关闭
+        </t-button>
+        <t-button 
+          wx:if="{{currentMessage.type === 'unread'}}"
+          theme="primary" 
+          size="large"
+          bindtap="markAsRead"
+        >
+          标记已读
+        </t-button>
+      </view>
+    </view>
+  </t-popup>
+</view> 

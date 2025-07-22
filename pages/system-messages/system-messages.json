@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "系统消息",
+  "usingComponents": {
+    "t-cell": "../../miniprogram_npm/cell/cell",
+    "t-cell-group": "../../miniprogram_npm/cell-group/cell-group",
+    "t-button": "../../miniprogram_npm/button/button",
+    "t-empty": "../../miniprogram_npm/empty/empty",
+    "t-icon": "../../miniprogram_npm/icon/icon",
+    "t-tag": "../../miniprogram_npm/tag/tag",
+    "t-popup": "../../miniprogram_npm/popup/popup"
+  }
+} 
