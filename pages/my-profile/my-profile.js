@@ -394,11 +394,7 @@ Page({
   onAddProfile() {
     wx.navigateTo({
       url: '/pages/create-profile/create-profile',
-      success: () => {
-        console.log('跳转到创建档案页面');
-      },
       fail: (err) => {
-        console.error('跳转失败:', err);
         wx.showToast({
           title: '页面跳转失败',
           icon: 'error'

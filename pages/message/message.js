@@ -32,7 +32,7 @@ Page({
       },
       {
         id: 5,
-        title: "用户反馈收集，参与反馈可获得积分奖励",
+        title: "用户反馈收集，参与反馈可获得专属优惠",
         image: "",
         views: 5678,
         time: "2024-07-17"
@@ -48,12 +48,10 @@ Page({
   // 加载消息数据
   loadMessages() {
     // 这里可以添加实际的API调用
-    console.log('加载消息数据')
   },
 
   // 下拉刷新
   onPullDownRefresh() {
-    console.log('下拉刷新')
     setTimeout(() => {
       wx.stopPullDownRefresh()
       wx.showToast({
@@ -63,9 +61,8 @@ Page({
     }, 1000)
   },
 
-    // 上拉加载更多
+  // 上拉加载更多
   onReachBottom() {
-    console.log('上拉加载更多')
     wx.showToast({
       title: '没有更多数据了',
       icon: 'none'

@@ -62,12 +62,12 @@ Page({
       },
       {
         id: 5,
+        type: 'notice',
         title: '用户反馈收集',
-        content: '为了更好地服务用户，我们正在收集用户反馈。您的建议对我们非常重要，参与反馈可获得积分奖励。',
-        type: 'system',
-        time: '2024-07-16 11:30',
-        isRead: true,
-        priority: 'low'
+        content: '为了更好地服务用户，我们正在收集用户反馈。您的建议对我们非常重要，参与反馈可获得专属优惠。',
+        time: '2024-01-10 09:15',
+        isRead: false,
+        priority: 'normal'
       }
     ],
   },

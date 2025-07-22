@@ -4,30 +4,37 @@ Page({
     messages: [
       {
         id: 1,
-        title: '系统维护通知',
-        preview: '系统将于今晚22:00-24:00进行维护升级，期间可能影响部分功能使用...',
-        content: '尊敬的用户，为了给您提供更好的服务体验，我们将在今晚22:00-24:00进行系统维护升级。维护期间，部分功能可能暂时无法使用，包括健康检测、报告生成等核心功能。请您提前安排相关操作，给您带来的不便敬请谅解。维护完成后，我们将第一时间通知您。',
-        time: '2024-01-15 14:30',
-        type: 'unread', // unread, read
-        typeText: '系统通知',
+        type: 'unread',
         icon: 'notification',
-        isImportant: true
+        title: '优惠券功能上线通知',
+        preview: '优惠券功能正式上线，现在可以使用优惠券享受各种服务...',
+        content: '好消息！我们的优惠券功能正式上线了。现在您可以使用优惠券享受各种服务，包括检测费用减免、会员特权等。新用户还可以获得专属优惠券，快来体验吧！',
+        time: '2024-01-15 10:30',
+        isImportant: true,
+        typeText: '系统通知',
+        actions: [
+          {
+            action: 'goToCoupons',
+            text: '查看优惠券',
+            theme: 'primary'
+          }
+        ]
       },
       {
         id: 2,
-        title: '新功能上线',
-        preview: '优惠券功能正式上线，现在可以使用积分兑换各种优惠券...',
-        content: '好消息！我们的优惠券功能正式上线了。现在您可以使用积分兑换各种优惠券，包括检测费用减免、会员特权等。新用户还可以获得专属优惠券，快来体验吧！',
-        time: '2024-01-14 10:15',
         type: 'unread',
-        typeText: '功能更新',
-        icon: 'star',
+        icon: 'notification',
+        title: '检测完成通知',
+        preview: '恭喜您完成健康检测，获得专属优惠券...',
+        content: '恭喜您完成健康检测！根据我们的活动规则，您获得了专属优惠券。优惠券可用于下次检测费用减免、会员特权等服务。继续使用我们的服务，获得更多专属优惠！',
+        time: '2024-01-14 16:45',
         isImportant: false,
+        typeText: '检测通知',
         actions: [
           {
-            text: '立即体验',
-            theme: 'primary',
-            action: 'goToCoupons'
+            action: 'goToCoupons',
+            text: '查看优惠券',
+            theme: 'primary'
           }
         ]
       },
@@ -198,22 +205,9 @@ Page({
           url: '/pages/my-coupons/my-coupons'
         });
         break;
-      case 'viewReport':
-        wx.showToast({
-          title: '查看报告功能开发中',
-          icon: 'none'
-        });
-        break;
-      case 'changePassword':
-        wx.showModal({
-          title: '修改密码',
-          content: '修改密码功能开发中，请联系客服处理。',
-          showCancel: false
-        });
-        break;
       default:
         wx.showToast({
-          title: '功能开发中',
+          title: '功能暂未开放',
           icon: 'none'
         });
     }

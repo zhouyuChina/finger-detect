@@ -8,7 +8,7 @@ Page({
         id: 1,
         value: '50',
         condition: '满500元可用',
-        description: '仅可购买XXXX部分商品',
+        description: '仅可购买指定商品',
         image: '/images/banner1.png',
         status: 'unused', // unused, claimed, used, expired
         statusText: '未使用',
@@ -18,7 +18,7 @@ Page({
         id: 2,
         value: '100',
         condition: '满1000元可用',
-        description: '仅可购买XXXX部分商品',
+        description: '仅可购买指定商品',
         image: '/images/banner2.png',
         status: 'claimed', // 已领取
         statusText: '已领取',
@@ -28,7 +28,7 @@ Page({
         id: 3,
         value: '30',
         condition: '满300元可用',
-        description: '仅可购买XXXX部分商品',
+        description: '仅可购买指定商品',
         image: '/images/banner3.png',
         status: 'used', // 已使用
         statusText: '已使用',
@@ -38,7 +38,7 @@ Page({
         id: 4,
         value: '20',
         condition: '满200元可用',
-        description: '仅可购买XXXX部分商品',
+        description: '仅可购买指定商品',
         image: '/images/default-avatar.png',
         status: 'expired', // 已过期
         statusText: '已过期',

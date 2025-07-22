@@ -127,7 +127,6 @@ Page({
   // 筛选记录
   filterRecords(filter) {
     // 根据筛选条件过滤记录
-    console.log('筛选条件：', filter)
     // 实际项目中这里会调用API获取筛选后的数据
   },
 

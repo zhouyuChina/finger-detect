@@ -143,7 +143,6 @@ Page({
     // 延迟显示用户选择器，确保页面完全加载
     setTimeout(() => {
       this.setData({ showUserSelector: true });
-      console.log('弹窗状态:', this.data.showUserSelector);
     }, 500);
   },
 
@@ -156,9 +155,11 @@ Page({
     }
   },
 
-  // 显示用户选择器
+  // 显示用户选择弹窗
   showUserSelector() {
-    this.setData({ showUserSelector: true });
+    this.setData({
+      showUserSelector: true
+    });
   },
 
   // 关闭用户选择器
@@ -189,7 +190,6 @@ Page({
       this.setData({
         selectedUser: { id: 'myself', ...this.data.myselfInfo }
       });
-      console.log('选择了本人:', this.data.selectedUser);
     } else {
       // 如果没有信息，弹出设置弹窗
       this.setData({
@@ -206,7 +206,6 @@ Page({
     this.setData({
       selectedUser: user
     });
-    console.log('选择了用户:', user);
   },
 
   // 新增用户

@@ -73,8 +73,6 @@ Page({
   },
 
   onLoad(options) {
-    console.log('record-gallery onLoad options:', options)
-    
     const { recordId, userId, part } = options
     this.setData({
       recordId: recordId,
@@ -84,8 +82,6 @@ Page({
         part: part
       }
     })
-    
-    console.log('record-gallery data set:', this.data)
     
     // 设置导航栏标题
     wx.setNavigationBarTitle({
@@ -98,8 +94,6 @@ Page({
 
   // 直接更新图片列表
   updatePhotoList() {
-    console.log('更新图片列表：', this.data.part)
-    
     // 根据部位更新描述
     const updatedPhotoList = this.data.photoList.map(item => ({
       ...item,
@@ -110,14 +104,10 @@ Page({
     this.setData({
       photoList: updatedPhotoList
     })
-    
-    console.log('图片列表更新完成，共', updatedPhotoList.length, '张图片')
   },
 
   // 加载拍照历史（保留用于后续API调用）
   loadPhotoHistory() {
-    console.log('加载拍照历史：', this.data.part)
-    
     // 模拟API调用延迟
     wx.showLoading({
       title: '加载中...'
@@ -132,7 +122,6 @@ Page({
       })
       
       wx.hideLoading()
-      console.log('拍照历史加载完成，共', mockData.length, '张图片')
     }, 1000)
   },
 
@@ -225,13 +214,7 @@ Page({
     wx.navigateBack()
   },
 
-  // 分享
-  onShare() {
-    wx.showToast({
-      title: '分享功能开发中',
-      icon: 'none'
-    })
-  },
+
 
   // Swiper切换事件
   onSwiperChange(e) {
@@ -249,11 +232,7 @@ Page({
     // const { index } = e.currentTarget.dataset
     // const currentPhoto = this.data.photoList[index]
     
-    // 预览图片
-    // wx.previewImage({
-    //   urls: this.data.photoList.map(item => item.imagePath),
-    //   current: currentPhoto.imagePath
-    // })
+
   },
 
   // 点击缩略图
@@ -293,14 +272,10 @@ Page({
   // 处理scroll-view的滚动事件
   onThumbnailScroll(e) {
     // 可以在这里处理滚动事件，比如更新当前可见的缩略图
-    console.log('缩略图滚动:', e.detail)
   },
 
   // 上一张图片
   onPrevImage() {
-
-    console.log('currentIndex', this.data.currentIndex)
-
     // 如果是第一张，直接返回，不执行任何操作
     if (this.data.currentIndex === 0) {
       wx.showToast({
@@ -345,12 +320,12 @@ Page({
 
   // 图片加载成功
   onImageLoad(e) {
-    console.log('图片加载成功:', e.detail)
+    // 图片加载成功处理
   },
 
   // 图片加载失败
   onImageError(e) {
-    console.log('图片加载失败:', e.detail)
+    // 图片加载失败处理
     const { index } = e.currentTarget.dataset
     
     // 设置默认图片
@@ -374,23 +349,6 @@ Page({
           })
         }
       }
-    })
-  },
-
-  // 对比分析
-  onCompare() {
-    if (this.data.photoList.length < 2) {
-      wx.showToast({
-        title: '至少需要2张图片才能对比',
-        icon: 'none'
-      })
-      return
-    }
-
-    wx.showModal({
-      title: '对比分析',
-      content: '对比分析功能正在开发中，敬请期待！',
-      showCancel: false
     })
   },
 

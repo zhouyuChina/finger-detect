@@ -10,11 +10,8 @@ Page({
       totalRecords: 12,
       totalReports: 8,
       familyMembers: 3,
-      points: 12,
+      totalDetections: 25,
       unreadMessages: 2
-    },
-    settings: {
-      notifications: true
     },
     showFeedbackPopup: false,
     feedbackType: 'bug',
@@ -105,18 +102,8 @@ Page({
         title: '反馈提交成功',
         icon: 'success'
       });
-
-      // 这里可以添加实际的提交逻辑
-      console.log('提交反馈:', {
-        type: feedbackType,
-        content: feedbackContent,
-        contact: contactInfo,
-        timestamp: new Date().toISOString()
-      });
     }, 1500);
   },
-
-
 
   // 查看检测记录
   onViewRecords() {
@@ -125,27 +112,13 @@ Page({
     })
   },
 
-  // 查看健康报告
-  onViewReports() {
-    wx.showToast({
-      title: '健康报告功能开发中',
-      icon: 'none'
-    })
-  },
 
-  // 查看家庭成员
-  onViewFamily() {
-    wx.showToast({
-      title: '家庭成员管理功能开发中',
-      icon: 'none'
-    })
-  },
 
-  // 查看积分
+  // 查看检测统计
   onViewPoints() {
     wx.showModal({
-      title: '我的积分',
-      content: `当前积分：${this.data.stats.points}\n\n积分可用于兑换优惠券和特权服务。`,
+      title: '检测统计',
+      content: `总检测次数：${this.data.stats.totalDetections}\n\n继续使用我们的服务，获得更多健康数据。`,
       showCancel: false
     })
   },
@@ -178,21 +151,7 @@ Page({
     })
   },
 
-  // 我的健康报告
-  onMyReports() {
-    wx.showToast({
-      title: '健康报告功能开发中',
-      icon: 'none'
-    })
-  },
 
-  // 家庭成员管理
-  onFamilyMembers() {
-    wx.showToast({
-      title: '家庭成员管理功能开发中',
-      icon: 'none'
-    })
-  },
 
   // 关于我们
   onAboutUs() {
@@ -201,8 +160,6 @@ Page({
     })
   },
 
-
-
   // 分享有礼
   onShare() {
     wx.showShareMenu({
@@ -210,8 +167,6 @@ Page({
       menus: ['shareAppMessage', 'shareTimeline']
     })
   },
-
-
 
   // 分享给朋友
   onShareAppMessage() {

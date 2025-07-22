@@ -89,7 +89,7 @@
   <view class="share-section">
     <t-cell 
       title="分享有礼" 
-      description="邀请好友获得积分奖励"
+      description="邀请好友获得专属优惠"
       hover
       bindtap="onShare"
     >
