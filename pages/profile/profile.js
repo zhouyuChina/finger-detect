@@ -15,21 +15,108 @@ Page({
     },
     settings: {
       notifications: true
-    }
+    },
+    showFeedbackPopup: false,
+    feedbackType: 'bug',
+    feedbackContent: '',
+    contactInfo: ''
   },
 
   onLoad() {
     // 页面加载
   },
 
-  // 编辑资料
+  // 留言反馈
   onEditProfile() {
-    wx.showModal({
-      title: '编辑资料',
-      content: '编辑个人资料功能开发中',
-      showCancel: false
-    })
+    this.setData({
+      showFeedbackPopup: true
+    });
   },
+
+  // 反馈弹窗状态变化
+  onFeedbackPopupChange(e) {
+    this.setData({
+      showFeedbackPopup: e.detail.visible
+    });
+  },
+
+  // 关闭反馈弹窗
+  closeFeedbackPopup() {
+    this.setData({
+      showFeedbackPopup: false,
+      feedbackType: 'bug',
+      feedbackContent: '',
+      contactInfo: ''
+    });
+  },
+
+  // 选择反馈类型
+  selectType(e) {
+    const type = e.currentTarget.dataset.type;
+    this.setData({
+      feedbackType: type
+    });
+  },
+
+  // 反馈内容输入
+  onContentInput(e) {
+    this.setData({
+      feedbackContent: e.detail.value
+    });
+  },
+
+  // 联系方式输入
+  onContactInput(e) {
+    this.setData({
+      contactInfo: e.detail.value
+    });
+  },
+
+  // 提交反馈
+  submitFeedback() {
+    const { feedbackType, feedbackContent, contactInfo } = this.data;
+    
+    if (!feedbackContent.trim()) {
+      wx.showToast({
+        title: '请输入反馈内容',
+        icon: 'error'
+      });
+      return;
+    }
+
+    // 显示提交中状态
+    wx.showLoading({
+      title: '提交中...'
+    });
+
+    // 模拟提交反馈
+    setTimeout(() => {
+      wx.hideLoading();
+      
+      // 重置表单
+      this.setData({
+        showFeedbackPopup: false,
+        feedbackType: 'bug',
+        feedbackContent: '',
+        contactInfo: ''
+      });
+
+      wx.showToast({
+        title: '反馈提交成功',
+        icon: 'success'
+      });
+
+      // 这里可以添加实际的提交逻辑
+      console.log('提交反馈:', {
+        type: feedbackType,
+        content: feedbackContent,
+        contact: contactInfo,
+        timestamp: new Date().toISOString()
+      });
+    }, 1500);
+  },
+
+
 
   // 查看检测记录
   onViewRecords() {
