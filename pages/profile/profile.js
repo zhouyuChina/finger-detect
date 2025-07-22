@@ -107,7 +107,7 @@ Page({
 
   // 查看检测记录
   onViewRecords() {
-    wx.switchTab({
+    wx.navigateTo({
       url: '/pages/records/records'
     })
   },
@@ -132,7 +132,7 @@ Page({
 
   // 我的检测记录
   onMyRecords() {
-    wx.switchTab({
+    wx.navigateTo({
       url: '/pages/records/records'
     })
   },

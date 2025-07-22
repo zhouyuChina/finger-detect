@@ -3,6 +3,7 @@
   padding: 0;
   background-color: #f5f5f5;
   min-height: 100vh;
+  justify-content: start;
 }
 
 /* 搜索区域 */

@@ -13,7 +13,8 @@
     "pages/record-gallery/record-gallery",
     "pages/my-profile/my-profile",
     "pages/my-coupons/my-coupons",
-    "pages/system-messages/system-messages"
+    "pages/system-messages/system-messages",
+    "pages/records-compare/records-compare"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -33,8 +34,8 @@
         "selectedIconPath": "images/home-active.png"
       },
       {
-        "pagePath": "pages/records/records",
-        "text": "检测记录",
+        "pagePath": "pages/records-compare/records-compare",
+        "text": "恢复记录",
         "iconPath": "images/record.png",
         "selectedIconPath": "images/record-active.png"
       },
