@@ -64,56 +64,23 @@ Page({
   // 加载轮播图
   async loadBanner() {
     try {
-      // 先尝试从缓存获取
-      let bannerList = storage.getBanner()
+      // 从服务器获取banner数据
+      const response = await api.system.getBanner()
+      console.log('Banner接口响应:', response)
       
-      if (bannerList.length === 0) {
-        // 缓存为空，从服务器获取
-        const response = await api.system.getBanner()
-        console.log('Banner接口响应:', response)
-        
-        // 处理接口返回的数据
-        if (response.code === 200 && response.data) {
-          bannerList = this.formatBannerData(response.data)
-          // 缓存数据
-          storage.setBanner(bannerList)
-        } else {
-          throw new Error('接口返回数据格式错误')
-        }
+      // 处理接口返回的数据
+      if (response.code === 200 && response.data) {
+        const bannerList = this.formatBannerData(response.data)
+        this.setData({ bannerList })
+        // 缓存数据
+        storage.setBanner(bannerList)
+      } else {
+        console.warn('Banner接口返回数据格式错误:', response)
+        this.setData({ bannerList: [] })
       }
-
-      this.setData({ bannerList })
     } catch (error) {
       console.error('加载轮播图失败:', error)
-      // 使用默认轮播图
-      this.setData({
-        bannerList: [
-          {
-            title: '健康检测服务',
-            desc: '专业医疗级检测服务',
-            background: 'linear-gradient(135deg, #4CAF50, #45a049)',
-            imageUrl: '',
-            linkUrl: '',
-            id: 1
-          },
-          {
-            title: 'AI智能分析',
-            desc: '快速准确的智能诊断',
-            background: 'linear-gradient(135deg, #2196F3, #1976D2)',
-            imageUrl: '',
-            linkUrl: '',
-            id: 2
-          },
-          {
-            title: '专业检测报告',
-            desc: '详细健康评估报告',
-            background: 'linear-gradient(135deg, #FF9800, #F57C00)',
-            imageUrl: '',
-            linkUrl: '',
-            id: 3
-          }
-        ]
-      })
+      this.setData({ bannerList: [] })
     }
   },
 
@@ -155,45 +122,24 @@ Page({
   // 加载消息列表
   async loadMessages() {
     try {
-      // 先尝试从缓存获取
-      let messages = storage.getMessages()
+      // 从服务器获取消息数据
+      const response = await api.message.getList({ limit: 10 })
+      console.log('消息接口响应:', response)
       
-      if (messages.length === 0) {
-        // 缓存为空，从服务器获取
-        const response = await api.message.getList({ limit: 10 })
-        messages = response.data || []
-        
+      if (response.code === 200 && response.data) {
+        const messages = response.data
+        this.setData({ messages })
+        this.calculateUnreadCount()
         // 缓存数据
         storage.setMessages(messages)
+      } else {
+        console.warn('消息接口返回数据格式错误:', response)
+        this.setData({ messages: [] })
+        this.calculateUnreadCount()
       }
-
-      this.setData({ messages })
-      this.calculateUnreadCount()
     } catch (error) {
       console.error('加载消息失败:', error)
-      // 使用默认消息
-      this.setData({
-        messages: [
-          {
-            id: 1,
-            title: '健康检测新功能上线',
-            content: '我们推出了全新的AI智能检测功能，提供更准确的健康分析。支持多种检测模式，检测时间缩短50%，准确率提升至98%。',
-            type: 'system',
-            time: '2024-07-20 10:30',
-            isRead: false,
-            priority: 'high'
-          },
-          {
-            id: 2,
-            title: '检测报告解读指南',
-            content: '为了让您更好地理解检测报告，我们提供了详细的解读指南。包含各项指标的含义、正常值范围、异常情况说明等。',
-            type: 'notice',
-            time: '2024-07-19 15:20',
-            isRead: true,
-            priority: 'medium'
-          }
-        ]
-      })
+      this.setData({ messages: [] })
       this.calculateUnreadCount()
     }
   },

@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="container">
-  <!-- 轮播图区域 - 使用简单背景色 -->
-  <view class="banner">
+  <!-- 轮播图区域 -->
+  <view class="banner" wx:if="{{bannerList.length > 0}}">
     <swiper 
       class="banner-swiper" 
       indicator-dots="{{true}}"
@@ -46,7 +46,7 @@
   </view>
 
   <!-- 消息列表 -->
-  <view class="message-section">
+  <view class="message-section" wx:if="{{messages.length > 0}}">
     <view class="section-header">
       <text class="section-title">健康资讯</text>
       <view class="header-actions">
@@ -83,5 +83,12 @@
         </view>
       </view>
     </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{bannerList.length === 0 && messages.length === 0 && !loading}}">
+    <view class="empty-icon">📱</view>
+    <text class="empty-text">暂无数据</text>
+    <text class="empty-desc">请稍后再试或检查网络连接</text>
   </view>
 </view> 
