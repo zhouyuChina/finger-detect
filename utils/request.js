@@ -120,7 +120,8 @@ class Request {
       }
     } catch (error) {
       console.error('获取token失败:', error)
-      throw error
+      // 开发模式下不抛出错误，静默处理
+      console.log('开发模式：静默处理token获取失败')
     } finally {
       this.isGettingToken = false
     }
