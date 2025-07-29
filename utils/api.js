@@ -119,8 +119,9 @@ const messageApi = {
   },
 
   // 获取资讯阅读状态
-  getReadStatus() {
-    return request.get(config.api.message.getReadStatus)
+  getReadStatus(articleIds = []) {
+    const params = articleIds.length > 0 ? { articleIds: articleIds.join(',') } : {}
+    return request.get(config.api.message.getReadStatus, params)
   },
 
   // 标记资讯已读

@@ -308,7 +308,11 @@ Page({
 
       // 获取阅读状态
       try {
-        const readStatusResponse = await api.message.getReadStatus()
+        // 提取文章ID列表
+        const articleIds = messages.map(msg => msg.id)
+        console.log('获取阅读状态，文章ID列表:', articleIds)
+        
+        const readStatusResponse = await api.message.getReadStatus(articleIds)
         console.log('阅读状态接口响应:', readStatusResponse)
         
         if (readStatusResponse.success && readStatusResponse.data) {
