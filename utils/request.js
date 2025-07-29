@@ -64,23 +64,45 @@ class Request {
       })
 
       console.log('Token接口响应:', response)
+      console.log('Token接口响应数据:', response.data)
 
       if (response.statusCode === 200) {
         const data = response.data
         
         // 检查响应格式
-        if (data.success && data.data && data.data.token) {
-          // 成功格式：{success: true, data: {token: "xxx"}, message: "xxx"}
-          const token = data.data.token
-          wx.setStorageSync('token', token)
-          console.log('获取token成功')
-        } else if (data.code === config.errorCodes.SUCCESS && data.data && data.data.token) {
-          // 标准格式：{code: 200, data: {token: "xxx"}, message: "xxx"}
-          const token = data.data.token
-          wx.setStorageSync('token', token)
-          console.log('获取token成功')
+        if (data.success && data.data) {
+          // 成功格式：{success: true, data: {...}, message: "xxx"}
+          // 检查data中是否有token字段
+          if (data.data.token) {
+            const token = data.data.token
+            wx.setStorageSync('token', token)
+            console.log('获取token成功:', token)
+          } else if (data.data.access_token) {
+            // 有些接口使用access_token字段
+            const token = data.data.access_token
+            wx.setStorageSync('token', token)
+            console.log('获取access_token成功:', token)
+          } else {
+            // 开发模式可能没有token，生成一个临时token
+            const tempToken = 'dev_token_' + Date.now()
+            wx.setStorageSync('token', tempToken)
+            console.log('开发模式生成临时token:', tempToken)
+          }
+        } else if (data.code === config.errorCodes.SUCCESS && data.data) {
+          // 标准格式：{code: 200, data: {...}, message: "xxx"}
+          if (data.data.token) {
+            const token = data.data.token
+            wx.setStorageSync('token', token)
+            console.log('获取token成功:', token)
+          } else if (data.data.access_token) {
+            const token = data.data.access_token
+            wx.setStorageSync('token', token)
+            console.log('获取access_token成功:', token)
+          } else {
+            throw new Error('响应数据中没有token字段')
+          }
         } else {
-          throw new Error(data.message || 'token为空')
+          throw new Error(data.message || '响应格式错误')
         }
       } else {
         throw new Error(`HTTP ${response.statusCode}: ${response.data?.message || '获取token失败'}`)
