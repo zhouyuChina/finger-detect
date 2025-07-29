@@ -32,7 +32,8 @@ const config = {
       updateProfile: '/user/profile',
       logout: '/auth/logout',
       refreshToken: '/auth/refresh',
-      wxLogin: '/auth/wx-login'
+      wxLogin: '/auth/wx-login',
+      getToken: '/miniprogram/auth'
     },
 
     // 检测相关

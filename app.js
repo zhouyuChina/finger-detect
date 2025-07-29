@@ -30,11 +30,26 @@ App({
       // 检查更新
       this.checkUpdate()
 
+      // 获取小程序token
+      await this.getAppToken()
+
       // 自动登录
       this.autoLogin()
 
     } catch (error) {
       console.error('应用初始化失败:', error)
+    }
+  },
+
+  // 获取小程序token
+  async getAppToken() {
+    try {
+      const api = require('./utils/api.js')
+      await api.user.getToken()
+      console.log('应用启动时获取token成功')
+    } catch (error) {
+      console.error('应用启动时获取token失败:', error)
+      // 不阻止应用启动，后续请求时会重试
     }
   },
 

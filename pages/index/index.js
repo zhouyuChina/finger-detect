@@ -310,5 +310,16 @@ Page({
       title: '健康检测小程序',
       imageUrl: '/images/share.png'
     }
+  },
+
+  // 测试JWT认证（开发阶段使用）
+  async testAuth() {
+    try {
+      const testAuth = require('../../utils/auth-test.js')
+      await testAuth.runFullTest()
+    } catch (error) {
+      console.error('JWT测试失败:', error)
+      common.showError('测试失败')
+    }
   }
 }) 

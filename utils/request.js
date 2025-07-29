@@ -8,6 +8,7 @@ class Request {
     this.retryCount = config.retryCount
     this.requestQueue = [] // 请求队列
     this.isRefreshing = false // 是否正在刷新token
+    this.isGettingToken = false // 是否正在获取token
   }
 
   // 获取请求头
@@ -24,6 +25,61 @@ class Request {
     }
 
     return headers
+  }
+
+  // 检查token是否存在
+  hasToken() {
+    return !!wx.getStorageSync('token')
+  }
+
+  // 获取小程序token
+  async getToken() {
+    if (this.isGettingToken) {
+      // 如果正在获取token，等待完成
+      return new Promise((resolve, reject) => {
+        const checkToken = () => {
+          if (this.hasToken()) {
+            resolve()
+          } else if (!this.isGettingToken) {
+            reject(new Error('获取token失败'))
+          } else {
+            setTimeout(checkToken, 100)
+          }
+        }
+        checkToken()
+      })
+    }
+
+    this.isGettingToken = true
+
+    try {
+      const response = await wx.request({
+        url: `${this.baseUrl}${config.api.user.getToken}`,
+        method: 'GET',
+        timeout: this.timeout,
+        success: (res) => {
+          if (res.statusCode === 200 && res.data.code === config.errorCodes.SUCCESS) {
+            const token = res.data.data.token
+            if (token) {
+              wx.setStorageSync('token', token)
+              console.log('获取token成功')
+            } else {
+              throw new Error('token为空')
+            }
+          } else {
+            throw new Error(res.data.message || '获取token失败')
+          }
+        },
+        fail: (error) => {
+          throw new Error('网络请求失败')
+        }
+      })
+    } catch (error) {
+      console.error('获取token失败:', error)
+      throw error
+    } finally {
+      this.isGettingToken = false
+    }
   }
 
   // 显示加载提示
@@ -74,7 +130,7 @@ class Request {
   }
 
   // 处理token过期
-  handleTokenExpired(resolve, reject) {
+  async handleTokenExpired(resolve, reject) {
     if (this.isRefreshing) {
       // 如果正在刷新，将请求加入队列
       this.requestQueue.push({ resolve, reject })
@@ -83,33 +139,31 @@ class Request {
 
     this.isRefreshing = true
 
-    // 尝试刷新token
-    this.refreshToken()
-      .then(() => {
-        // 刷新成功，重试队列中的请求
-        this.requestQueue.forEach(({ resolve, reject }) => {
-          resolve()
-        })
-        this.requestQueue = []
-        this.isRefreshing = false
+    try {
+      // 尝试获取新token
+      await this.getToken()
+      
+      // 获取成功，重试队列中的请求
+      this.requestQueue.forEach(({ resolve, reject }) => {
+        resolve()
       })
-      .catch(() => {
-        // 刷新失败，跳转到登录页
-        this.requestQueue.forEach(({ resolve, reject }) => {
-          reject()
-        })
-        this.requestQueue = []
-        this.isRefreshing = false
-        
-        // 清除本地存储
-        wx.removeStorageSync('token')
-        wx.removeStorageSync('userInfo')
-        
-        // 跳转到登录页
-        wx.reLaunch({
-          url: '/pages/login/login'
-        })
+      this.requestQueue = []
+      this.isRefreshing = false
+    } catch (error) {
+      // 获取失败，清除本地存储
+      this.requestQueue.forEach(({ resolve, reject }) => {
+        reject(error)
       })
+      this.requestQueue = []
+      this.isRefreshing = false
+      
+      // 清除本地存储
+      wx.removeStorageSync('token')
+      wx.removeStorageSync('userInfo')
+      
+      console.error('Token获取失败，请重新登录')
+      this.showError('登录已过期，请重新登录')
+    }
   }
 
   // 刷新token
@@ -145,10 +199,21 @@ class Request {
   }
 
   // 发送请求
-  request(options) {
-    return new Promise((resolve, reject) => {
-      const { url, method = 'GET', data = {}, showLoading = true, retry = 0 } = options
+  async request(options) {
+    const { url, method = 'GET', data = {}, showLoading = true, retry = 0, needToken = true } = options
 
+    // 如果需要token但没有token，先获取token
+    if (needToken && !this.hasToken()) {
+      try {
+        await this.getToken()
+      } catch (error) {
+        console.error('获取token失败:', error)
+        this.showError('获取认证失败，请重试')
+        throw error
+      }
+    }
+
+    return new Promise((resolve, reject) => {
       if (showLoading) {
         this.showLoading()
       }
@@ -197,6 +262,7 @@ class Request {
       url,
       method: 'GET',
       data,
+      needToken: options.needToken !== false, // 默认需要token
       ...options
     })
   }
@@ -207,6 +273,7 @@ class Request {
       url,
       method: 'POST',
       data,
+      needToken: options.needToken !== false, // 默认需要token
       ...options
     })
   }
@@ -217,6 +284,7 @@ class Request {
       url,
       method: 'PUT',
       data,
+      needToken: options.needToken !== false, // 默认需要token
       ...options
     })
   }
@@ -227,6 +295,7 @@ class Request {
       url,
       method: 'DELETE',
       data,
+      needToken: options.needToken !== false, // 默认需要token
       ...options
     })
   }

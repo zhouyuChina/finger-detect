@@ -37,6 +37,11 @@ const userApi = {
   // 刷新token
   refreshToken() {
     return request.post(config.api.user.refreshToken)
+  },
+
+  // 获取小程序token
+  getToken() {
+    return request.get(config.api.user.getToken, {}, { needToken: false })
   }
 }
 
