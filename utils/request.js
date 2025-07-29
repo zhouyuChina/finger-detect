@@ -154,7 +154,12 @@ class Request {
     const { statusCode, data } = response
 
     if (statusCode === 200) {
-      if (data.code === config.errorCodes.SUCCESS) {
+      // 支持开发模式测试接口格式：{success: true, data: {...}, message: "xxx"}
+      if (data.success === true) {
+        console.log('检测到开发模式成功响应')
+        resolve(data)
+      } else if (data.code === config.errorCodes.SUCCESS) {
+        // 标准格式：{code: 200, data: {...}, message: "xxx"}
         resolve(data)
       } else if (data.code === config.errorCodes.UNAUTHORIZED) {
         // token过期，尝试刷新
