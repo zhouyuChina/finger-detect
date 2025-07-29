@@ -16,12 +16,12 @@ page {
 }
 
 .banner-swiper {
-  height: 300rpx;
+  height: 600rpx;
   width: 100vw;
 }
 
 .banner-item {
-  height: 300rpx;
+  height: 600rpx;
   display: flex;
   align-items: center;
   justify-content: center;

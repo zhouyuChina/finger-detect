@@ -14,6 +14,11 @@ const userApi = {
     return request.post(config.api.user.register, data)
   },
 
+  // 微信登录
+  wxLogin(data) {
+    return request.post(config.api.user.wxLogin, data)
+  },
+
   // 获取用户信息
   getProfile() {
     return request.get(config.api.user.profile)
@@ -27,6 +32,11 @@ const userApi = {
   // 用户登出
   logout() {
     return request.post(config.api.user.logout)
+  },
+
+  // 刷新token
+  refreshToken() {
+    return request.post(config.api.user.refreshToken)
   }
 }
 
@@ -63,6 +73,11 @@ const detectionApi = {
   // 删除检测记录
   delete(id) {
     return request.delete(`${config.api.detection.delete}/${id}`)
+  },
+
+  // AI分析检测
+  analyze(data) {
+    return request.post(config.api.detection.analyze, data)
   }
 }
 
@@ -91,6 +106,11 @@ const messageApi = {
   // 删除消息
   delete(id) {
     return request.delete(`${config.api.message.delete}/${id}`)
+  },
+
+  // 获取未读消息数量
+  getUnreadCount() {
+    return request.get(config.api.message.unreadCount)
   }
 }
 
@@ -109,6 +129,11 @@ const couponApi = {
   // 领取优惠券
   receive(id) {
     return request.post(`${config.api.coupon.receive}/${id}`)
+  },
+
+  // 获取我的优惠券
+  getMyCoupons(params = {}) {
+    return request.get(config.api.coupon.myCoupons, params)
   }
 }
 
@@ -127,6 +152,72 @@ const systemApi = {
   // 获取版本信息
   getVersion() {
     return request.get(config.api.system.version)
+  },
+
+  // 健康检查
+  health() {
+    return request.get(config.api.system.health)
+  }
+}
+
+// 档案相关API
+const profileApi = {
+  // 获取档案列表
+  getList(params = {}) {
+    return request.get(config.api.profile.list, params)
+  },
+
+  // 创建档案
+  create(data) {
+    return request.post(config.api.profile.create, data)
+  },
+
+  // 更新档案
+  update(id, data) {
+    return request.put(`${config.api.profile.update}/${id}`, data)
+  },
+
+  // 删除档案
+  delete(id) {
+    return request.delete(`${config.api.profile.delete}/${id}`)
+  },
+
+  // 获取档案详情
+  getDetail(id) {
+    return request.get(`${config.api.profile.detail}/${id}`)
+  }
+}
+
+// 记录相关API
+const recordApi = {
+  // 获取记录列表
+  getList(params = {}) {
+    return request.get(config.api.record.list, params)
+  },
+
+  // 创建记录
+  create(data) {
+    return request.post(config.api.record.create, data)
+  },
+
+  // 更新记录
+  update(id, data) {
+    return request.put(`${config.api.record.update}/${id}`, data)
+  },
+
+  // 删除记录
+  delete(id) {
+    return request.delete(`${config.api.record.delete}/${id}`)
+  },
+
+  // 获取记录详情
+  getDetail(id) {
+    return request.get(`${config.api.record.detail}/${id}`)
+  },
+
+  // 记录对比
+  compare(data) {
+    return request.post(config.api.record.compare, data)
   }
 }
 
@@ -135,5 +226,7 @@ module.exports = {
   detection: detectionApi,
   message: messageApi,
   coupon: couponApi,
-  system: systemApi
+  system: systemApi,
+  profile: profileApi,
+  record: recordApi
 } 

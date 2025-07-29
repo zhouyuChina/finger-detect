@@ -3,12 +3,14 @@ const config = {
   // 环境配置
   env: {
     development: {
-      baseUrl: 'http://localhost:3000/api',
-      uploadUrl: 'http://localhost:3000/upload'
+      baseUrl: 'http://localhost:3001/api',
+      uploadUrl: 'http://localhost:3001/api/upload',
+      wsUrl: 'ws://localhost:3001'
     },
     production: {
       baseUrl: 'https://your-production-domain.com/api',
-      uploadUrl: 'https://your-production-domain.com/upload'
+      uploadUrl: 'https://your-production-domain.com/api/upload',
+      wsUrl: 'wss://your-production-domain.com'
     }
   },
 
@@ -20,15 +22,17 @@ const config = {
     return this.env[this.currentEnv] || this.env.development
   },
 
-  // API接口地址
+  // API接口地址 - 适配Next.js后台
   api: {
     // 用户相关
     user: {
-      login: '/user/login',
-      register: '/user/register',
+      login: '/auth/login',
+      register: '/auth/register',
       profile: '/user/profile',
-      updateProfile: '/user/profile/update',
-      logout: '/user/logout'
+      updateProfile: '/user/profile',
+      logout: '/auth/logout',
+      refreshToken: '/auth/refresh',
+      wxLogin: '/auth/wx-login'
     },
 
     // 检测相关
@@ -38,7 +42,8 @@ const config = {
       result: '/detection/result',
       history: '/detection/history',
       compare: '/detection/compare',
-      delete: '/detection/delete'
+      delete: '/detection/delete',
+      analyze: '/detection/analyze'
     },
 
     // 消息相关
@@ -47,26 +52,48 @@ const config = {
       detail: '/message/detail',
       markRead: '/message/mark-read',
       markAllRead: '/message/mark-all-read',
-      delete: '/message/delete'
+      delete: '/message/delete',
+      unreadCount: '/message/unread-count'
     },
 
     // 优惠券相关
     coupon: {
       list: '/coupon/list',
       use: '/coupon/use',
-      receive: '/coupon/receive'
+      receive: '/coupon/receive',
+      myCoupons: '/coupon/my-coupons'
     },
 
     // 系统相关
     system: {
       banner: '/system/banner',
       config: '/system/config',
-      version: '/system/version'
+      version: '/system/version',
+      health: '/system/health'
+    },
+
+    // 档案相关
+    profile: {
+      list: '/profile/list',
+      create: '/profile/create',
+      update: '/profile/update',
+      delete: '/profile/delete',
+      detail: '/profile/detail'
+    },
+
+    // 记录相关
+    record: {
+      list: '/record/list',
+      create: '/record/create',
+      update: '/record/update',
+      delete: '/record/delete',
+      detail: '/record/detail',
+      compare: '/record/compare'
     }
   },
 
   // 请求超时时间
-  timeout: 10000,
+  timeout: 15000,
 
   // 请求重试次数
   retryCount: 3,
@@ -75,7 +102,10 @@ const config = {
   upload: {
     maxSize: 10 * 1024 * 1024, // 10MB
     allowedTypes: ['image/jpeg', 'image/png', 'image/jpg'],
-    quality: 0.8
+    quality: 0.8,
+    // Next.js上传配置
+    fieldName: 'file',
+    multiple: false
   },
 
   // 缓存配置
@@ -85,7 +115,9 @@ const config = {
       userInfo: 24 * 60 * 60 * 1000, // 24小时
       banner: 60 * 60 * 1000, // 1小时
       config: 24 * 60 * 60 * 1000, // 24小时
-      message: 5 * 60 * 1000 // 5分钟
+      message: 5 * 60 * 1000, // 5分钟
+      profile: 30 * 60 * 1000, // 30分钟
+      record: 10 * 60 * 1000 // 10分钟
     }
   },
 
@@ -97,7 +129,9 @@ const config = {
     NOT_FOUND: 404,
     SERVER_ERROR: 500,
     NETWORK_ERROR: -1,
-    TIMEOUT_ERROR: -2
+    TIMEOUT_ERROR: -2,
+    VALIDATION_ERROR: 422,
+    RATE_LIMIT: 429
   },
 
   // 错误信息
@@ -105,10 +139,28 @@ const config = {
     401: '登录已过期，请重新登录',
     403: '没有权限访问',
     404: '请求的资源不存在',
+    422: '请求参数错误',
+    429: '请求过于频繁，请稍后重试',
     500: '服务器内部错误',
     '-1': '网络连接失败',
     '-2': '请求超时',
     'default': '操作失败，请稍后重试'
+  },
+
+  // Next.js特定配置
+  nextjs: {
+    // API路由前缀
+    apiPrefix: '/api',
+    // 文件上传路径
+    uploadPath: '/api/upload',
+    // 静态文件路径
+    staticPath: '/static',
+    // 认证相关
+    auth: {
+      tokenKey: 'Authorization',
+      refreshTokenKey: 'Refresh-Token',
+      tokenPrefix: 'Bearer '
+    }
   }
 }
 
