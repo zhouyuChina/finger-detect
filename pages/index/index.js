@@ -99,55 +99,15 @@ Page({
         storage.setBannerConfig(bannerConfig)
       } else {
         console.warn('Banner接口返回数据格式错误:', response)
-        // 使用测试数据
-        const testBannerList = [
-          {
-            id: 1,
-            title: '健康检测服务',
-            desc: '专业医疗级检测服务',
-            background: 'linear-gradient(135deg, #4CAF50, #45a049)',
-            imageUrl: '',
-            linkUrl: '/pages/about/about'
-          },
-          {
-            id: 2,
-            title: 'AI智能分析',
-            desc: '快速准确的智能诊断',
-            background: 'linear-gradient(135deg, #2196F3, #1976D2)',
-            imageUrl: '',
-            linkUrl: '/pages/photo-detection/photo-detection'
-          }
-        ]
-        
         this.setData({ 
-          bannerList: testBannerList,
+          bannerList: [],
           bannerConfig: { autoplay: true, interval: 3000, circular: true, indicatorDots: true }
         })
       }
     } catch (error) {
       console.error('加载轮播图失败:', error)
-      // 使用测试数据
-      const testBannerList = [
-        {
-          id: 1,
-          title: '健康检测服务',
-          desc: '专业医疗级检测服务',
-          background: 'linear-gradient(135deg, #4CAF50, #45a049)',
-          imageUrl: '',
-          linkUrl: '/pages/about/about'
-        },
-        {
-          id: 2,
-          title: 'AI智能分析',
-          desc: '快速准确的智能诊断',
-          background: 'linear-gradient(135deg, #2196F3, #1976D2)',
-          imageUrl: '',
-          linkUrl: '/pages/photo-detection/photo-detection'
-        }
-      ]
-      
       this.setData({ 
-        bannerList: testBannerList,
+        bannerList: [],
         bannerConfig: { autoplay: true, interval: 3000, circular: true, indicatorDots: true }
       })
     }
