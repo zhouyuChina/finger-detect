@@ -38,39 +38,8 @@ Page({
     try {
       this.setData({ loading: true })
       
-      // 先设置测试数据，确保banner能显示
-      const testBannerList = [
-        {
-          id: 1,
-          title: '健康检测服务',
-          desc: '专业医疗级检测服务',
-          background: 'linear-gradient(135deg, #4CAF50, #45a049)',
-          imageUrl: '',
-          linkUrl: '/pages/about/about'
-        },
-        {
-          id: 2,
-          title: 'AI智能分析',
-          desc: '快速准确的智能诊断',
-          background: 'linear-gradient(135deg, #2196F3, #1976D2)',
-          imageUrl: '',
-          linkUrl: '/pages/photo-detection/photo-detection'
-        }
-      ]
-      
-      this.setData({ 
-        bannerList: testBannerList,
-        bannerConfig: { autoplay: true, interval: 3000, circular: true, indicatorDots: true }
-      })
-      
-      console.log('设置测试banner数据:', testBannerList)
-      
-      // 然后尝试加载真实的banner数据
-      try {
-        await this.loadBanner()
-      } catch (error) {
-        console.error('加载真实banner失败，使用测试数据:', error)
-      }
+      // 直接加载真实的banner数据
+      await this.loadBanner()
       
       // 暂时禁用消息加载，避免404错误
       // this.loadMessages().catch(error => {
