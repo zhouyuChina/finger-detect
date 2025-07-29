@@ -66,7 +66,7 @@ const config = {
 
     // 系统相关
     system: {
-      banner: '/system/banner',
+      banner: '/miniprogram/banners',
       config: '/system/config',
       version: '/system/version',
       health: '/system/health'

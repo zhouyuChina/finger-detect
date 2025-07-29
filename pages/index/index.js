@@ -70,10 +70,16 @@ Page({
       if (bannerList.length === 0) {
         // 缓存为空，从服务器获取
         const response = await api.system.getBanner()
-        bannerList = response.data || []
+        console.log('Banner接口响应:', response)
         
-        // 缓存数据
-        storage.setBanner(bannerList)
+        // 处理接口返回的数据
+        if (response.code === 200 && response.data) {
+          bannerList = this.formatBannerData(response.data)
+          // 缓存数据
+          storage.setBanner(bannerList)
+        } else {
+          throw new Error('接口返回数据格式错误')
+        }
       }
 
       this.setData({ bannerList })
@@ -85,21 +91,65 @@ Page({
           {
             title: '健康检测服务',
             desc: '专业医疗级检测服务',
-            background: 'linear-gradient(135deg, #4CAF50, #45a049)'
+            background: 'linear-gradient(135deg, #4CAF50, #45a049)',
+            imageUrl: '',
+            linkUrl: '',
+            id: 1
           },
           {
             title: 'AI智能分析',
             desc: '快速准确的智能诊断',
-            background: 'linear-gradient(135deg, #2196F3, #1976D2)'
+            background: 'linear-gradient(135deg, #2196F3, #1976D2)',
+            imageUrl: '',
+            linkUrl: '',
+            id: 2
           },
           {
             title: '专业检测报告',
             desc: '详细健康评估报告',
-            background: 'linear-gradient(135deg, #FF9800, #F57C00)'
+            background: 'linear-gradient(135deg, #FF9800, #F57C00)',
+            imageUrl: '',
+            linkUrl: '',
+            id: 3
           }
         ]
       })
     }
+  },
+
+  // 格式化Banner数据
+  formatBannerData(data) {
+    if (!Array.isArray(data)) {
+      console.warn('Banner数据不是数组格式:', data)
+      return []
+    }
+
+    return data.map((item, index) => {
+      // 根据接口返回的数据结构进行适配
+      return {
+        id: item.id || index + 1,
+        title: item.title || item.name || `Banner ${index + 1}`,
+        desc: item.description || item.desc || item.subtitle || '',
+        imageUrl: item.imageUrl || item.image || item.img || '',
+        linkUrl: item.linkUrl || item.link || item.url || '',
+        background: item.background || item.bgColor || this.getDefaultBackground(index),
+        sort: item.sort || item.order || index,
+        status: item.status || 1,
+        createTime: item.createTime || item.createdAt || new Date().toISOString()
+      }
+    }).sort((a, b) => a.sort - b.sort) // 按排序字段排序
+  },
+
+  // 获取默认背景色
+  getDefaultBackground(index) {
+    const backgrounds = [
+      'linear-gradient(135deg, #4CAF50, #45a049)',
+      'linear-gradient(135deg, #2196F3, #1976D2)',
+      'linear-gradient(135deg, #FF9800, #F57C00)',
+      'linear-gradient(135deg, #9C27B0, #7B1FA2)',
+      'linear-gradient(135deg, #E91E63, #C2185B)'
+    ]
+    return backgrounds[index % backgrounds.length]
   },
 
   // 加载消息列表
@@ -266,8 +316,37 @@ Page({
     const index = e.currentTarget.dataset.index
     const banner = this.data.bannerList[index]
     
-    // 这里可以根据轮播图配置跳转到相应页面
     console.log('点击轮播图:', banner)
+    
+    // 处理轮播图点击跳转
+    if (banner.linkUrl) {
+      // 如果是外部链接
+      if (banner.linkUrl.startsWith('http')) {
+        // 复制链接到剪贴板
+        wx.setClipboardData({
+          data: banner.linkUrl,
+          success: () => {
+            common.showSuccess('链接已复制到剪贴板')
+          }
+        })
+      } else {
+        // 如果是内部页面路径
+        wx.navigateTo({
+          url: banner.linkUrl,
+          fail: (error) => {
+            console.error('页面跳转失败:', error)
+            common.showError('页面跳转失败')
+          }
+        })
+      }
+    } else {
+      // 没有链接时显示提示
+      common.showToast({
+        title: banner.title,
+        icon: 'none',
+        duration: 2000
+      })
+    }
   },
 
   // 分享

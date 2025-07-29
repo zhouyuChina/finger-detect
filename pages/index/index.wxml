@@ -11,12 +11,24 @@
       indicator-color="rgba(255, 255, 255, 0.5)"
       indicator-active-color="rgba(255, 255, 255, 0.8)"
     >
-      <swiper-item wx:for="{{bannerList}}" wx:key="index">
-        <view class="banner-item" style="background: {{item.background}}">
+      <swiper-item wx:for="{{bannerList}}" wx:key="id">
+        <view 
+          class="banner-item" 
+          style="background: {{item.background}}"
+          bindtap="onBannerTap"
+          data-index="{{index}}"
+        >
           <view class="banner-content">
             <text class="banner-title">{{item.title}}</text>
             <text class="banner-desc">{{item.desc}}</text>
           </view>
+          <!-- 如果有图片，显示图片 -->
+          <image 
+            wx:if="{{item.imageUrl}}" 
+            class="banner-image" 
+            src="{{item.imageUrl}}" 
+            mode="aspectFill"
+          />
         </view>
       </swiper-item>
     </swiper>
