@@ -54,7 +54,9 @@ const config = {
       markRead: '/message/mark-read',
       markAllRead: '/message/mark-all-read',
       delete: '/message/delete',
-      unreadCount: '/message/unread-count'
+      unreadCount: '/message/unread-count',
+      getReadStatus: '/miniprogram/news/read',
+      markArticleRead: '/miniprogram/news/read'
     },
 
     // 优惠券相关

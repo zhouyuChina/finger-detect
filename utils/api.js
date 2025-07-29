@@ -116,6 +116,16 @@ const messageApi = {
   // 获取未读消息数量
   getUnreadCount() {
     return request.get(config.api.message.unreadCount)
+  },
+
+  // 获取资讯阅读状态
+  getReadStatus() {
+    return request.get(config.api.message.getReadStatus)
+  },
+
+  // 标记资讯已读
+  markArticleRead(articleId) {
+    return request.post(config.api.message.markArticleRead, { articleId })
   }
 }
 
