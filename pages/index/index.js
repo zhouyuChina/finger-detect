@@ -150,25 +150,54 @@ Page({
 
   // 格式化Banner数据
   formatBannerData(data) {
-    if (!Array.isArray(data)) {
-      console.warn('Banner数据不是数组格式:', data)
-      return []
-    }
-
-    return data.map((item, index) => {
-      // 根据接口返回的数据结构进行适配
-      return {
-        id: item.id || index + 1,
-        title: item.title || item.name || `Banner ${index + 1}`,
-        desc: item.description || item.desc || item.subtitle || '',
-        imageUrl: item.imageUrl || item.image || item.img || '',
-        linkUrl: item.linkUrl || item.link || item.url || '',
-        background: item.background || item.bgColor || this.getDefaultBackground(index),
-        sort: item.sort || item.order || index,
-        status: item.status || 1,
-        createTime: item.createTime || item.createdAt || new Date().toISOString()
+    console.log('格式化Banner数据，输入:', data)
+    
+    // 处理新的数据结构：{banners: [...], config: {...}}
+    if (typeof data === 'object' && data !== null && data.banners) {
+      console.log('检测到banners字段，处理banners数组')
+      const banners = data.banners
+      
+      if (!Array.isArray(banners)) {
+        console.warn('banners字段不是数组格式:', banners)
+        return []
       }
-    }).sort((a, b) => a.sort - b.sort) // 按排序字段排序
+
+      return banners.map((item, index) => {
+        // 根据接口返回的数据结构进行适配
+        return {
+          id: item.id || index + 1,
+          title: item.title || item.name || `Banner ${index + 1}`,
+          desc: item.description || item.desc || item.subtitle || '',
+          imageUrl: item.imageUrl || item.image || item.img || '',
+          linkUrl: item.linkUrl || item.link || item.url || '',
+          background: item.background || item.bgColor || this.getDefaultBackground(index),
+          sort: item.sort || item.order || index,
+          status: item.status || 1,
+          createTime: item.createTime || item.createdAt || new Date().toISOString()
+        }
+      }).sort((a, b) => a.sort - b.sort) // 按排序字段排序
+    }
+    
+    // 兼容旧的数据结构：直接是数组
+    if (Array.isArray(data)) {
+      console.log('检测到数组格式，直接处理')
+      return data.map((item, index) => {
+        return {
+          id: item.id || index + 1,
+          title: item.title || item.name || `Banner ${index + 1}`,
+          desc: item.description || item.desc || item.subtitle || '',
+          imageUrl: item.imageUrl || item.image || item.img || '',
+          linkUrl: item.linkUrl || item.link || item.url || '',
+          background: item.background || item.bgColor || this.getDefaultBackground(index),
+          sort: item.sort || item.order || index,
+          status: item.status || 1,
+          createTime: item.createTime || item.createdAt || new Date().toISOString()
+        }
+      }).sort((a, b) => a.sort - b.sort)
+    }
+    
+    console.warn('Banner数据格式不支持:', data)
+    return []
   },
 
   // 获取默认背景色
@@ -185,9 +214,23 @@ Page({
 
   // 格式化Banner配置
   formatBannerConfig(data) {
+    console.log('格式化Banner配置，输入:', data)
+    
+    // 处理新的数据结构：{banners: [...], config: {...}}
+    if (typeof data === 'object' && data !== null && data.config) {
+      console.log('检测到config字段，使用config配置')
+      const config = data.config
+      return {
+        autoplay: config.autoplay !== undefined ? config.autoplay : true,
+        interval: config.interval || 3000,
+        circular: config.circular !== undefined ? config.circular : true,
+        indicatorDots: config.indicatorDots !== undefined ? config.indicatorDots : true
+      }
+    }
+    
     // 如果data是数组，尝试从第一个元素获取配置
     if (Array.isArray(data)) {
-      // 从数组的第一个元素获取配置，或者使用默认配置
+      console.log('检测到数组格式，从第一个元素获取配置')
       const firstItem = data[0]
       return {
         autoplay: firstItem?.autoplay !== undefined ? firstItem.autoplay : true,
@@ -199,6 +242,7 @@ Page({
     
     // 如果data是对象，可能包含配置信息
     if (typeof data === 'object' && data !== null) {
+      console.log('检测到对象格式，直接使用配置')
       return {
         autoplay: data.autoplay !== undefined ? data.autoplay : true,
         interval: data.interval || 3000,
@@ -207,6 +251,7 @@ Page({
       }
     }
     
+    console.log('使用默认配置')
     // 默认配置
     return {
       autoplay: true,
