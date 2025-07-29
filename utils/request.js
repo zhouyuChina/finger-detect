@@ -53,27 +53,38 @@ class Request {
     this.isGettingToken = true
 
     try {
-      const response = await wx.request({
-        url: `${this.baseUrl}${config.api.user.getToken}`,
-        method: 'GET',
-        timeout: this.timeout,
-        success: (res) => {
-          if (res.statusCode === 200 && res.data.code === config.errorCodes.SUCCESS) {
-            const token = res.data.data.token
-            if (token) {
-              wx.setStorageSync('token', token)
-              console.log('获取token成功')
-            } else {
-              throw new Error('token为空')
-            }
-          } else {
-            throw new Error(res.data.message || '获取token失败')
-          }
-        },
-        fail: (error) => {
-          throw new Error('网络请求失败')
-        }
+      const response = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${this.baseUrl}${config.api.user.getToken}`,
+          method: 'GET',
+          timeout: this.timeout,
+          success: resolve,
+          fail: reject
+        })
       })
+
+      console.log('Token接口响应:', response)
+
+      if (response.statusCode === 200) {
+        const data = response.data
+        
+        // 检查响应格式
+        if (data.success && data.data && data.data.token) {
+          // 成功格式：{success: true, data: {token: "xxx"}, message: "xxx"}
+          const token = data.data.token
+          wx.setStorageSync('token', token)
+          console.log('获取token成功')
+        } else if (data.code === config.errorCodes.SUCCESS && data.data && data.data.token) {
+          // 标准格式：{code: 200, data: {token: "xxx"}, message: "xxx"}
+          const token = data.data.token
+          wx.setStorageSync('token', token)
+          console.log('获取token成功')
+        } else {
+          throw new Error(data.message || 'token为空')
+        }
+      } else {
+        throw new Error(`HTTP ${response.statusCode}: ${response.data?.message || '获取token失败'}`)
+      }
     } catch (error) {
       console.error('获取token失败:', error)
       throw error
