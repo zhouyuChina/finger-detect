@@ -202,15 +202,15 @@ page {
   font-weight: 500;
 }
 
-.icon-bg.技术资讯 {
+.icon-bg.tech {
   background-color: #2196F3;
 }
 
-.icon-bg.健康提醒 {
+.icon-bg.health {
   background-color: #4CAF50;
 }
 
-.icon-bg.资讯 {
+.icon-bg.news {
   background-color: #ffa726;
 }
 
