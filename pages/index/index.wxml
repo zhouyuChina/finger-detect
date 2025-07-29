@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="container">
   <!-- 轮播图区域 -->
-  <view class="banner" wx:if="{{bannerList.length > 0}}">
+  <view class="banner" wx:if="{{bannerList && bannerList.length > 0}}">
     <swiper 
       class="banner-swiper" 
       indicator-dots="{{bannerConfig.indicatorDots}}"
@@ -32,6 +32,18 @@
         </view>
       </swiper-item>
     </swiper>
+  </view>
+
+  <!-- 调试用测试banner -->
+  <view class="banner" wx:if="{{!bannerList || bannerList.length === 0}}">
+    <view class="banner-swiper">
+      <view class="banner-item" style="background: linear-gradient(135deg, #4CAF50, #45a049);">
+        <view class="banner-content">
+          <text class="banner-title">测试Banner</text>
+          <text class="banner-desc">这是一个测试banner，用于调试显示问题</text>
+        </view>
+      </view>
+    </view>
   </view>
 
   <!-- 主要功能区域 -->
