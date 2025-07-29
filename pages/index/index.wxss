@@ -150,10 +150,40 @@ page {
   border-bottom: none;
 }
 
+/* 消息项样式 */
 .message-item.unread {
   background-color: #f8f9ff;
 }
 
+.message-item.top {
+  border-left: 4rpx solid #ff6b35;
+}
+
+.message-item.important {
+  border-left: 4rpx solid #ff4757;
+}
+
+.message-item.top.important {
+  border-left: 4rpx solid #ff6b35;
+}
+
+/* 消息封面图片 */
+.message-cover {
+  position: relative;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  width: 120rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 消息图标（无封面图片时显示） */
 .message-icon {
   position: relative;
   margin-right: 20rpx;
@@ -172,15 +202,15 @@ page {
   font-weight: 500;
 }
 
-.icon-bg.system {
-  background-color: #ff4757;
+.icon-bg.技术资讯 {
+  background-color: #2196F3;
 }
 
-.icon-bg.notice {
+.icon-bg.健康提醒 {
   background-color: #4CAF50;
 }
 
-.icon-bg.tip {
+.icon-bg.资讯 {
   background-color: #ffa726;
 }
 
@@ -218,6 +248,10 @@ page {
   color: #333;
   flex: 1;
   margin-right: 16rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .message-time {
@@ -226,7 +260,7 @@ page {
   flex-shrink: 0;
 }
 
-.message-body {
+.message-summary {
   font-size: 26rpx;
   color: #666;
   line-height: 1.5;
@@ -238,27 +272,52 @@ page {
 
 .message-tags {
   display: flex;
-  gap: 12rpx;
+  gap: 8rpx;
   margin-top: 8rpx;
+  flex-wrap: wrap;
 }
 
-.priority-tag {
+/* 标签样式 */
+.top-tag {
   font-size: 20rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  background-color: #ff6b35;
   color: white;
 }
 
-.priority-tag.high {
+.important-tag {
+  font-size: 20rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
   background-color: #ff4757;
+  color: white;
 }
 
-.type-tag {
+.category-tag {
   font-size: 20rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
   background-color: #f0f0f0;
   color: #666;
+}
+
+.read-count {
+  font-size: 20rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+/* 作者信息 */
+.message-author {
+  margin-top: 4rpx;
+}
+
+.author-text {
+  font-size: 22rpx;
+  color: #999;
 }
 
 /* 快捷功能区域 */

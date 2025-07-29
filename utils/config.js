@@ -49,7 +49,7 @@ const config = {
 
     // 消息相关
     message: {
-      list: '/message/list',
+      list: '/miniprogram/news',
       detail: '/message/detail',
       markRead: '/message/mark-read',
       markAllRead: '/message/mark-all-read',

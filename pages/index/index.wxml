@@ -69,15 +69,25 @@
     
     <view class="message-list">
       <view 
-        class="message-item {{item.isRead ? 'read' : 'unread'}}"
+        class="message-item {{item.isRead ? 'read' : 'unread'}} {{item.isTop ? 'top' : ''}} {{item.isImportant ? 'important' : ''}}"
         wx:for="{{messages}}" 
         wx:key="id"
         bindtap="onMessageTap"
         data-index="{{index}}"
       >
-        <view class="message-icon">
-          <view class="icon-bg {{item.type}}">
-            <text class="icon-text">{{item.type === 'system' ? '系' : item.type === 'notice' ? '通' : '贴'}}</text>
+        <!-- 消息封面图片 -->
+        <view class="message-cover" wx:if="{{item.coverImage}}">
+          <image 
+            class="cover-image" 
+            src="{{item.coverImage}}" 
+            mode="aspectFill"
+          />
+        </view>
+        
+        <!-- 消息图标（无封面图片时显示） -->
+        <view class="message-icon" wx:if="{{!item.coverImage}}">
+          <view class="icon-bg {{item.category}}">
+            <text class="icon-text">{{item.category === '技术资讯' ? '技' : item.category === '健康提醒' ? '健' : '资'}}</text>
           </view>
           <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
         </view>
@@ -85,12 +95,25 @@
         <view class="message-content">
           <view class="message-header">
             <text class="message-title">{{item.title}}</text>
-            <text class="message-time">{{item.time}}</text>
+            <text class="message-time">{{item.publishTime}}</text>
           </view>
-          <text class="message-body">{{item.content}}</text>
+          <text class="message-summary">{{item.summary}}</text>
+          
+          <!-- 消息标签 -->
           <view class="message-tags">
-            <text class="priority-tag {{item.priority}}" wx:if="{{item.priority === 'high'}}">重要</text>
-            <text class="type-tag">{{item.type === 'system' ? '系统' : item.type === 'notice' ? '通知' : '小贴士'}}</text>
+            <!-- 置顶标签 -->
+            <text class="top-tag" wx:if="{{item.isTop}}">置顶</text>
+            <!-- 重要标签 -->
+            <text class="important-tag" wx:if="{{item.isImportant}}">重要</text>
+            <!-- 分类标签 -->
+            <text class="category-tag">{{item.category}}</text>
+            <!-- 阅读数 -->
+            <text class="read-count" wx:if="{{item.readCount > 0}}">{{item.readCount}}阅读</text>
+          </view>
+          
+          <!-- 作者信息 -->
+          <view class="message-author" wx:if="{{item.author}}">
+            <text class="author-text">作者：{{item.author}}</text>
           </view>
         </view>
       </view>

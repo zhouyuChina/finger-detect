@@ -41,10 +41,10 @@ Page({
       // 直接加载真实的banner数据
       await this.loadBanner()
       
-      // 暂时禁用消息加载，避免404错误
-      // this.loadMessages().catch(error => {
-      //   console.error('加载消息失败，但不影响页面显示:', error)
-      // })
+      // 加载消息列表
+      await this.loadMessages().catch(error => {
+        console.warn('消息加载失败，但不影响页面显示:', error)
+      })
     } catch (error) {
       console.error('初始化页面失败:', error)
       common.showError('加载数据失败')
@@ -56,8 +56,13 @@ Page({
   // 刷新数据
   async refreshData() {
     try {
-      // 只刷新banner数据，暂时不刷新消息
-      await this.loadBanner()
+      // 刷新banner和消息数据
+      await Promise.all([
+        this.loadBanner(),
+        this.loadMessages().catch(error => {
+          console.warn('消息刷新失败:', error)
+        })
+      ])
       common.showSuccess('刷新成功')
     } catch (error) {
       console.error('刷新数据失败:', error)
@@ -286,8 +291,16 @@ Page({
       const response = await api.message.getList({ limit: 10 })
       console.log('消息接口响应:', response)
       
-      if (response.code === 200 && response.data) {
-        const messages = response.data
+      if (response.success && response.data && response.data.list) {
+        // 处理新的数据结构：{success: true, data: {list: [...], pagination: {...}}}
+        const messages = this.formatMessageData(response.data.list)
+        this.setData({ messages })
+        this.calculateUnreadCount()
+        // 缓存数据
+        storage.setMessages(messages)
+      } else if (response.code === 200 && response.data) {
+        // 兼容旧的数据结构
+        const messages = this.formatMessageData(response.data)
         this.setData({ messages })
         this.calculateUnreadCount()
         // 缓存数据
@@ -302,6 +315,62 @@ Page({
       this.setData({ messages: [] })
       this.calculateUnreadCount()
     }
+  },
+
+  // 格式化消息数据
+  formatMessageData(data) {
+    console.log('格式化消息数据，输入:', data)
+    
+    if (!Array.isArray(data)) {
+      console.warn('消息数据不是数组格式:', data)
+      return []
+    }
+
+    return data.map((item, index) => {
+      // 处理封面图片URL，如果是相对路径则拼接完整URL
+      let coverImage = item.coverImage || item.image || item.img || ''
+      if (coverImage && !coverImage.startsWith('http')) {
+        // 如果是相对路径，拼接静态资源URL
+        const baseUrl = 'http://localhost:3001' // 开发环境静态资源基础URL
+        coverImage = baseUrl + coverImage
+        console.log('处理消息图片URL:', item.coverImage, '->', coverImage)
+      }
+
+      // 处理发布时间
+      const publishedAt = item.publishedAt || item.createdAt || item.createTime || new Date().toISOString()
+      const publishTime = common.formatTime(new Date(publishedAt), 'MM-DD HH:mm')
+
+      // 处理标签和类型
+      const tags = item.tags || []
+      const types = item.types || []
+      const isTop = types.includes('置顶')
+      const isImportant = types.includes('重要')
+
+      return {
+        id: item.id || index + 1,
+        title: item.title || `消息 ${index + 1}`,
+        summary: item.summary || item.content || item.desc || '',
+        coverImage: coverImage,
+        author: item.author || '系统',
+        category: item.category || '资讯',
+        tags: tags,
+        types: types,
+        isTop: isTop,
+        isImportant: isImportant,
+        readCount: item.readCount || 0,
+        isRead: item.isRead || false,
+        publishedAt: publishedAt,
+        publishTime: publishTime,
+        createdAt: item.createdAt || item.createTime || publishedAt
+      }
+    }).sort((a, b) => {
+      // 排序：置顶 > 重要 > 发布时间倒序
+      if (a.isTop && !b.isTop) return -1
+      if (!a.isTop && b.isTop) return 1
+      if (a.isImportant && !b.isImportant) return -1
+      if (!a.isImportant && b.isImportant) return 1
+      return new Date(b.publishedAt) - new Date(a.publishedAt)
+    })
   },
 
   // 计算未读消息数量
