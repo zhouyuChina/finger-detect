@@ -163,12 +163,21 @@ Page({
       }
 
       return banners.map((item, index) => {
+        // 处理图片URL，如果是相对路径则拼接完整URL
+        let imageUrl = item.imageUrl || item.image || item.img || ''
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          // 如果是相对路径，拼接静态资源URL
+          const baseUrl = 'http://localhost:3001' // 开发环境静态资源基础URL
+          imageUrl = baseUrl + imageUrl
+          console.log('处理图片URL:', item.imageUrl, '->', imageUrl)
+        }
+        
         // 根据接口返回的数据结构进行适配
         return {
           id: item.id || index + 1,
           title: item.title || item.name || `Banner ${index + 1}`,
           desc: item.description || item.desc || item.subtitle || '',
-          imageUrl: item.imageUrl || item.image || item.img || '',
+          imageUrl: imageUrl,
           linkUrl: item.linkUrl || item.link || item.url || '',
           background: item.background || item.bgColor || this.getDefaultBackground(index),
           sort: item.sort || item.order || index,
@@ -182,11 +191,20 @@ Page({
     if (Array.isArray(data)) {
       console.log('检测到数组格式，直接处理')
       return data.map((item, index) => {
+        // 处理图片URL，如果是相对路径则拼接完整URL
+        let imageUrl = item.imageUrl || item.image || item.img || ''
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          // 如果是相对路径，拼接静态资源URL
+          const baseUrl = 'http://localhost:3001' // 开发环境静态资源基础URL
+          imageUrl = baseUrl + imageUrl
+          console.log('处理图片URL:', item.imageUrl, '->', imageUrl)
+        }
+        
         return {
           id: item.id || index + 1,
           title: item.title || item.name || `Banner ${index + 1}`,
           desc: item.description || item.desc || item.subtitle || '',
-          imageUrl: item.imageUrl || item.image || item.img || '',
+          imageUrl: imageUrl,
           linkUrl: item.linkUrl || item.link || item.url || '',
           background: item.background || item.bgColor || this.getDefaultBackground(index),
           sort: item.sort || item.order || index,
