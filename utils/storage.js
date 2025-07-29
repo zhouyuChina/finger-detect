@@ -131,8 +131,8 @@ class Storage {
   }
 
   // 设置轮播图配置缓存
-  setBannerConfig(config) {
-    this.set('bannerConfig', config, config.cache.expireTime.banner)
+  setBannerConfig(bannerConfig) {
+    this.set('bannerConfig', bannerConfig, config.cache.expireTime.banner)
   }
 
   // 获取轮播图配置缓存
