@@ -23,7 +23,8 @@ Page({
 
   // 页面显示时
   onShow() {
-    this.loadMessages()
+    // 暂时禁用消息加载，避免404错误影响页面显示
+    // this.loadMessages()
   },
 
   // 下拉刷新
@@ -36,11 +37,13 @@ Page({
     try {
       this.setData({ loading: true })
       
-      // 并行加载数据
-      await Promise.all([
-        this.loadBanner(),
-        this.loadMessages()
-      ])
+      // 只加载banner，暂时不加载消息
+      await this.loadBanner()
+      
+      // 暂时禁用消息加载，避免404错误
+      // this.loadMessages().catch(error => {
+      //   console.error('加载消息失败，但不影响页面显示:', error)
+      // })
     } catch (error) {
       console.error('初始化页面失败:', error)
       common.showError('加载数据失败')
@@ -52,10 +55,8 @@ Page({
   // 刷新数据
   async refreshData() {
     try {
-      await Promise.all([
-        this.loadBanner(),
-        this.loadMessages()
-      ])
+      // 只刷新banner数据，暂时不刷新消息
+      await this.loadBanner()
       common.showSuccess('刷新成功')
     } catch (error) {
       console.error('刷新数据失败:', error)
