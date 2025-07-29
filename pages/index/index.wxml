@@ -4,10 +4,10 @@
   <view class="banner" wx:if="{{bannerList.length > 0}}">
     <swiper 
       class="banner-swiper" 
-      indicator-dots="{{true}}"
-      autoplay="{{true}}"
-      interval="{{3000}}"
-      circular="{{true}}"
+      indicator-dots="{{bannerConfig.indicatorDots}}"
+      autoplay="{{bannerConfig.autoplay}}"
+      interval="{{bannerConfig.interval}}"
+      circular="{{bannerConfig.circular}}"
       indicator-color="rgba(255, 255, 255, 0.5)"
       indicator-active-color="rgba(255, 255, 255, 0.8)"
     >

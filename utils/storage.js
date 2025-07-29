@@ -130,6 +130,21 @@ class Storage {
     return this.get('banner', [])
   }
 
+  // 设置轮播图配置缓存
+  setBannerConfig(config) {
+    this.set('bannerConfig', config, config.cache.expireTime.banner)
+  }
+
+  // 获取轮播图配置缓存
+  getBannerConfig() {
+    return this.get('bannerConfig', {
+      autoplay: true,
+      interval: 3000,
+      circular: true,
+      indicatorDots: true
+    })
+  }
+
   // 设置系统配置缓存
   setSystemConfig(config) {
     this.set('systemConfig', config, config.cache.expireTime.config)

@@ -7,6 +7,10 @@ Page({
   data: {
     // 轮播图数据
     bannerList: [],
+    bannerConfig: {
+      autoplay: true,
+      interval: 3000
+    },
     unreadCount: 0, // 未读消息数量
     messages: [], // 消息列表
     loading: false, // 加载状态
@@ -71,16 +75,28 @@ Page({
       // 处理接口返回的数据
       if (response.code === 200 && response.data) {
         const bannerList = this.formatBannerData(response.data)
-        this.setData({ bannerList })
+        const bannerConfig = this.formatBannerConfig(response.data)
+        
+        this.setData({ 
+          bannerList,
+          bannerConfig
+        })
         // 缓存数据
         storage.setBanner(bannerList)
+        storage.setBannerConfig(bannerConfig)
       } else {
         console.warn('Banner接口返回数据格式错误:', response)
-        this.setData({ bannerList: [] })
+        this.setData({ 
+          bannerList: [],
+          bannerConfig: { autoplay: true, interval: 3000 }
+        })
       }
     } catch (error) {
       console.error('加载轮播图失败:', error)
-      this.setData({ bannerList: [] })
+      this.setData({ 
+        bannerList: [],
+        bannerConfig: { autoplay: true, interval: 3000 }
+      })
     }
   },
 
@@ -117,6 +133,39 @@ Page({
       'linear-gradient(135deg, #E91E63, #C2185B)'
     ]
     return backgrounds[index % backgrounds.length]
+  },
+
+  // 格式化Banner配置
+  formatBannerConfig(data) {
+    // 如果data是数组，尝试从第一个元素获取配置
+    if (Array.isArray(data)) {
+      // 从数组的第一个元素获取配置，或者使用默认配置
+      const firstItem = data[0]
+      return {
+        autoplay: firstItem?.autoplay !== undefined ? firstItem.autoplay : true,
+        interval: firstItem?.interval || 3000,
+        circular: firstItem?.circular !== undefined ? firstItem.circular : true,
+        indicatorDots: firstItem?.indicatorDots !== undefined ? firstItem.indicatorDots : true
+      }
+    }
+    
+    // 如果data是对象，可能包含配置信息
+    if (typeof data === 'object' && data !== null) {
+      return {
+        autoplay: data.autoplay !== undefined ? data.autoplay : true,
+        interval: data.interval || 3000,
+        circular: data.circular !== undefined ? data.circular : true,
+        indicatorDots: data.indicatorDots !== undefined ? data.indicatorDots : true
+      }
+    }
+    
+    // 默认配置
+    return {
+      autoplay: true,
+      interval: 3000,
+      circular: true,
+      indicatorDots: true
+    }
   },
 
   // 加载消息列表
