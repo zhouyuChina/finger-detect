@@ -101,14 +101,14 @@ Page({
         console.warn('Banner接口返回数据格式错误:', response)
         this.setData({ 
           bannerList: [],
-          bannerConfig: { autoplay: true, interval: 3000, circular: true, indicatorDots: true }
+          bannerConfig: { ...config.ui.banner }
         })
       }
     } catch (error) {
       console.error('加载轮播图失败:', error)
       this.setData({ 
         bannerList: [],
-        bannerConfig: { autoplay: true, interval: 3000, circular: true, indicatorDots: true }
+        bannerConfig: { ...config.ui.banner }
       })
     }
   },
@@ -199,15 +199,21 @@ Page({
   formatBannerConfig(data) {
     console.log('格式化Banner配置，输入:', data)
     
+    // 从配置文件获取默认配置
+    const defaultConfig = config.ui.banner
+    console.log('配置文件默认配置:', defaultConfig)
+    
     // 处理新的数据结构：{banners: [...], config: {...}}
     if (typeof data === 'object' && data !== null && data.config) {
-      console.log('检测到config字段，使用config配置')
-      const config = data.config
+      console.log('检测到config字段，合并接口配置')
+      const apiConfig = data.config
       return {
-        autoplay: config.autoplay !== undefined ? config.autoplay : true,
-        interval: config.interval || 3000,
-        circular: config.circular !== undefined ? config.circular : true,
-        indicatorDots: config.indicatorDots !== undefined ? config.indicatorDots : true
+        autoplay: apiConfig.autoplay !== undefined ? apiConfig.autoplay : defaultConfig.autoplay,
+        interval: apiConfig.interval || defaultConfig.interval,
+        circular: apiConfig.circular !== undefined ? apiConfig.circular : defaultConfig.circular,
+        indicatorDots: apiConfig.indicatorDots !== undefined ? apiConfig.indicatorDots : defaultConfig.indicatorDots,
+        duration: apiConfig.duration || defaultConfig.duration,
+        easingFunction: apiConfig.easingFunction || defaultConfig.easingFunction
       }
     }
     
@@ -216,32 +222,30 @@ Page({
       console.log('检测到数组格式，从第一个元素获取配置')
       const firstItem = data[0]
       return {
-        autoplay: firstItem?.autoplay !== undefined ? firstItem.autoplay : true,
-        interval: firstItem?.interval || 3000,
-        circular: firstItem?.circular !== undefined ? firstItem.circular : true,
-        indicatorDots: firstItem?.indicatorDots !== undefined ? firstItem.indicatorDots : true
+        autoplay: firstItem?.autoplay !== undefined ? firstItem.autoplay : defaultConfig.autoplay,
+        interval: firstItem?.interval || defaultConfig.interval,
+        circular: firstItem?.circular !== undefined ? firstItem.circular : defaultConfig.circular,
+        indicatorDots: firstItem?.indicatorDots !== undefined ? firstItem.indicatorDots : defaultConfig.indicatorDots,
+        duration: firstItem?.duration || defaultConfig.duration,
+        easingFunction: firstItem?.easingFunction || defaultConfig.easingFunction
       }
     }
     
     // 如果data是对象，可能包含配置信息
     if (typeof data === 'object' && data !== null) {
-      console.log('检测到对象格式，直接使用配置')
+      console.log('检测到对象格式，合并配置')
       return {
-        autoplay: data.autoplay !== undefined ? data.autoplay : true,
-        interval: data.interval || 3000,
-        circular: data.circular !== undefined ? data.circular : true,
-        indicatorDots: data.indicatorDots !== undefined ? data.indicatorDots : true
+        autoplay: data.autoplay !== undefined ? data.autoplay : defaultConfig.autoplay,
+        interval: data.interval || defaultConfig.interval,
+        circular: data.circular !== undefined ? data.circular : defaultConfig.circular,
+        indicatorDots: data.indicatorDots !== undefined ? data.indicatorDots : defaultConfig.indicatorDots,
+        duration: data.duration || defaultConfig.duration,
+        easingFunction: data.easingFunction || defaultConfig.easingFunction
       }
     }
     
-    console.log('使用默认配置')
-    // 默认配置
-    return {
-      autoplay: true,
-      interval: 3000,
-      circular: true,
-      indicatorDots: true
-    }
+    console.log('使用配置文件默认配置')
+    return { ...defaultConfig }
   },
 
   // 加载消息列表

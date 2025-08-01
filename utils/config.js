@@ -124,6 +124,32 @@ const config = {
     }
   },
 
+  // UI组件默认配置
+  ui: {
+    // Banner轮播图默认配置
+    banner: {
+      autoplay: true,
+      interval: 3000,
+      circular: true,
+      indicatorDots: true,
+      duration: 500,
+      easingFunction: 'default'
+    },
+    // 消息列表默认配置
+    message: {
+      pageSize: 10,
+      showAvatar: true,
+      showTime: true,
+      showCategory: true
+    },
+    // 图片默认配置
+    image: {
+      lazyLoad: true,
+      showMenuByLongpress: true,
+      mode: 'aspectFill'
+    }
+  },
+
   // 错误码配置
   errorCodes: {
     SUCCESS: 200,
