@@ -5,12 +5,14 @@ const config = {
     development: {
       baseUrl: 'http://localhost:3001/api',
       uploadUrl: 'http://localhost:3001/api/upload',
-      wsUrl: 'ws://localhost:3001'
+      wsUrl: 'ws://localhost:3001',
+      staticUrl: 'http://localhost:3001' // 静态资源基础URL
     },
     production: {
       baseUrl: 'https://your-production-domain.com/api',
       uploadUrl: 'https://your-production-domain.com/api/upload',
-      wsUrl: 'wss://your-production-domain.com'
+      wsUrl: 'wss://your-production-domain.com',
+      staticUrl: 'https://your-production-domain.com' // 静态资源基础URL
     }
   },
 

@@ -132,8 +132,8 @@ Page({
         let imageUrl = item.imageUrl || item.image || item.img || ''
         if (imageUrl && !imageUrl.startsWith('http')) {
           // 如果是相对路径，拼接静态资源URL
-          const baseUrl = 'http://localhost:3001' // 开发环境静态资源基础URL
-          imageUrl = baseUrl + imageUrl
+          const staticUrl = config.getCurrentConfig().staticUrl
+          imageUrl = staticUrl + imageUrl
           console.log('处理图片URL:', item.imageUrl, '->', imageUrl)
         }
         
@@ -160,8 +160,8 @@ Page({
         let imageUrl = item.imageUrl || item.image || item.img || ''
         if (imageUrl && !imageUrl.startsWith('http')) {
           // 如果是相对路径，拼接静态资源URL
-          const baseUrl = 'http://localhost:3001' // 开发环境静态资源基础URL
-          imageUrl = baseUrl + imageUrl
+          const staticUrl = config.getCurrentConfig().staticUrl
+          imageUrl = staticUrl + imageUrl
           console.log('处理图片URL:', item.imageUrl, '->', imageUrl)
         }
         
@@ -313,8 +313,8 @@ Page({
       let coverImage = item.coverImage || item.image || item.img || ''
       if (coverImage && !coverImage.startsWith('http')) {
         // 如果是相对路径，拼接静态资源URL
-        const baseUrl = 'http://localhost:3001' // 开发环境静态资源基础URL
-        coverImage = baseUrl + coverImage
+        const staticUrl = config.getCurrentConfig().staticUrl
+        coverImage = staticUrl + coverImage
         console.log('处理消息图片URL:', item.coverImage, '->', coverImage)
       }
 
