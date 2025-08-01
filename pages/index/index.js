@@ -2,6 +2,7 @@
 const api = require('../../utils/api.js')
 const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
+const config = require('../../utils/config.js')
 
 Page({
   data: {
