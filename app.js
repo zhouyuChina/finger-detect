@@ -195,9 +195,26 @@ App({
       }
 
       console.log('准备注册用户数据:', registerData)
+      console.log('注册数据JSON字符串:', JSON.stringify(registerData, null, 2))
 
       // 5. 调用后端注册接口
+      console.log('=== 注册请求调试 ===')
+      console.log('请求URL:', config.getCurrentConfig().baseUrl + config.api.user.register)
+      console.log('请求方法: POST')
+      console.log('请求头:', {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      })
+      console.log('请求体大小:', JSON.stringify(registerData).length, '字符')
+      
       const response = await api.user.miniProgramRegister(registerData)
+      
+      console.log('=== 注册响应调试 ===')
+      console.log('响应状态码:', response.code)
+      console.log('响应消息:', response.message)
+      console.log('响应数据:', response.data)
+      console.log('完整响应对象:', response)
+      console.log('=====================')
       
       if (response.code === 200) {
         console.log('用户自动注册成功:', response.data)
@@ -235,7 +252,23 @@ App({
       }
 
     } catch (error) {
-      console.error('微信登录并注册失败:', error)
+      console.error('=== 注册失败详细错误 ===')
+      console.error('错误对象:', error)
+      console.error('错误消息:', error.message)
+      console.error('错误代码:', error.code)
+      console.error('原始数据:', error.originalData)
+      console.error('错误堆栈:', error.stack)
+      console.error('=======================')
+      
+      // 如果是500错误，显示更友好的提示
+      if (error.code === 500) {
+        wx.showToast({
+          title: '服务器暂时不可用，请稍后重试',
+          icon: 'none',
+          duration: 3000
+        })
+      }
+      
       // 登录失败不影响应用使用
     }
   },
