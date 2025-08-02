@@ -30,10 +30,7 @@ App({
       // 检查更新
       this.checkUpdate()
 
-      // 获取小程序token
-      await this.getAppToken()
-
-      // 自动登录
+      // 自动登录（包含token获取逻辑）
       this.autoLogin()
 
     } catch (error) {
@@ -100,7 +97,7 @@ App({
         hasOpenId: !!openId
       })
       
-      if (hasToken) {
+      if (hasToken && !token.startsWith('dev_token_')) {
         console.log('检测到有效token，跳过注册流程')
         // 验证token有效性
         if (userInfo) {
@@ -109,7 +106,12 @@ App({
           console.log('使用现有登录状态')
         }
       } else {
-        console.log('未检测到token，开始注册流程')
+        console.log('未检测到有效token或只有临时token，开始注册流程')
+        // 清除临时token
+        if (token && token.startsWith('dev_token_')) {
+          storage.remove('token')
+          console.log('清除临时token')
+        }
         // 尝试微信登录并自动注册
         await this.wxLoginAndRegister()
       }
