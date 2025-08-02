@@ -3,6 +3,7 @@ const api = require('../../utils/api.js')
 const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
 const config = require('../../utils/config.js')
+const envDebug = require('../../utils/env-debug.js')
 
 Page({
   data: {
@@ -15,6 +16,17 @@ Page({
     unreadCount: 0, // 未读消息数量
     messages: [], // 消息列表
     loading: false, // 加载状态
+    
+    // 调试相关
+    showDebug: false,
+    currentEnv: {
+      name: '测试环境',
+      apiUrl: 'http://47.76.126.85:4000/api'
+    },
+    connectionStatus: {
+      success: false,
+      message: '未测试'
+    }
   },
 
   // 页面加载时
@@ -666,6 +678,88 @@ Page({
     } catch (error) {
       console.error('JWT测试失败:', error)
       common.showError('测试失败')
+    }
+  },
+
+  // 调试相关方法
+  toggleDebug() {
+    this.setData({
+      showDebug: !this.data.showDebug
+    })
+    if (this.data.showDebug) {
+      this.updateEnvInfo()
+    }
+  },
+
+  updateEnvInfo() {
+    const envInfo = envDebug.getCurrentEnv()
+    this.setData({
+      currentEnv: envInfo
+    })
+  },
+
+  async testConnection() {
+    try {
+      this.setData({
+        'connectionStatus.success': false,
+        'connectionStatus.message': '测试中...'
+      })
+      
+      const result = await envDebug.testCurrentEnv()
+      
+      this.setData({
+        connectionStatus: {
+          success: result.success,
+          message: result.success ? '连接正常' : result.error.errMsg
+        }
+      })
+      
+      wx.showToast({
+        title: result.success ? '连接成功' : '连接失败',
+        icon: result.success ? 'success' : 'error'
+      })
+    } catch (error) {
+      console.error('测试连接失败:', error)
+      this.setData({
+        connectionStatus: {
+          success: false,
+          message: '测试失败'
+        }
+      })
+    }
+  },
+
+  switchToLocal() {
+    envDebug.switchToLocal()
+    this.updateEnvInfo()
+    wx.showToast({
+      title: '已切换到本地环境',
+      icon: 'success'
+    })
+  },
+
+  switchToTest() {
+    envDebug.switchToTest()
+    this.updateEnvInfo()
+    this.updateEnvInfo()
+    wx.showToast({
+      title: '已切换到测试环境',
+      icon: 'success'
+    })
+  },
+
+  async compareEnvs() {
+    try {
+      wx.showLoading({ title: '对比中...' })
+      await envDebug.compareAllEnvs()
+      wx.hideLoading()
+      wx.showToast({
+        title: '对比完成，查看控制台',
+        icon: 'none'
+      })
+    } catch (error) {
+      wx.hideLoading()
+      console.error('环境对比失败:', error)
     }
   }
 }) 

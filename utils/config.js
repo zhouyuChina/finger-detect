@@ -1,5 +1,23 @@
-const baseUrl = '47.76.126.85:4000'
-// const baseUrl = 'localhost:3001'
+// 环境配置 - 可以在这里切换环境
+const ENV_CONFIG = {
+  LOCAL: {
+    baseUrl: 'localhost:3001',
+    name: '本地环境'
+  },
+  TEST: {
+    baseUrl: '47.76.126.85:4000',
+    name: '测试环境'
+  },
+  PRODUCTION: {
+    baseUrl: 'your-production-domain.com',
+    name: '生产环境'
+  }
+}
+
+// 当前使用的环境 - 修改这里来切换环境
+const CURRENT_ENV = 'TEST' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
+
+const baseUrl = ENV_CONFIG[CURRENT_ENV].baseUrl
 
 // API配置文件
 const config = {
@@ -24,7 +42,14 @@ const config = {
 
   // 获取当前环境配置
   getCurrentConfig() {
-    return this.env[this.currentEnv] || this.env.development
+    const config = this.env[this.currentEnv] || this.env.development
+    console.log(`=== 当前环境配置 ===`)
+    console.log(`环境名称: ${ENV_CONFIG[CURRENT_ENV].name}`)
+    console.log(`基础URL: ${baseUrl}`)
+    console.log(`API地址: ${config.baseUrl}`)
+    console.log(`静态资源: ${config.staticUrl}`)
+    console.log(`=====================`)
+    return config
   },
 
   // API接口地址 - 适配Next.js后台
