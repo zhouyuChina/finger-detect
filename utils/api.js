@@ -34,6 +34,11 @@ const userApi = {
     return request.put(config.api.user.updateProfile, data)
   },
 
+  // 同步用户完整信息（用户授权后调用）
+  syncProfile(userInfo) {
+    return request.post(config.api.user.syncProfile, userInfo)
+  },
+
   // 用户登出
   logout() {
     return request.post(config.api.user.logout)

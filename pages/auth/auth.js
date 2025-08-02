@@ -130,6 +130,17 @@ Page({
           storage.setOpenId(response.data.openId)
         }
         
+        // 如果用户提供了真实信息，调用同步接口
+        if (userInfo && userInfo.nickName !== '微信用户') {
+          try {
+            console.log('调用同步用户信息接口')
+            const syncResponse = await api.user.syncProfile(userInfo)
+            console.log('同步用户信息响应:', syncResponse.code, syncResponse.message)
+          } catch (syncError) {
+            console.warn('同步用户信息失败，但不影响使用:', syncError)
+          }
+        }
+        
         // 隐藏授权页面
         this.setData({ showAuth: false })
         
