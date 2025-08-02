@@ -33,7 +33,7 @@ Page({
   // 页面加载时
   onLoad() {
     console.log('首页加载')
-    this.initPage()
+    this.checkAuthAndInit()
   },
 
   // 页面显示时
@@ -45,6 +45,31 @@ Page({
   // 下拉刷新
   onPullDownRefresh() {
     this.refreshData()
+  },
+
+  // 检查授权并初始化
+  checkAuthAndInit() {
+    const token = storage.getToken()
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    console.log('检查授权状态:', {
+      hasToken: !!token,
+      hasUserInfo: !!userInfo,
+      hasOpenId: !!openId
+    })
+    
+    // 如果缺少必要数据，跳转到授权页面
+    if (!token || !userInfo || !openId) {
+      console.log('缺少授权数据，跳转到授权页面')
+      wx.redirectTo({
+        url: '/pages/auth/auth'
+      })
+      return
+    }
+    
+    console.log('授权数据完整，初始化页面')
+    this.initPage()
   },
 
   // 初始化页面

@@ -30,8 +30,8 @@ App({
       // 检查更新
       this.checkUpdate()
 
-      // 自动登录（包含token获取逻辑）
-      this.autoLogin()
+      // 不再自动登录，由授权页面处理
+      console.log('应用初始化完成，等待用户授权')
 
     } catch (error) {
       console.error('应用初始化失败:', error)
