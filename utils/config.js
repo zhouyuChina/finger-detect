@@ -42,14 +42,7 @@ const config = {
 
   // 获取当前环境配置
   getCurrentConfig() {
-    const config = this.env[this.currentEnv] || this.env.development
-    console.log(`=== 当前环境配置 ===`)
-    console.log(`环境名称: ${ENV_CONFIG[CURRENT_ENV].name}`)
-    console.log(`基础URL: ${baseUrl}`)
-    console.log(`API地址: ${config.baseUrl}`)
-    console.log(`静态资源: ${config.staticUrl}`)
-    console.log(`=====================`)
-    return config
+    return this.env[this.currentEnv] || this.env.development
   },
 
   // API接口地址 - 适配Next.js后台

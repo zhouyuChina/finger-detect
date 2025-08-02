@@ -84,35 +84,31 @@ App({
   // 自动登录
   async autoLogin() {
     try {
-      // 检查是否有token
-      const hasToken = storage.isLoggedIn()
+      // 检查localStorage中是否有完整的用户数据
       const token = storage.getToken()
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
       
-      console.log('自动登录检查:', {
-        hasToken,
-        token: token ? token.substring(0, 20) + '...' : null,
+      console.log('检查localStorage数据:', {
+        hasToken: !!token,
         hasUserInfo: !!userInfo,
         hasOpenId: !!openId
       })
       
-      if (hasToken && !token.startsWith('dev_token_')) {
-        console.log('检测到有效token，跳过注册流程')
-        // 验证token有效性
-        if (userInfo) {
-          this.globalData.userInfo = userInfo
-          this.globalData.isLoggedIn = true
-          console.log('使用现有登录状态')
-        }
+      // 只有当localStorage中缺少必要数据时才触发注册
+      if (token && userInfo && openId && !token.startsWith('dev_token_')) {
+        console.log('localStorage数据完整，使用现有登录状态')
+        this.globalData.userInfo = userInfo
+        this.globalData.isLoggedIn = true
       } else {
-        console.log('未检测到有效token或只有临时token，开始注册流程')
-        // 清除临时token
+        console.log('localStorage数据不完整，开始注册流程')
+        // 清除可能存在的临时数据
         if (token && token.startsWith('dev_token_')) {
           storage.remove('token')
-          console.log('清除临时token')
         }
-        // 尝试微信登录并自动注册
+        // 确保清除所有用户相关数据
+        storage.clearUserData()
+        // 触发微信登录并注册
         await this.wxLoginAndRegister()
       }
     } catch (error) {
@@ -194,50 +190,28 @@ App({
         appVersion: this.globalData.appConfig.version
       }
 
-      console.log('准备注册用户数据:', registerData)
-      console.log('注册数据JSON字符串:', JSON.stringify(registerData, null, 2))
-
-      // 5. 调用后端注册接口
-      console.log('=== 注册请求调试 ===')
-      console.log('请求URL:', config.getCurrentConfig().baseUrl + config.api.user.register)
-      console.log('请求方法: POST')
-      console.log('请求头:', {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      })
-      console.log('请求体大小:', JSON.stringify(registerData).length, '字符')
+      console.log('开始注册用户...')
       
       const response = await api.user.miniProgramRegister(registerData)
       
-      console.log('=== 注册响应调试 ===')
-      console.log('响应状态码:', response.code)
-      console.log('响应消息:', response.message)
-      console.log('响应数据:', response.data)
-      console.log('完整响应对象:', response)
-      console.log('=====================')
+      console.log('注册响应:', response.code, response.message)
       
       if (response.code === 200) {
-        console.log('用户自动注册成功:', response.data)
-        console.log('注册响应数据结构:', Object.keys(response.data))
+        console.log('注册成功，保存用户数据')
         
         // 保存用户信息和token
         if (response.data.token) {
           storage.setToken(response.data.token)
-          console.log('token已保存:', response.data.token)
         }
         if (response.data.userInfo) {
           storage.setUserInfo(response.data.userInfo)
           this.globalData.userInfo = response.data.userInfo
           this.globalData.isLoggedIn = true
-          console.log('用户信息已保存:', response.data.userInfo)
         }
         
         // 保存openId到localStorage（7天过期）
         if (response.data.openId) {
           storage.setOpenId(response.data.openId)
-          console.log('openId已保存到localStorage，过期时间7天:', response.data.openId)
-        } else {
-          console.log('后端响应中没有openId字段，当前响应数据:', response.data)
         }
         
         // 显示欢迎信息
@@ -252,13 +226,7 @@ App({
       }
 
     } catch (error) {
-      console.error('=== 注册失败详细错误 ===')
-      console.error('错误对象:', error)
-      console.error('错误消息:', error.message)
-      console.error('错误代码:', error.code)
-      console.error('原始数据:', error.originalData)
-      console.error('错误堆栈:', error.stack)
-      console.error('=======================')
+      console.error('注册失败:', error.message || error)
       
       // 如果是500错误，显示更友好的提示
       if (error.code === 500) {
