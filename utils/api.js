@@ -42,6 +42,11 @@ const userApi = {
   // 获取小程序token
   getToken() {
     return request.get(config.api.user.getToken, {}, { needToken: false })
+  },
+
+  // 获取用户统计信息
+  getStats() {
+    return request.get(config.api.user.stats)
   }
 }
 

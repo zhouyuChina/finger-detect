@@ -1,5 +1,13 @@
 <!--profile.wxml-->
 <view class="container">
+  <!-- 加载状态 -->
+  <t-loading 
+    theme="circular" 
+    size="40rpx" 
+    loading="{{loading}}"
+    class="loading-container"
+  />
+  
   <!-- 用户信息区域 -->
   <view class="user-section">
     <view class="user-info">

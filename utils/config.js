@@ -1,12 +1,15 @@
+// const baseUrl = '47.76.126.85:4000'
+const baseUrl = 'localhost:3001'
+
 // API配置文件
 const config = {
   // 环境配置
   env: {
     development: {
-      baseUrl: 'http://localhost:3001/api',
-      uploadUrl: 'http://localhost:3001/api/upload',
-      wsUrl: 'ws://localhost:3001',
-      staticUrl: 'http://localhost:3001' // 静态资源基础URL
+      baseUrl: `http://${baseUrl}/api`,
+      uploadUrl: `http://${baseUrl}/api/upload`,
+      wsUrl: `ws://${baseUrl}`,
+      staticUrl: `http://${baseUrl}` // 静态资源基础URL
     },
     production: {
       baseUrl: 'https://your-production-domain.com/api',
@@ -35,7 +38,8 @@ const config = {
       logout: '/auth/logout',
       refreshToken: '/auth/refresh',
       wxLogin: '/auth/wx-login',
-      getToken: '/miniprogram/auth'
+      getToken: '/miniprogram/auth',
+      stats: '/user/stats' // 用户统计信息
     },
 
     // 检测相关
