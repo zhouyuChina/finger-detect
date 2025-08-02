@@ -88,14 +88,28 @@ App({
   async autoLogin() {
     try {
       // 检查是否有token
-      if (storage.isLoggedIn()) {
+      const hasToken = storage.isLoggedIn()
+      const token = storage.getToken()
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      console.log('自动登录检查:', {
+        hasToken,
+        token: token ? token.substring(0, 20) + '...' : null,
+        hasUserInfo: !!userInfo,
+        hasOpenId: !!openId
+      })
+      
+      if (hasToken) {
+        console.log('检测到有效token，跳过注册流程')
         // 验证token有效性
-        const userInfo = storage.getUserInfo()
         if (userInfo) {
           this.globalData.userInfo = userInfo
           this.globalData.isLoggedIn = true
+          console.log('使用现有登录状态')
         }
       } else {
+        console.log('未检测到token，开始注册流程')
         // 尝试微信登录并自动注册
         await this.wxLoginAndRegister()
       }
