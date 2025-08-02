@@ -77,6 +77,11 @@ Content-Type: application/json
 }
 ```
 
+**前端处理：**
+- `openId` 会自动保存到 localStorage，过期时间 7 天
+- 可以通过 `getApp().getOpenId()` 获取
+- 可以通过 `getApp().hasValidOpenId()` 检查是否有效
+
 ## 数据库表结构
 
 ### 用户表 (users)

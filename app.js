@@ -196,6 +196,12 @@ App({
           this.globalData.isLoggedIn = true
         }
         
+        // 保存openId到localStorage（7天过期）
+        if (response.data.openId) {
+          storage.setOpenId(response.data.openId)
+          console.log('openId已保存到localStorage，过期时间7天')
+        }
+        
         // 显示欢迎信息
         wx.showToast({
           title: '欢迎使用健康检测',
@@ -308,5 +314,15 @@ App({
   // 检查功能是否启用
   isFeatureEnabled(featureName) {
     return this.globalData.appConfig.features[featureName] || false
+  },
+
+  // 获取openId
+  getOpenId() {
+    return storage.getOpenId()
+  },
+
+  // 检查是否有有效的openId
+  hasValidOpenId() {
+    return !!storage.getOpenId()
   }
 })

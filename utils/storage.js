@@ -185,11 +185,24 @@ class Storage {
     return this.get('refreshToken')
   }
 
+  // 设置openId
+  setOpenId(openId) {
+    // 设置7天过期时间
+    const expireTime = 7 * 24 * 60 * 60 * 1000 // 7天
+    this.set('openId', openId, expireTime)
+  }
+
+  // 获取openId
+  getOpenId() {
+    return this.get('openId')
+  }
+
   // 清除用户相关缓存
   clearUserData() {
     this.remove('userInfo')
     this.remove('token')
     this.remove('refreshToken')
+    this.remove('openId')
   }
 
   // 检查是否登录
