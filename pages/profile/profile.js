@@ -3,6 +3,7 @@ const api = require('../../utils/api.js')
 const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
 const config = require('../../utils/config.js')
+const profileDebug = require('../../utils/profile-debug.js')
 
 Page({
   data: {
@@ -28,6 +29,11 @@ Page({
   onLoad() {
     console.log('Profile页面加载')
     this.loadUserData()
+    
+    // 调试模式：自动运行调试
+    if (this.data.debugMode) {
+      this.debugProfile()
+    }
   },
 
   onShow() {
@@ -320,6 +326,23 @@ Page({
     return {
       title: '健康检测平台 - 专业AI健康分析',
       imageUrl: '/images/share-cover.png'
+    }
+  },
+
+  // 调试方法
+  async debugProfile() {
+    try {
+      console.log('开始调试个人中心...')
+      const result = await profileDebug.debugProfile()
+      
+      // 显示调试结果
+      wx.showModal({
+        title: '调试结果',
+        content: `Token: ${result.token ? '存在' : '不存在'}\nProfile接口: ${result.profile.success ? '成功' : '失败'}\nStats接口: ${result.stats.success ? '成功' : '失败'}`,
+        showCancel: false
+      })
+    } catch (error) {
+      console.error('调试失败:', error)
     }
   }
 }) 
