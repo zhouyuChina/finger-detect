@@ -1,5 +1,6 @@
 // 个人中心调试工具
 const config = require('./config.js')
+const storage = require('./storage.js')
 
 class ProfileDebugger {
   constructor() {
@@ -86,7 +87,7 @@ class ProfileDebugger {
 
   // 检查token
   checkToken() {
-    const token = wx.getStorageSync('token')
+    const token = storage.getToken()
     console.log('=== 检查Token ===')
     console.log('Token存在:', !!token)
     if (token) {
@@ -99,8 +100,8 @@ class ProfileDebugger {
   // 检查用户数据
   checkUserData() {
     console.log('=== 检查本地用户数据 ===')
-    const userInfo = wx.getStorageSync('userInfo')
-    const openId = wx.getStorageSync('openId')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
     
     console.log('用户信息存在:', !!userInfo)
     console.log('OpenId存在:', !!openId)
