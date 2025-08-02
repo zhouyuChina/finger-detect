@@ -4,6 +4,7 @@ const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
 const config = require('../../utils/config.js')
 const envDebug = require('../../utils/env-debug.js')
+const apiDebug = require('../../utils/api-debug.js')
 
 Page({
   data: {
@@ -685,6 +686,50 @@ Page({
     } catch (error) {
       wx.hideLoading()
       console.error('环境对比失败:', error)
+    }
+  },
+
+  async compareApis() {
+    try {
+      wx.showLoading({ title: '对比接口中...' })
+      const result = await apiDebug.compareApis()
+      wx.hideLoading()
+      
+      if (result.auth.success && !result.register.success) {
+        wx.showToast({
+          title: 'Auth成功，Register失败',
+          icon: 'none',
+          duration: 3000
+        })
+      } else if (result.auth.success && result.register.success) {
+        wx.showToast({
+          title: '两个接口都成功',
+          icon: 'success'
+        })
+      } else {
+        wx.showToast({
+          title: '两个接口都失败',
+          icon: 'error'
+        })
+      }
+    } catch (error) {
+      wx.hideLoading()
+      console.error('接口对比失败:', error)
+    }
+  },
+
+  async testDataFormats() {
+    try {
+      wx.showLoading({ title: '测试数据格式...' })
+      await apiDebug.testDataFormats()
+      wx.hideLoading()
+      wx.showToast({
+        title: '测试完成，查看控制台',
+        icon: 'none'
+      })
+    } catch (error) {
+      wx.hideLoading()
+      console.error('数据格式测试失败:', error)
     }
   }
 }) 

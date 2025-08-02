@@ -156,6 +156,8 @@
       <button class="debug-btn" bindtap="switchToLocal">切换到本地</button>
       <button class="debug-btn" bindtap="switchToTest">切换到测试</button>
       <button class="debug-btn" bindtap="compareEnvs">对比环境</button>
+      <button class="debug-btn" bindtap="compareApis">对比接口</button>
+      <button class="debug-btn" bindtap="testDataFormats">测试数据格式</button>
     </view>
   </view>
 
