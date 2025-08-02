@@ -1,5 +1,6 @@
 // HTTP请求工具类
 const config = require('./config.js')
+const storage = require('./storage.js')
 
 class Request {
   constructor() {
@@ -19,9 +20,13 @@ class Request {
     }
 
     // 添加token
-    const token = wx.getStorageSync('token')
+    const token = storage.getToken()
+    console.log('当前存储的token:', token)
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
+      console.log('添加Authorization头:', headers['Authorization'])
+    } else {
+      console.log('没有找到token，请求头中不包含Authorization')
     }
 
     return headers
@@ -29,7 +34,7 @@ class Request {
 
   // 检查token是否存在
   hasToken() {
-    return !!wx.getStorageSync('token')
+    return !!storage.getToken()
   }
 
   // 获取小程序token
@@ -77,17 +82,17 @@ class Request {
           
           if (data.data && data.data.token) {
             const token = data.data.token
-            wx.setStorageSync('token', token)
+            storage.setToken(token)
             console.log('获取token成功:', token)
           } else if (data.data && data.data.access_token) {
             // 有些接口使用access_token字段
             const token = data.data.access_token
-            wx.setStorageSync('token', token)
+            storage.setToken(token)
             console.log('获取access_token成功:', token)
           } else {
             // 开发模式可能没有token，生成一个临时token
             const tempToken = 'dev_token_' + Date.now()
-            wx.setStorageSync('token', tempToken)
+            storage.setToken(tempToken)
             console.log('开发模式生成临时token:', tempToken)
           }
         } else if (data.code === config.errorCodes.SUCCESS) {
@@ -96,23 +101,23 @@ class Request {
           
           if (data.data && data.data.token) {
             const token = data.data.token
-            wx.setStorageSync('token', token)
+            storage.setToken(token)
             console.log('获取token成功:', token)
           } else if (data.data && data.data.access_token) {
             const token = data.data.access_token
-            wx.setStorageSync('token', token)
+            storage.setToken(token)
             console.log('获取access_token成功:', token)
           } else {
             // 开发模式可能没有token，生成一个临时token
             const tempToken = 'dev_token_' + Date.now()
-            wx.setStorageSync('token', tempToken)
+            storage.setToken(tempToken)
             console.log('开发模式生成临时token:', tempToken)
           }
         } else {
           console.log('未知响应格式，生成临时token')
           // 未知格式，生成临时token
           const tempToken = 'dev_token_' + Date.now()
-          wx.setStorageSync('token', tempToken)
+          storage.setToken(tempToken)
           console.log('生成临时token:', tempToken)
         }
       } else {
