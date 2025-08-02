@@ -185,21 +185,26 @@ App({
       
       if (response.code === 200) {
         console.log('用户自动注册成功:', response.data)
+        console.log('注册响应数据结构:', Object.keys(response.data))
         
         // 保存用户信息和token
         if (response.data.token) {
           storage.setToken(response.data.token)
+          console.log('token已保存:', response.data.token)
         }
         if (response.data.userInfo) {
           storage.setUserInfo(response.data.userInfo)
           this.globalData.userInfo = response.data.userInfo
           this.globalData.isLoggedIn = true
+          console.log('用户信息已保存:', response.data.userInfo)
         }
         
         // 保存openId到localStorage（7天过期）
         if (response.data.openId) {
           storage.setOpenId(response.data.openId)
-          console.log('openId已保存到localStorage，过期时间7天')
+          console.log('openId已保存到localStorage，过期时间7天:', response.data.openId)
+        } else {
+          console.log('后端响应中没有openId字段，当前响应数据:', response.data)
         }
         
         // 显示欢迎信息
