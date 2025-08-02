@@ -96,15 +96,124 @@ App({
           this.globalData.isLoggedIn = true
         }
       } else {
-        // 尝试微信登录
-        await this.wxLogin()
+        // 尝试微信登录并自动注册
+        await this.wxLoginAndRegister()
       }
     } catch (error) {
       console.error('自动登录失败:', error)
     }
   },
 
-  // 微信登录
+  // 微信登录并自动注册
+  async wxLoginAndRegister() {
+    try {
+      const api = require('./utils/api.js')
+      
+      // 1. 获取微信登录code
+      const loginRes = await new Promise((resolve, reject) => {
+        wx.login({
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      if (!loginRes.code) {
+        throw new Error('获取微信登录code失败')
+      }
+
+      console.log('微信登录成功，code:', loginRes.code)
+
+      // 2. 获取用户信息（如果用户授权）
+      let userInfo = null
+      try {
+        const settingRes = await new Promise((resolve, reject) => {
+          wx.getSetting({
+            success: resolve,
+            fail: reject
+          })
+        })
+
+        if (settingRes.authSetting['scope.userInfo']) {
+          const userInfoRes = await new Promise((resolve, reject) => {
+            wx.getUserInfo({
+              success: resolve,
+              fail: reject
+            })
+          })
+          userInfo = userInfoRes.userInfo
+        }
+      } catch (error) {
+        console.log('获取用户信息失败，将使用默认信息:', error)
+      }
+
+      // 3. 获取系统信息
+      const systemInfo = this.globalData.systemInfo || await common.getSystemInfo()
+
+      // 4. 构建注册数据
+      const registerData = {
+        code: loginRes.code,
+        userInfo: userInfo || {
+          nickName: '微信用户',
+          avatarUrl: '/images/default-avatar.png',
+          gender: 0,
+          country: '',
+          province: '',
+          city: ''
+        },
+        systemInfo: {
+          platform: systemInfo.platform,
+          system: systemInfo.system,
+          version: systemInfo.version,
+          SDKVersion: systemInfo.SDKVersion,
+          brand: systemInfo.brand,
+          model: systemInfo.model,
+          screenWidth: systemInfo.screenWidth,
+          screenHeight: systemInfo.screenHeight,
+          windowWidth: systemInfo.windowWidth,
+          windowHeight: systemInfo.windowHeight,
+          pixelRatio: systemInfo.pixelRatio,
+          language: systemInfo.language
+        },
+        registerTime: new Date().toISOString(),
+        appVersion: this.globalData.appConfig.version
+      }
+
+      console.log('准备注册用户数据:', registerData)
+
+      // 5. 调用后端注册接口
+      const response = await api.user.miniProgramRegister(registerData)
+      
+      if (response.code === 200) {
+        console.log('用户自动注册成功:', response.data)
+        
+        // 保存用户信息和token
+        if (response.data.token) {
+          storage.setToken(response.data.token)
+        }
+        if (response.data.userInfo) {
+          storage.setUserInfo(response.data.userInfo)
+          this.globalData.userInfo = response.data.userInfo
+          this.globalData.isLoggedIn = true
+        }
+        
+        // 显示欢迎信息
+        wx.showToast({
+          title: '欢迎使用健康检测',
+          icon: 'success',
+          duration: 2000
+        })
+      } else {
+        console.error('用户注册失败:', response.message)
+        // 注册失败不影响应用使用，用户可以在后续操作中手动注册
+      }
+
+    } catch (error) {
+      console.error('微信登录并注册失败:', error)
+      // 登录失败不影响应用使用
+    }
+  },
+
+  // 微信登录（保留原方法，用于其他场景）
   async wxLogin() {
     try {
       const loginRes = await new Promise((resolve, reject) => {

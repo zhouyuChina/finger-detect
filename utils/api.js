@@ -14,6 +14,11 @@ const userApi = {
     return request.post(config.api.user.register, data)
   },
 
+  // 小程序用户注册（自动注册）
+  miniProgramRegister(wxUserInfo) {
+    return request.post(config.api.user.register, wxUserInfo, { needToken: false })
+  },
+
   // 微信登录
   wxLogin(data) {
     return request.post(config.api.user.wxLogin, data)

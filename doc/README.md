@@ -15,14 +15,19 @@
   - `GET /api/user/stats` - 获取用户统计信息
 - **状态**：✅ 已完成
 
-#### 2. [Banner API 格式文档](./BANNER_API_FORMAT.md)
+#### 2. [小程序自动注册接口文档](./MINIPROGRAM_REGISTER_API.md)
+- **用途**：用户进入小程序时的自动注册接口
+- **接口**：`POST /api/miniprogram/register`
+- **状态**：✅ 已完成
+
+#### 3. [Banner API 格式文档](./BANNER_API_FORMAT.md)
 - **用途**：首页轮播图接口格式说明
 - **接口**：`GET /api/miniprogram/banners`
 - **状态**：✅ 已完成
 
 ### 🔧 开发指南
 
-#### 3. [Next.js 后端集成指南](./NEXTJS_API_GUIDE.md)
+#### 4. [Next.js 后端集成指南](./NEXTJS_API_GUIDE.md)
 - **用途**：微信小程序与 Next.js 后端集成的完整指南
 - **内容**：
   - CORS 配置
@@ -31,7 +36,7 @@
   - 部署说明
 - **状态**：✅ 已完成
 
-#### 4. [开发者工具已知问题](./DEVELOPER_TOOLS_KNOWN_ISSUES.md)
+#### 5. [开发者工具已知问题](./DEVELOPER_TOOLS_KNOWN_ISSUES.md)
 - **用途**：微信开发者工具的常见问题和解决方案
 - **内容**：
   - AB Test API 警告
@@ -43,6 +48,7 @@
 
 | 页面 | 接口 | 状态 | 文档 |
 |------|------|------|------|
+| 小程序启动 | 自动注册 | ✅ 已完成 | [注册 API](./MINIPROGRAM_REGISTER_API.md) |
 | 首页 | Banner | ✅ 已完成 | [Banner API](./BANNER_API_FORMAT.md) |
 | 首页 | 消息列表 | ✅ 已完成 | 待补充 |
 | 首页 | 消息已读 | ✅ 已完成 | 待补充 |

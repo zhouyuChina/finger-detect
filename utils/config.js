@@ -32,14 +32,14 @@ const config = {
     // 用户相关
     user: {
       login: '/auth/login',
-      register: '/auth/register',
-      profile: '/user/profile',
-      updateProfile: '/user/profile',
+      register: '/miniprogram/register', // 小程序用户注册
+      profile: '/miniprogram/profile',
+      updateProfile: '/miniprogram/profile',
       logout: '/auth/logout',
       refreshToken: '/auth/refresh',
       wxLogin: '/auth/wx-login',
       getToken: '/miniprogram/auth',
-      stats: '/user/stats' // 用户统计信息
+      stats: '/miniprogram/stats' // 用户统计信息
     },
 
     // 检测相关
