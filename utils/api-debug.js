@@ -31,7 +31,7 @@ class ApiDebugger {
       console.log('响应头:', response.header)
       
       return {
-        success: true,
+        success: response.statusCode === 200 && (response.data.success === true || response.data.code === 200),
         statusCode: response.statusCode,
         data: response.data,
         headers: response.header
@@ -102,7 +102,7 @@ class ApiDebugger {
       console.log('响应头:', response.header)
       
       return {
-        success: true,
+        success: response.statusCode === 200 && (response.data.success === true || response.data.code === 200),
         statusCode: response.statusCode,
         data: response.data,
         headers: response.header
