@@ -19,7 +19,18 @@ Page({
 
   // 页面加载时
   onLoad() {
+    console.log('=== 首页加载调试信息 ===')
     console.log('页面加载，当前数据状态:', this.data)
+    
+    // 打印当前用户信息
+    this.printUserInfo()
+    
+    // 打印存储信息
+    this.printStorageInfo()
+    
+    // 打印应用信息
+    this.printAppInfo()
+    
     this.initPage()
   },
 
@@ -73,12 +84,66 @@ Page({
     }
   },
 
+  // 打印用户信息
+  printUserInfo() {
+    const app = getApp()
+    const userInfo = app.getUserInfo()
+    const isLoggedIn = app.isLoggedIn()
+    const openId = app.getOpenId()
+    const hasValidOpenId = app.hasValidOpenId()
+    
+    console.log('=== 用户信息 ===')
+    console.log('用户信息:', userInfo)
+    console.log('是否已登录:', isLoggedIn)
+    console.log('openId:', openId)
+    console.log('openId是否有效:', hasValidOpenId)
+    console.log('================')
+  },
+
+  // 打印存储信息
+  printStorageInfo() {
+    const token = storage.getToken()
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    const isLoggedIn = storage.isLoggedIn()
+    
+    console.log('=== 存储信息 ===')
+    console.log('token:', token ? token.substring(0, 20) + '...' : null)
+    console.log('存储的用户信息:', userInfo)
+    console.log('存储的openId:', openId)
+    console.log('存储的登录状态:', isLoggedIn)
+    console.log('================')
+  },
+
+  // 打印应用信息
+  printAppInfo() {
+    const app = getApp()
+    const systemInfo = app.getSystemInfo()
+    const appConfig = app.getAppConfig()
+    
+    console.log('=== 应用信息 ===')
+    console.log('系统信息:', systemInfo)
+    console.log('应用配置:', appConfig)
+    console.log('================')
+  },
+
   // 加载轮播图
   async loadBanner() {
     try {
+      console.log('=== Banner请求调试 ===')
+      console.log('请求URL:', config.getCurrentConfig().baseUrl + config.api.system.banner)
+      console.log('请求头:', {
+        'Content-Type': 'application/json',
+        'Authorization': storage.getToken() ? 'Bearer ' + storage.getToken().substring(0, 20) + '...' : '无'
+      })
+      
       // 从服务器获取banner数据
       const response = await api.system.getBanner()
-      console.log('Banner接口响应:', response)
+      console.log('Banner接口完整响应:', response)
+      console.log('Banner响应状态码:', response.code)
+      console.log('Banner响应数据:', response.data)
+      console.log('Banner响应消息:', response.message)
+      console.log('=====================')
       
       // 处理接口返回的数据
       if (response.code === 200 && response.data) {
@@ -252,9 +317,21 @@ Page({
   // 加载消息列表
   async loadMessages() {
     try {
+      console.log('=== 消息请求调试 ===')
+      console.log('请求URL:', config.getCurrentConfig().baseUrl + config.api.message.list + '?limit=10')
+      console.log('请求参数:', { limit: 10 })
+      console.log('请求头:', {
+        'Content-Type': 'application/json',
+        'Authorization': storage.getToken() ? 'Bearer ' + storage.getToken().substring(0, 20) + '...' : '无'
+      })
+      
       // 从服务器获取消息数据
       const response = await api.message.getList({ limit: 10 })
-      console.log('消息接口响应:', response)
+      console.log('消息接口完整响应:', response)
+      console.log('消息响应状态码:', response.code)
+      console.log('消息响应数据:', response.data)
+      console.log('消息响应消息:', response.message)
+      console.log('=====================')
       
       let messages = []
       
