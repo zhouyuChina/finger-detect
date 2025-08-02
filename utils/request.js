@@ -290,6 +290,14 @@ class Request {
             this.hideLoading()
           }
 
+          console.error('请求失败详情:', {
+            url: `${this.baseUrl}${url}`,
+            method: method,
+            error: error,
+            errMsg: error.errMsg,
+            errno: error.errno
+          })
+
           // 网络错误，尝试重试
           if (retry < this.retryCount) {
             console.log(`请求失败，第${retry + 1}次重试:`, url)
@@ -300,10 +308,19 @@ class Request {
               }).then(resolve).catch(reject)
             }, 1000 * (retry + 1)) // 递增延迟
           } else {
-            this.showError(config.errorMessages.NETWORK_ERROR)
+            // 根据错误类型显示不同的错误信息
+            let errorMessage = config.errorMessages.NETWORK_ERROR
+            if (error.errno === 600001) {
+              errorMessage = '网络连接失败，请检查网络设置或联系客服'
+            } else if (error.errMsg && error.errMsg.includes('CONNECTION_REFUSED')) {
+              errorMessage = '服务器连接失败，请稍后重试'
+            }
+            
+            this.showError(errorMessage)
             reject({
               code: config.errorCodes.NETWORK_ERROR,
-              message: config.errorMessages.NETWORK_ERROR
+              message: errorMessage,
+              originalError: error
             })
           }
         }

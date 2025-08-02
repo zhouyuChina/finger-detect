@@ -1,5 +1,5 @@
-// const baseUrl = '47.76.126.85:4000'
-const baseUrl = 'localhost:3001'
+const baseUrl = '47.76.126.85:4000'
+// const baseUrl = 'localhost:3001'
 
 // API配置文件
 const config = {
