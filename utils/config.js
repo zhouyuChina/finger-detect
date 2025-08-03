@@ -75,7 +75,7 @@ const config = {
     // 消息相关
     message: {
       list: '/miniprogram/news',
-      detail: '/message/detail',
+      detail: '/miniprogram/news', // 新闻详情接口
       markRead: '/message/mark-read',
       markAllRead: '/miniprogram/news/read-all', // 一键已读
       delete: '/message/delete',

@@ -209,6 +209,16 @@ class Storage {
   isLoggedIn() {
     return !!this.getToken()
   }
+
+  // 设置文章详情缓存
+  setArticleDetail(id, detail) {
+    this.set(`article_${id}`, detail, config.cache.expireTime.message)
+  },
+
+  // 获取文章详情缓存
+  getArticleDetail(id) {
+    return this.get(`article_${id}`)
+  }
 }
 
 // 创建单例实例

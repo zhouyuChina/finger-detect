@@ -6,8 +6,8 @@
       <!-- Logo区域 -->
       <view class="logo-section">
         <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
-        <text class="app-name">健康检测</text>
-        <text class="app-desc">专业AI健康分析平台</text>
+        <text class="app-name">手指专业检测</text>
+        <text class="app-desc">专业 AI 分析平台</text>
       </view>
 
       <!-- 授权说明 -->
@@ -18,21 +18,6 @@
         
         <view class="auth-desc">
           <text class="desc-text">为了更好地为您提供个性化服务，我们需要获取您的基本信息</text>
-        </view>
-
-        <view class="auth-benefits">
-          <view class="benefit-item">
-            <text class="benefit-icon">👤</text>
-            <text class="benefit-text">个性化推荐</text>
-          </view>
-          <view class="benefit-item">
-            <text class="benefit-icon">📊</text>
-            <text class="benefit-text">健康数据分析</text>
-          </view>
-          <view class="benefit-item">
-            <text class="benefit-icon">🔒</text>
-            <text class="benefit-text">数据安全保护</text>
-          </view>
         </view>
       </view>
 

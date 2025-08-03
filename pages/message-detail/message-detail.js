@@ -1,181 +1,128 @@
 // message-detail.js
+const api = require('../../utils/api.js')
+const storage = require('../../utils/storage.js')
+const common = require('../../utils/common.js')
+const config = require('../../utils/config.js')
+
 Page({
   data: {
     articleId: null,
     articleDetail: {},
-    relatedArticles: []
+    loading: false,
+    error: false,
+    errorMessage: ''
   },
 
   onLoad(options) {
     const { id } = options
-    this.setData({
-      articleId: id
-    })
+    console.log('Message详情页面加载，文章ID:', id)
+    
+    if (!id) {
+      this.setData({ 
+        error: true, 
+        errorMessage: '缺少文章ID参数' 
+      })
+      return
+    }
+    
+    this.setData({ articleId: id })
     this.loadArticleDetail(id)
   },
 
   // 加载文章详情
-  loadArticleDetail(id) {
-    // Mock数据 - 根据ID返回不同的文章内容
-    const articleData = {
-      1: {
-        id: 1,
-        title: "目前AI 在疾病的诊断和治疗上的应用",
-        publishTime: "2024-07-21 10:30",
-        readCount: 1234,
-        content: `人工智能在医学诊断和治疗领域的应用正在快速发展，特别是在影像学和病理学方面取得了重要突破。
-
-在影像学方面，AI技术主要应用于医学影像的识别和分析。腾讯AI部门已经在上海多家三甲医院协助进行肺癌CT诊断。AI系统能够快速识别肺部结节、肿瘤等异常情况，大大提高了诊断效率和准确性。
-
-在病理学方面，AI主要用于血液系统恶性肿瘤（主要是白血病）的辅助诊断。通过分析病理切片图像，AI能够识别细胞形态异常，为医生提供诊断参考。
-
-然而，AI在病理学诊断中也面临一些挑战。实体瘤成分复杂，部分诊断需要免疫组化，这增加了AI诊断的难度。在影像学方面（如肺癌），大多数AI技术依赖于肿瘤大小、实性成分比例和CT值。
-
-对于CT值较低的纯磨玻璃结节（GGO），特别是那些后来被证实为微浸润或浸润性腺癌且大于1cm的结节，准确识别仍然具有挑战性。作者建议在这些特定情况下，增加结节大小在AI诊断中的权重。
-
-总的来说，AI在临床诊断中的未来是"光明的"。随着技术的不断进步和数据的积累，AI将在医疗诊断中发挥越来越重要的作用，为医生提供更准确的诊断支持，最终造福患者。`,
-        image: "/images/banner1.png",
-        tags: ["AI医疗", "诊断技术", "影像学", "病理学"]
-      },
-      2: {
-        id: 2,
-        title: "检测报告解读指南，让您更好地理解健康数据",
-        publishTime: "2024-07-20 15:20",
-        readCount: 2345,
-        content: `为了让您更好地理解检测报告，我们提供了详细的解读指南。本指南将帮助您理解各项指标的含义、正常值范围以及异常情况的说明。
-
-**血糖检测指标解读：**
-- 空腹血糖：正常值3.9-6.1mmol/L
-- 餐后2小时血糖：正常值<7.8mmol/L
-- 糖化血红蛋白：正常值4.0%-6.0%
-
-**血压检测指标解读：**
-- 收缩压：正常值90-140mmHg
-- 舒张压：正常值60-90mmHg
-- 脉压差：正常值30-50mmHg
-
-**心率检测指标解读：**
-- 静息心率：正常值60-100次/分钟
-- 运动时心率：最大心率=220-年龄
-- 心率变异性：反映自主神经功能
-
-**血脂检测指标解读：**
-- 总胆固醇：正常值<5.2mmol/L
-- 甘油三酯：正常值<1.7mmol/L
-- 高密度脂蛋白：正常值>1.04mmol/L
-- 低密度脂蛋白：正常值<3.4mmol/L
-
-当检测结果超出正常范围时，建议及时咨询医生，进行进一步的检查和治疗。`,
-        image: "/images/banner2.png",
-        tags: ["健康指南", "检测报告", "指标解读"]
-      },
-      3: {
-        id: 3,
-        title: "健康生活小贴士，定期检测保持身体健康",
-        publishTime: "2024-07-19 09:15",
-        readCount: 3456,
-        content: `定期进行健康检测是保持身体健康的重要方式。以下是一些健康生活的小贴士：
-
-**1. 定期检测的重要性**
-- 每半年进行一次全面健康检测
-- 及时发现潜在健康问题
-- 预防疾病的发生和发展
-
-**2. 健康饮食建议**
-- 多吃蔬菜水果，每天至少5份
-- 控制盐分摄入，每天不超过6克
-- 适量摄入优质蛋白质
-- 减少饱和脂肪和反式脂肪的摄入
-
-**3. 运动健身指南**
-- 每周至少150分钟中等强度运动
-- 包括有氧运动和力量训练
-- 循序渐进，避免过度运动
-- 选择适合自己的运动方式
-
-**4. 心理健康维护**
-- 保持充足的睡眠，每天7-8小时
-- 学会压力管理，保持积极心态
-- 与家人朋友保持良好的社交关系
-- 培养兴趣爱好，丰富精神生活
-
-**5. 生活习惯改善**
-- 戒烟限酒，远离有害物质
-- 保持规律作息，避免熬夜
-- 定期体检，关注身体变化
-- 及时就医，不要讳疾忌医
-
-记住，健康是人生最宝贵的财富，投资健康就是投资未来。`,
-        image: "/images/banner3.png",
-        tags: ["健康生活", "运动健身", "饮食建议"]
-      },
-      4: {
-        id: 4,
-        title: "检测流程优化通知，体验更流畅的检测服务",
-        publishTime: "2024-07-18 14:45",
-        readCount: 4567,
-        content: `我们对检测流程进行了全面优化，现在检测时间更短，结果更准确，体验更流畅。
-
-**优化内容：**
-
-1. **检测时间缩短**
-   - 传统检测时间：15-20分钟
-   - 优化后时间：8-12分钟
-   - 效率提升：40%以上
-
-2. **检测精度提升**
-   - 采用最新AI算法
-   - 多维度数据分析
-   - 准确率提升至98.5%
-
-3. **用户体验改善**
-   - 简化操作流程
-   - 优化界面设计
-   - 增加语音提示功能
-
-4. **结果展示优化**
-   - 更直观的数据图表
-   - 详细的健康建议
-   - 个性化报告生成
-
-5. **后续服务完善**
-   - 在线咨询服务
-   - 定期健康提醒
-   - 专家一对一指导
-
-新流程已正式上线，欢迎体验。如有任何问题或建议，请及时反馈。`,
-        image: "/images/banner1.png",
-        tags: ["流程优化", "服务升级", "用户体验"]
-      },
-      5: {
-        id: 5,
-        title: "用户反馈收集，参与反馈可获得专属优惠",
-        content: `为了更好地服务用户，我们正在收集用户反馈。您的建议对我们非常重要，参与反馈可获得专属优惠。
-
-反馈奖励规则：
-- 有效反馈：专属优惠券
-- 重要建议：高级会员体验
-- 优秀创意：免费检测服务
-- 月度最佳：VIP会员资格
-
-专属优惠可用于兑换健康检测服务、专业咨询等。感谢您的参与和支持！`,
-        time: "2024-07-17",
-        views: 5678,
-        tags: ["用户反馈", "专属优惠", "服务改进"]
+  async loadArticleDetail(id) {
+    try {
+      this.setData({ loading: true, error: false })
+      
+      console.log('开始加载文章详情，ID:', id)
+      const response = await api.message.getNewsDetail(id)
+      console.log('文章详情接口响应:', response)
+      
+      if (response.success && response.data) {
+        const articleDetail = this.formatArticleData(response.data)
+        this.setData({ articleDetail })
+        
+        // 缓存文章详情
+        storage.setArticleDetail(id, articleDetail)
+        console.log('文章详情加载成功:', articleDetail.title)
+      } else {
+        console.warn('文章详情接口返回错误:', response)
+        this.handleError(response.message || '获取文章详情失败')
       }
+    } catch (error) {
+      console.error('加载文章详情失败:', error)
+      this.handleError('网络错误，请稍后重试')
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  // 格式化文章数据
+  formatArticleData(data) {
+    console.log('格式化文章数据，输入:', data)
+    
+    // 处理封面图片URL，如果是相对路径则拼接完整URL
+    let coverImage = data.coverImage || data.image || ''
+    if (coverImage && !coverImage.startsWith('http')) {
+      const staticUrl = config.getCurrentConfig().staticUrl
+      coverImage = staticUrl + coverImage
+      console.log('处理文章图片URL:', data.coverImage, '->', coverImage)
     }
 
-    const article = articleData[id] || articleData[1]
-    this.setData({
-      articleDetail: article
-    })
+    // 处理发布时间
+    const publishedAt = data.publishedAt || data.createdAt || new Date().toISOString()
+    const publishTime = common.formatTime(new Date(publishedAt), 'YYYY-MM-DD HH:mm')
+
+    return {
+      id: data.id,
+      title: data.title || '无标题',
+      content: data.content || '',
+      summary: data.summary || '',
+      coverImage: coverImage,
+      author: data.author || '系统',
+      category: data.category || '资讯',
+      tags: data.tags || [],
+      readCount: data.readCount || 0,
+      isPublished: data.isPublished || false,
+      publishedAt: publishedAt,
+      publishTime: publishTime,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt
+    }
   },
 
-  // 点击相关文章
-  onRelatedClick(e) {
-    const { id } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/message-detail/message-detail?id=${id}`
+  // 处理错误
+  handleError(message) {
+    this.setData({ 
+      error: true, 
+      errorMessage: message 
     })
+    common.showError(message)
   },
+
+  // 重新加载
+  onRetry() {
+    if (this.data.articleId) {
+      this.loadArticleDetail(this.data.articleId)
+    }
+  },
+
+  // 分享
+  onShareAppMessage() {
+    const { articleDetail } = this.data
+    return {
+      title: articleDetail.title || '健康检测资讯',
+      path: `/pages/message-detail/message-detail?id=${this.data.articleId}`,
+      imageUrl: articleDetail.coverImage
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    const { articleDetail } = this.data
+    return {
+      title: articleDetail.title || '健康检测资讯',
+      imageUrl: articleDetail.coverImage
+    }
+  }
 }) 

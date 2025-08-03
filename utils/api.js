@@ -113,6 +113,11 @@ const messageApi = {
     return request.get(`${config.api.message.detail}/${id}`)
   },
 
+  // 获取新闻详情
+  getNewsDetail(id) {
+    return request.get(`${config.api.message.detail}/${id}`)
+  },
+
   // 标记消息为已读
   markRead(id) {
     return request.put(`${config.api.message.markRead}/${id}`)

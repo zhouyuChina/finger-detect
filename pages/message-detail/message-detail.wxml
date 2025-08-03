@@ -1,27 +1,80 @@
 <!--message-detail.wxml-->
 <view class="container">
-  <!-- 文章标题 -->
-  <view class="article-header">
-    <view class="article-title">{{articleDetail.title}}</view>
-    <view class="article-meta">
-      <text class="publish-time">发布时间：{{articleDetail.publishTime}}</text>
-      <text class="read-count">阅读量：{{articleDetail.readCount}}</text>
-    </view>
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 错误状态 -->
+  <view class="error-state" wx:if="{{error}}">
+    <view class="error-icon">⚠️</view>
+    <view class="error-text">{{errorMessage}}</view>
+    <view class="error-btn" bindtap="onRetry">重新加载</view>
   </view>
 
   <!-- 文章内容 -->
-  <view class="article-content">
-    <view class="content-text">{{articleDetail.content}}</view>
-    
-    <!-- 文章图片 -->
-    <view class="article-image" wx:if="{{articleDetail.image}}">
-      <image src="{{articleDetail.image}}" mode="widthFix" />
+  <view class="article-content" wx:if="{{!loading && !error && articleDetail.title}}">
+    <!-- 文章标题 -->
+    <view class="article-header">
+      <view class="article-title">{{articleDetail.title}}</view>
+      <view class="article-meta">
+        <view class="meta-item">
+          <text class="meta-icon">👤</text>
+          <text class="meta-text">{{articleDetail.author}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-icon">📅</text>
+          <text class="meta-text">{{articleDetail.publishTime}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-icon">👁️</text>
+          <text class="meta-text">{{articleDetail.readCount}}</text>
+        </view>
+        <view class="meta-item" wx:if="{{articleDetail.category}}">
+          <text class="meta-icon">📂</text>
+          <text class="meta-text">{{articleDetail.category}}</text>
+        </view>
+      </view>
     </view>
-    
+
+    <!-- 文章摘要 -->
+    <view class="article-summary" wx:if="{{articleDetail.summary}}">
+      <text class="summary-text">{{articleDetail.summary}}</text>
+    </view>
+
+    <!-- 文章封面图片 -->
+    <view class="article-cover" wx:if="{{articleDetail.coverImage}}">
+      <image src="{{articleDetail.coverImage}}" mode="widthFix" />
+    </view>
+
     <!-- 文章标签 -->
     <view class="article-tags" wx:if="{{articleDetail.tags.length > 0}}">
       <text class="tag" wx:for="{{articleDetail.tags}}" wx:key="*this">{{item}}</text>
     </view>
-  </view>
 
+    <!-- 文章正文 -->
+    <view class="article-body">
+      <rich-text nodes="{{articleDetail.content}}"></rich-text>
+    </view>
+
+    <!-- 文章信息 -->
+    <view class="article-info">
+      <view class="info-item">
+        <text class="info-label">发布时间：</text>
+        <text class="info-value">{{articleDetail.publishTime}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">阅读量：</text>
+        <text class="info-value">{{articleDetail.readCount}}</text>
+      </view>
+      <view class="info-item" wx:if="{{articleDetail.author}}">
+        <text class="info-label">作者：</text>
+        <text class="info-value">{{articleDetail.author}}</text>
+      </view>
+      <view class="info-item" wx:if="{{articleDetail.category}}">
+        <text class="info-label">分类：</text>
+        <text class="info-value">{{articleDetail.category}}</text>
+      </view>
+    </view>
+  </view>
 </view> 
