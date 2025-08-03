@@ -201,19 +201,34 @@ App({
         
         // 保存用户信息和token
         const responseData = response.data || response
+        console.log('app.js 注册响应数据:', responseData)
+        
         if (responseData.token) {
           storage.setToken(responseData.token)
+          console.log('app.js 保存token成功')
         }
         if (responseData.userInfo) {
           storage.setUserInfo(responseData.userInfo)
           this.globalData.userInfo = responseData.userInfo
           this.globalData.isLoggedIn = true
+          console.log('app.js 保存用户信息成功')
         }
         
         // 保存openId到localStorage（7天过期）
         if (responseData.openId) {
           storage.setOpenId(responseData.openId)
+          console.log('app.js 保存openId成功')
         }
+        
+        // 验证保存的数据
+        const savedToken = storage.getToken()
+        const savedUserInfo = storage.getUserInfo()
+        const savedOpenId = storage.getOpenId()
+        console.log('app.js 保存后的数据验证:', {
+          token: !!savedToken,
+          userInfo: !!savedUserInfo,
+          openId: !!savedOpenId
+        })
         
         // 显示欢迎信息
         wx.showToast({

@@ -119,17 +119,39 @@ Page({
         
         // 保存用户信息和token
         const responseData = response.data || response
+        console.log('注册响应数据:', responseData)
+        
         if (responseData.token) {
           storage.setToken(responseData.token)
+          console.log('保存token成功:', responseData.token)
+        } else {
+          console.warn('响应中没有token')
         }
+        
         if (responseData.userInfo) {
           storage.setUserInfo(responseData.userInfo)
+          console.log('保存用户信息成功:', responseData.userInfo)
+        } else {
+          console.warn('响应中没有userInfo')
         }
         
         // 保存openId到localStorage（7天过期）
         if (responseData.openId) {
           storage.setOpenId(responseData.openId)
+          console.log('保存openId成功:', responseData.openId)
+        } else {
+          console.warn('响应中没有openId')
         }
+        
+        // 验证保存的数据
+        const savedToken = storage.getToken()
+        const savedUserInfo = storage.getUserInfo()
+        const savedOpenId = storage.getOpenId()
+        console.log('保存后的数据验证:', {
+          token: !!savedToken,
+          userInfo: !!savedUserInfo,
+          openId: !!savedOpenId
+        })
         
         // 如果用户提供了真实信息，调用同步接口
         if (userInfo && userInfo.nickName !== '微信用户') {
@@ -152,12 +174,27 @@ Page({
           duration: 2000
         })
 
-        // 延迟跳转到首页
-        setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/index/index'
+        // 验证数据完整性后再跳转
+        const finalToken = storage.getToken()
+        const finalUserInfo = storage.getUserInfo()
+        const finalOpenId = storage.getOpenId()
+        
+        if (finalToken && finalUserInfo && finalOpenId) {
+          console.log('数据保存完整，准备跳转到首页')
+          // 延迟跳转到首页
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/index/index'
+            })
+          }, 2000)
+        } else {
+          console.error('数据保存不完整，无法跳转:', {
+            token: !!finalToken,
+            userInfo: !!finalUserInfo,
+            openId: !!finalOpenId
           })
-        }, 2000)
+          common.showError('登录数据保存失败，请重试')
+        }
         
       } else {
         console.error('用户注册失败:', response.message)

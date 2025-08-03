@@ -53,22 +53,30 @@ Page({
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
-    console.log('检查授权状态:', {
+    console.log('index页面检查授权状态:', {
       hasToken: !!token,
       hasUserInfo: !!userInfo,
-      hasOpenId: !!openId
+      hasOpenId: !!openId,
+      tokenValue: token ? token.substring(0, 10) + '...' : null,
+      userInfoValue: userInfo ? JSON.stringify(userInfo).substring(0, 50) + '...' : null,
+      openIdValue: openId ? openId.substring(0, 10) + '...' : null
     })
     
     // 如果缺少必要数据，跳转到授权页面
     if (!token || !userInfo || !openId) {
-      console.log('缺少授权数据，跳转到授权页面')
+      console.log('index页面缺少授权数据，跳转到授权页面')
+      console.log('缺少的数据:', {
+        missingToken: !token,
+        missingUserInfo: !userInfo,
+        missingOpenId: !openId
+      })
       wx.redirectTo({
         url: '/pages/auth/auth'
       })
       return
     }
     
-    console.log('授权数据完整，初始化页面')
+    console.log('index页面授权数据完整，初始化页面')
     this.initPage()
   },
 
