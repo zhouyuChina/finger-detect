@@ -25,7 +25,7 @@
   <!-- 主要内容区域 -->
   <view class="content-area">
     <view class="photo-section">
-      <view class="photo-title">请拍照进行检测</view>
+      <view class="photo-title">请开始拍照</view>
       
       <!-- 拍照区域 -->
       <view class="photo-area">
