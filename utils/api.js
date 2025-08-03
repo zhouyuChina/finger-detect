@@ -72,7 +72,12 @@ const userApi = {
 
 // 检测相关API
 const detectionApi = {
-  // 创建检测
+  // 获取检测记录列表
+  getList(params = {}) {
+    return request.get(config.api.detection.list, params)
+  },
+
+  // 创建检测记录
   create(data) {
     return request.post(config.api.detection.create, data)
   },

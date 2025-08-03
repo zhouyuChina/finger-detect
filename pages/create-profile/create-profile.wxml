@@ -60,6 +60,7 @@
           wx:key="id"
           bindtap="selectProfile"
           data-profile="{{item}}"
+          data-index="{{index}}"
         >
           <view class="profile-info">
             <view class="profile-name">{{item.name}}</view>

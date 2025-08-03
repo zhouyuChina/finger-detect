@@ -15,38 +15,51 @@
 
   <!-- 主要内容区域 -->
   <view class="content-area">
-    <!-- 第一部分：照片显示区域 -->
-    <view class="image-section">
-      <view class="image-container">
-        <image 
-          class="detection-image" 
-          src="{{detectionResult.imagePath || '/images/default-avatar.png'}}" 
-          mode="aspectFill"
-          bindtap="previewImage"
-        />
-      </view>
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-icon">⏳</view>
+      <text class="loading-text">加载检测结果中...</text>
     </view>
-
-    <!-- 第二部分：描述内容 -->
-    <view class="description-section">
-      <view class="section-title">描述:</view>
-      <view class="description-content">
-        <text class="description-text">{{detectionResult.description}}</text>
+    
+    <!-- 正常状态 -->
+    <view wx:else>
+      <!-- 第一部分：照片显示区域 -->
+      <view class="image-section">
+        <view class="image-container">
+          <image 
+            class="detection-image" 
+            src="{{detectionResult.imagePath || '/images/default-avatar.png'}}" 
+            mode="aspectFill"
+            bindtap="previewImage"
+          />
+        </view>
       </view>
-    </view>
 
-    <!-- 第三部分：产品使用建议 -->
-    <view class="suggestions-section">
-      <view class="section-title">产品的使用建议:</view>
-      <view class="suggestions-content">
-        <text class="suggestions-text">{{detectionResult.suggestions}}</text>
+      <!-- 第二部分：描述内容 -->
+      <view class="description-section">
+        <view class="section-title">
+          {{detection.isFirstReport ? '检测报告' : '治疗记录'}}:
+        </view>
+        <view class="description-content">
+          <text class="description-text">{{detectionResult.description}}</text>
+        </view>
+      </view>
+
+      <!-- 第三部分：产品使用建议 -->
+      <view class="suggestions-section" wx:if="{{detection.isFirstReport}}">
+        <view class="section-title">产品的使用建议:</view>
+        <view class="suggestions-content">
+          <text class="suggestions-text">{{detectionResult.suggestions}}</text>
+        </view>
       </view>
     </view>
   </view>
 
   <!-- 操作按钮 -->
   <view class="action-buttons">
-    <button class="btn btn-save" bindtap="saveToProfile">保存到档案</button>
+    <button class="btn btn-save" bindtap="saveToProfile">
+      {{detection.isFirstReport ? '保存报告' : '保存记录'}}
+    </button>
     <button class="btn btn-home" bindtap="backToHome">返回首页</button>
   </view>
 </view> 

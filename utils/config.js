@@ -65,7 +65,8 @@ const config = {
 
     // 检测相关
     detection: {
-      create: '/detection/create',
+      list: '/miniprogram/detection', // 获取检测记录列表
+      create: '/miniprogram/detection-fixed', // 创建检测记录
       upload: '/detection/upload',
       result: '/detection/result',
       history: '/detection/history',

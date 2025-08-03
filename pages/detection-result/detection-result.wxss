@@ -81,6 +81,32 @@ page {
   gap: 30rpx;
 }
 
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 30rpx;
+  text-align: center;
+}
+
+.loading-icon {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+  animation: spin 2s linear infinite;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* 第一部分：照片显示区域 */
 .image-section {
   width: 100%;

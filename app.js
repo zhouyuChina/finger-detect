@@ -194,24 +194,25 @@ App({
       
       const response = await api.user.miniProgramRegister(registerData)
       
-      console.log('注册响应:', response.code, response.message)
+      console.log('注册响应:', response)
       
-      if (response.code === 200) {
+      if (response.success || response.code === 200) {
         console.log('注册成功，保存用户数据')
         
         // 保存用户信息和token
-        if (response.data.token) {
-          storage.setToken(response.data.token)
+        const responseData = response.data || response
+        if (responseData.token) {
+          storage.setToken(responseData.token)
         }
-        if (response.data.userInfo) {
-          storage.setUserInfo(response.data.userInfo)
-          this.globalData.userInfo = response.data.userInfo
+        if (responseData.userInfo) {
+          storage.setUserInfo(responseData.userInfo)
+          this.globalData.userInfo = responseData.userInfo
           this.globalData.isLoggedIn = true
         }
         
         // 保存openId到localStorage（7天过期）
-        if (response.data.openId) {
-          storage.setOpenId(response.data.openId)
+        if (responseData.openId) {
+          storage.setOpenId(responseData.openId)
         }
         
         // 显示欢迎信息

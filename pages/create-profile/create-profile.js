@@ -140,6 +140,14 @@ Page({
     this.loadUsers();
   },
 
+  onShow() {
+    // 页面显示时，如果已经选择了用户，重新加载档案
+    if (this.data.selectedUser && this.data.selectedUser.username) {
+      console.log('页面显示，重新加载档案')
+      this.loadUserProfiles(this.data.selectedUser.id);
+    }
+  },
+
   // 加载用户数据
   async loadUsers() {
     try {
@@ -219,7 +227,11 @@ Page({
       photoCount: archive.photoCount || 0,
       detectionTime: archive.detectionTime,
       createdAt: archive.createdAt,
-      updatedAt: archive.updatedAt
+      updatedAt: archive.updatedAt,
+      // 保留原始数据用于传递
+      originalData: archive,
+      // 添加用户名信息
+      username: this.data.selectedUser?.username
     }))
   },
 
@@ -300,9 +312,12 @@ Page({
 
   // 选择本人（微信用户）
   selectMyself() {
+    console.log('选择本人，当前微信用户信息:', this.data.wechatUser)
+    
     if (this.data.wechatUser) {
       const myselfUser = {
         id: 'myself',
+        username: this.data.wechatUser.openid || 'myself', // 添加 username 字段
         nickname: this.data.wechatUser.nickname || '本人',
         age: this.calculateAge(this.data.wechatUser.registerTime),
         address: `${this.data.wechatUser.country || ''}${this.data.wechatUser.province || ''}${this.data.wechatUser.city || ''}`,
@@ -310,10 +325,13 @@ Page({
         avatar: this.data.wechatUser.avatar || this.data.wechatUser.avatarUrl
       }
       
+      console.log('选择本人，构建的用户信息:', myselfUser)
+      
       this.setData({
         selectedUser: myselfUser
       });
     } else {
+      console.error('微信用户信息不存在')
       wx.showToast({
         title: '微信用户信息获取失败',
         icon: 'none'
@@ -358,31 +376,59 @@ Page({
     try {
       console.log('开始加载用户档案，用户ID:', userId)
       
-      // 如果是本人，使用微信用户信息
+      // 如果是本人，尝试获取档案
       if (userId === 'myself') {
-        // 本人暂时没有档案，显示空状态
-        this.setData({ selectedUserProfiles: [] });
+        const selectedUser = this.data.selectedUser;
+        if (selectedUser && selectedUser.username) {
+          // 尝试获取本人的档案
+          console.log('准备调用档案接口，本人用户名:', selectedUser.username)
+          const response = await api.profile.getArchives(selectedUser.username)
+          console.log('本人档案接口响应:', response)
+          
+          if (response.success && response.data) {
+            const archives = response.data.archives || []
+            console.log('获取到本人档案列表:', archives)
+            
+            const formattedProfiles = this.formatArchives(archives)
+            this.setData({ selectedUserProfiles: formattedProfiles });
+          } else {
+            // 如果接口失败或没有档案，显示空状态
+            console.log('本人暂无档案或接口失败')
+            this.setData({ selectedUserProfiles: [] });
+          }
+        } else {
+          console.warn('本人用户信息不完整')
+          this.setData({ selectedUserProfiles: [] });
+        }
         return;
       }
       
       // 获取用户信息
       const selectedUser = this.data.selectedUser;
+      console.log('当前选中的用户:', selectedUser)
       if (!selectedUser || !selectedUser.username) {
         console.warn('用户信息不完整，无法获取档案')
+        console.warn('selectedUser:', selectedUser)
+        console.warn('username:', selectedUser?.username)
         this.setData({ selectedUserProfiles: [] });
         return;
       }
       
       // 调用档案列表接口
+      console.log('准备调用档案接口，用户名:', selectedUser.username)
       const response = await api.profile.getArchives(selectedUser.username)
       console.log('档案列表接口响应:', response)
+      console.log('响应状态:', response.success)
+      console.log('响应数据:', response.data)
       
       if (response.success && response.data) {
         const archives = response.data.archives || []
         console.log('获取到档案列表:', archives)
         
         // 格式化档案数据
+        console.log('原始档案数据:', archives)
         const formattedProfiles = this.formatArchives(archives)
+        console.log('格式化后的档案数据:', formattedProfiles)
         this.setData({ selectedUserProfiles: formattedProfiles });
       } else {
         console.warn('档案列表接口返回错误:', response)
@@ -399,6 +445,13 @@ Page({
   // 选择档案
   selectProfile(e) {
     const profile = e.currentTarget.dataset.profile;
+    const index = e.currentTarget.dataset.index;
+    
+    console.log('选择的档案索引:', index)
+    console.log('选择的档案详情:', profile)
+    console.log('档案的photoCount:', profile.photoCount)
+    console.log('档案的原始数据:', profile.originalData)
+    
     this.setData({ selectedProfile: profile });
     
     // 选择档案后直接跳转到拍照页面
@@ -409,7 +462,7 @@ Page({
 
     setTimeout(() => {
       wx.navigateTo({
-        url: '/pages/photo-detection/photo-detection'
+        url: `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(profile))}`
       });
     }, 1000);
   },
@@ -448,9 +501,21 @@ Page({
     try {
       // 获取用户信息
       const selectedUser = this.data.selectedUser;
-      if (!selectedUser || !selectedUser.username) {
+      console.log('创建档案时的用户信息:', selectedUser)
+      
+      if (!selectedUser) {
+        console.error('用户信息不存在')
         wx.showToast({
-          title: '用户信息不完整',
+          title: '用户信息不存在，请重新选择用户',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      if (!selectedUser.username) {
+        console.error('用户信息不完整，缺少 username:', selectedUser)
+        wx.showToast({
+          title: '用户信息不完整，请重新选择用户',
           icon: 'none'
         });
         return;
@@ -492,7 +557,7 @@ Page({
         // 创建档案后直接跳转到拍照页面
         setTimeout(() => {
           wx.navigateTo({
-            url: '/pages/photo-detection/photo-detection'
+            url: `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(formattedArchive))}`
           });
         }, 1000);
       } else {

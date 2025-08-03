@@ -96,6 +96,85 @@ page {
   margin-bottom: 60rpx;
 }
 
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 30rpx;
+  text-align: center;
+}
+
+.loading-icon {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+  animation: spin 2s linear infinite;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 错误状态 */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 30rpx;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+}
+
+.error-text {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+}
+
+.retry-btn {
+  padding: 20rpx 40rpx;
+  background-color: #007aff;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+/* 档案信息 */
+.profile-info {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.profile-name {
+  display: block;
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.profile-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+}
+
 /* 拍照区域 */
 .photo-area {
   width: 100%;
