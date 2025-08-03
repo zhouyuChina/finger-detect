@@ -225,17 +225,17 @@ class Storage {
   // 设置子用户列表
   setSubUsers(subUsers) {
     this.set('subUsers', subUsers)
-  },
+  }
 
   // 获取子用户列表
   getSubUsers() {
     return this.get('subUsers', [])
-  },
+  }
 
   // 设置当前子用户
   setCurrentSubUser(currentSubUser) {
     this.set('currentSubUser', currentSubUser)
-  },
+  }
 
   // 获取当前子用户
   getCurrentSubUser() {
