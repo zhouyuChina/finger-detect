@@ -1,7 +1,12 @@
 <!--message.wxml-->
 <view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-text">加载中...</view>
+  </view>
+
   <!-- 消息列表 -->
-  <view class="message-list">
+  <view class="message-list" wx:if="{{!loading && messageList.length > 0}}">
     <view class="message-item" wx:for="{{messageList}}" wx:key="id" bindtap="onMessageClick" data-id="{{item.id}}">
       <view class="message-title">{{item.title}}</view>
       <view class="message-image">
@@ -18,5 +23,12 @@
         </view>
       </view>
     </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && messageList.length === 0}}">
+    <view class="empty-icon">📭</view>
+    <view class="empty-text">暂无消息</view>
+    <view class="empty-desc">下拉刷新获取最新消息</view>
   </view>
 </view> 
