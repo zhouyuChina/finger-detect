@@ -47,26 +47,22 @@ Page({
     this.refreshData()
   },
 
-  // 检查授权并初始化
+  // 检查授权并初始化（新接口格式）
   checkAuthAndInit() {
-    const token = storage.getToken()
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
     console.log('index页面检查授权状态:', {
-      hasToken: !!token,
       hasUserInfo: !!userInfo,
       hasOpenId: !!openId,
-      tokenValue: token ? token.substring(0, 10) + '...' : null,
       userInfoValue: userInfo ? JSON.stringify(userInfo).substring(0, 50) + '...' : null,
       openIdValue: openId ? openId.substring(0, 10) + '...' : null
     })
     
-    // 如果缺少必要数据，跳转到授权页面
-    if (!token || !userInfo || !openId) {
+    // 如果缺少必要数据，跳转到授权页面（新接口不再需要token）
+    if (!userInfo || !openId) {
       console.log('index页面缺少授权数据，跳转到授权页面')
       console.log('缺少的数据:', {
-        missingToken: !token,
         missingUserInfo: !userInfo,
         missingOpenId: !openId
       })

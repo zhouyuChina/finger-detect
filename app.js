@@ -199,35 +199,48 @@ App({
       if (response.success || response.code === 200) {
         console.log('注册成功，保存用户数据')
         
-        // 保存用户信息和token
+        // 保存用户信息（新接口格式）
         const responseData = response.data || response
         console.log('app.js 注册响应数据:', responseData)
         
-        if (responseData.token) {
-          storage.setToken(responseData.token)
-          console.log('app.js 保存token成功')
-        }
-        if (responseData.userInfo) {
-          storage.setUserInfo(responseData.userInfo)
-          this.globalData.userInfo = responseData.userInfo
+        // 从新接口格式中提取数据
+        const user = responseData.user
+        if (user) {
+          // 保存openId（从user.openid获取）
+          if (user.openid) {
+            storage.setOpenId(user.openid)
+            console.log('app.js 保存openId成功')
+          }
+          
+          // 保存用户信息（使用user对象）
+          storage.setUserInfo(user)
+          this.globalData.userInfo = user
           this.globalData.isLoggedIn = true
           console.log('app.js 保存用户信息成功')
-        }
-        
-        // 保存openId到localStorage（7天过期）
-        if (responseData.openId) {
-          storage.setOpenId(responseData.openId)
-          console.log('app.js 保存openId成功')
+          
+          // 保存子用户列表
+          if (user.subUsers) {
+            storage.setSubUsers(user.subUsers)
+            console.log('app.js 保存子用户列表成功，数量:', user.subUsers.length)
+          }
+          
+          // 保存当前子用户
+          if (user.currentSubUser) {
+            storage.setCurrentSubUser(user.currentSubUser)
+            console.log('app.js 保存当前子用户成功')
+          }
         }
         
         // 验证保存的数据
-        const savedToken = storage.getToken()
         const savedUserInfo = storage.getUserInfo()
         const savedOpenId = storage.getOpenId()
+        const savedSubUsers = storage.getSubUsers()
+        const savedCurrentSubUser = storage.getCurrentSubUser()
         console.log('app.js 保存后的数据验证:', {
-          token: !!savedToken,
           userInfo: !!savedUserInfo,
-          openId: !!savedOpenId
+          openId: !!savedOpenId,
+          subUsers: !!savedSubUsers,
+          currentSubUser: !!savedCurrentSubUser
         })
         
         // 显示欢迎信息

@@ -117,40 +117,50 @@ Page({
       if (response.success || response.code === 200) {
         console.log('注册成功，保存用户数据')
         
-        // 保存用户信息和token
+        // 保存用户信息（新接口格式）
         const responseData = response.data || response
         console.log('注册响应数据:', responseData)
         
-        if (responseData.token) {
-          storage.setToken(responseData.token)
-          console.log('保存token成功:', responseData.token)
+        // 从新接口格式中提取数据
+        const user = responseData.user
+        if (user) {
+          // 保存openId（从user.openid获取）
+          if (user.openid) {
+            storage.setOpenId(user.openid)
+            console.log('保存openId成功:', user.openid)
+          } else {
+            console.warn('响应中没有openid')
+          }
+          
+          // 保存用户信息（使用user对象）
+          storage.setUserInfo(user)
+          console.log('保存用户信息成功:', user)
+          
+          // 保存子用户列表
+          if (user.subUsers) {
+            storage.setSubUsers(user.subUsers)
+            console.log('保存子用户列表成功，数量:', user.subUsers.length)
+          }
+          
+          // 保存当前子用户
+          if (user.currentSubUser) {
+            storage.setCurrentSubUser(user.currentSubUser)
+            console.log('保存当前子用户成功:', user.currentSubUser)
+          }
         } else {
-          console.warn('响应中没有token')
-        }
-        
-        if (responseData.userInfo) {
-          storage.setUserInfo(responseData.userInfo)
-          console.log('保存用户信息成功:', responseData.userInfo)
-        } else {
-          console.warn('响应中没有userInfo')
-        }
-        
-        // 保存openId到localStorage（7天过期）
-        if (responseData.openId) {
-          storage.setOpenId(responseData.openId)
-          console.log('保存openId成功:', responseData.openId)
-        } else {
-          console.warn('响应中没有openId')
+          console.warn('响应中没有user对象')
         }
         
         // 验证保存的数据
-        const savedToken = storage.getToken()
         const savedUserInfo = storage.getUserInfo()
         const savedOpenId = storage.getOpenId()
+        const savedSubUsers = storage.getSubUsers()
+        const savedCurrentSubUser = storage.getCurrentSubUser()
         console.log('保存后的数据验证:', {
-          token: !!savedToken,
           userInfo: !!savedUserInfo,
-          openId: !!savedOpenId
+          openId: !!savedOpenId,
+          subUsers: !!savedSubUsers,
+          currentSubUser: !!savedCurrentSubUser
         })
         
         // 如果用户提供了真实信息，调用同步接口
@@ -174,12 +184,11 @@ Page({
           duration: 2000
         })
 
-        // 验证数据完整性后再跳转
-        const finalToken = storage.getToken()
+        // 验证数据完整性后再跳转（新接口格式）
         const finalUserInfo = storage.getUserInfo()
         const finalOpenId = storage.getOpenId()
         
-        if (finalToken && finalUserInfo && finalOpenId) {
+        if (finalUserInfo && finalOpenId) {
           console.log('数据保存完整，准备跳转到首页')
           // 延迟跳转到首页
           setTimeout(() => {
@@ -189,7 +198,6 @@ Page({
           }, 2000)
         } else {
           console.error('数据保存不完整，无法跳转:', {
-            token: !!finalToken,
             userInfo: !!finalUserInfo,
             openId: !!finalOpenId
           })
