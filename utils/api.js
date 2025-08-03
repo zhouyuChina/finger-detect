@@ -141,7 +141,7 @@ const messageApi = {
 
   // 标记资讯已读
   markArticleRead(articleId) {
-    return request.post(config.api.message.markArticleRead, { articleId })
+    return request.post(config.api.message.markArticleRead, { articleIds: articleId.toString() })
   }
 }
 
