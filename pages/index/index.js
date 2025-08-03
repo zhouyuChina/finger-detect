@@ -77,13 +77,16 @@ Page({
     try {
       this.setData({ loading: true })
       
-      // 直接加载真实的banner数据
-      await this.loadBanner()
-      
-      // 加载消息列表
-      await this.loadMessages().catch(error => {
-        console.warn('消息加载失败，但不影响页面显示:', error)
-      })
+      // 并行加载banner、消息数据和未读数量
+      await Promise.all([
+        this.loadBanner(),
+        this.loadMessages().catch(error => {
+          console.warn('消息加载失败，但不影响页面显示:', error)
+        }),
+        this.fetchUnreadCount().catch(error => {
+          console.warn('未读数量获取失败，但不影响页面显示:', error)
+        })
+      ])
     } catch (error) {
       console.error('初始化页面失败:', error)
       common.showError('加载数据失败')
@@ -95,11 +98,14 @@ Page({
   // 刷新数据
   async refreshData() {
     try {
-      // 刷新banner和消息数据
+      // 刷新banner、消息数据和未读数量
       await Promise.all([
         this.loadBanner(),
         this.loadMessages().catch(error => {
           console.warn('消息刷新失败:', error)
+        }),
+        this.fetchUnreadCount().catch(error => {
+          console.warn('未读数量刷新失败:', error)
         })
       ])
       common.showSuccess('刷新成功')
@@ -317,12 +323,14 @@ Page({
         const articleIds = messages.map(msg => msg.id)
         console.log('获取阅读状态，文章ID列表:', articleIds)
         
-        const readStatusResponse = await api.message.getReadStatus(articleIds)
-        console.log('阅读状态接口响应:', readStatusResponse)
-        
-        if (readStatusResponse.success && readStatusResponse.data) {
-          // 合并阅读状态到消息数据
-          messages = this.mergeReadStatus(messages, readStatusResponse.data)
+        if (articleIds.length > 0) {
+          const readStatusResponse = await api.message.getReadStatus(articleIds)
+          console.log('阅读状态接口响应:', readStatusResponse)
+          
+          if (readStatusResponse.success && readStatusResponse.data) {
+            // 合并阅读状态到消息数据
+            messages = this.mergeReadStatus(messages, readStatusResponse.data)
+          }
         }
       } catch (readError) {
         console.warn('获取阅读状态失败，使用默认状态:', readError)
@@ -432,6 +440,29 @@ Page({
   calculateUnreadCount() {
     const unreadCount = this.data.messages.filter(msg => !msg.isRead).length
     this.setData({ unreadCount })
+    console.log('未读消息数量:', unreadCount)
+  },
+
+  // 从服务器获取未读数量
+  async fetchUnreadCount() {
+    try {
+      const response = await api.message.getUnreadCount()
+      console.log('未读数量接口响应:', response)
+      
+      if (response.success && response.data) {
+        const { unreadCount, totalArticles, readArticles } = response.data
+        this.setData({ 
+          unreadCount: unreadCount || 0,
+          totalArticles: totalArticles || 0,
+          readArticles: readArticles || 0
+        })
+        console.log('服务器未读数量:', unreadCount, '总数:', totalArticles, '已读:', readArticles)
+      }
+    } catch (error) {
+      console.warn('获取未读数量失败，使用本地计算:', error)
+      // 失败时使用本地计算
+      this.calculateUnreadCount()
+    }
   },
 
   // 拍照检测
@@ -513,30 +544,30 @@ Page({
         return
       }
 
-      // 批量标记已读
-      const markPromises = unreadMessages.map(msg => 
-        api.message.markArticleRead(msg.id).catch(error => {
-          console.warn(`标记消息 ${msg.id} 已读失败:`, error)
-          return null
-        })
-      )
-
-      await Promise.all(markPromises)
+      // 调用一键已读接口
+      const response = await api.message.markAllRead()
+      console.log('一键已读响应:', response)
       
-      // 更新本地状态
-      const messages = this.data.messages.map(msg => ({
-        ...msg,
-        isRead: true,
-        readAt: msg.readAt || new Date().toISOString()
-      }))
-      
-      this.setData({ messages })
-      this.calculateUnreadCount()
-      
-      // 更新缓存
-      storage.setMessages(messages)
-      
-      common.showSuccess(`已标记 ${unreadMessages.length} 条消息为已读`)
+      if (response.success && response.data) {
+        const { markedCount, totalArticles, message } = response.data
+        
+        // 更新本地状态
+        const messages = this.data.messages.map(msg => ({
+          ...msg,
+          isRead: true,
+          readAt: msg.readAt || new Date().toISOString()
+        }))
+        
+        this.setData({ messages })
+        this.calculateUnreadCount()
+        
+        // 更新缓存
+        storage.setMessages(messages)
+        
+        common.showSuccess(message || `已标记 ${markedCount} 条消息为已读`)
+      } else {
+        throw new Error(response.message || '标记已读失败')
+      }
     } catch (error) {
       console.error('全部标记已读失败:', error)
       common.showError('标记已读失败')

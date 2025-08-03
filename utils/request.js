@@ -29,6 +29,15 @@ class Request {
       console.log('没有找到token，请求头中不包含Authorization')
     }
 
+    // 添加openId
+    const openId = storage.getOpenId()
+    if (openId) {
+      headers['X-Openid'] = openId
+      console.log('添加X-Openid头:', openId)
+    } else {
+      console.log('没有找到openId，请求头中不包含X-Openid')
+    }
+
     return headers
   }
 

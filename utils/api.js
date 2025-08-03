@@ -135,13 +135,22 @@ const messageApi = {
 
   // 获取资讯阅读状态
   getReadStatus(articleIds = []) {
-    const params = articleIds.length > 0 ? { articleIds: articleIds.join(',') } : {}
-    return request.get(config.api.message.getReadStatus, params)
+    return request.post(config.api.message.getReadStatus, { articleIds })
   },
 
-  // 标记资讯已读
+  // 标记单个资讯已读
   markArticleRead(articleId) {
-    return request.post(config.api.message.markArticleRead, { articleIds: articleId.toString() })
+    return request.post(config.api.message.markArticleRead, { articleId })
+  },
+
+  // 一键标记所有已读
+  markAllRead() {
+    return request.post(config.api.message.markAllRead)
+  },
+
+  // 获取未读数量
+  getUnreadCount() {
+    return request.get(config.api.message.unreadCount)
   }
 }
 

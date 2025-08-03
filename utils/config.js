@@ -77,11 +77,11 @@ const config = {
       list: '/miniprogram/news',
       detail: '/message/detail',
       markRead: '/message/mark-read',
-      markAllRead: '/message/mark-all-read',
+      markAllRead: '/miniprogram/news/read-all', // 一键已读
       delete: '/message/delete',
-      unreadCount: '/message/unread-count',
-      getReadStatus: '/miniprogram/news/read',
-      markArticleRead: '/miniprogram/news/read'
+      unreadCount: '/miniprogram/news/unread-count', // 未读数量
+      getReadStatus: '/miniprogram/news/read', // 获取阅读状态
+      markArticleRead: '/miniprogram/news/read' // 标记单个已读
     },
 
     // 优惠券相关
