@@ -30,9 +30,20 @@
       
       <!-- 用户选择区域 -->
       <view class="user-selection-area">
-        <view class="selection-placeholder" bindtap="showUserSelector">
-          <text class="placeholder-text">请选择用户</text>
-       -->
+        <!-- 加载状态 -->
+        <view class="loading-state" wx:if="{{loading}}">
+          <text class="loading-text">加载中...</text>
+        </view>
+        
+        <!-- 错误状态 -->
+        <view class="error-state" wx:elif="{{error}}">
+          <text class="error-text">{{errorMessage}}</text>
+          <button class="retry-btn" bindtap="onRetry">重试</button>
+        </view>
+        
+        <!-- 正常状态 -->
+        <view class="selection-placeholder" wx:else bindtap="showUserSelector">
+          <text class="placeholder-text">{{selectedUser ? selectedUser.nickname : '请选择用户'}}</text>
         </view>
       </view>
     </view>
@@ -53,6 +64,10 @@
           <view class="profile-info">
             <view class="profile-name">{{item.name}}</view>
             <view class="profile-desc">{{item.bodyPart}} - {{item.detailPart}}</view>
+            <view class="profile-meta">
+              <text class="meta-item">活跃度: {{item.activity}}</text>
+              <text class="meta-item">照片: {{item.photoCount}}张</text>
+            </view>
           </view>
           <view class="profile-arrow">></view>
         </view>
@@ -107,7 +122,7 @@
         </view>
         <view 
           class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
-          wx:for="{{otherUsers}}" 
+          wx:for="{{subUsers}}" 
           wx:key="id"
           bindtap="selectUser"
           data-user="{{item}}"
@@ -116,7 +131,7 @@
           <text class="option-check" wx:if="{{selectedUser && selectedUser.id === item.id}}">✅</text>
         </view>
         <view class="selector-option add-option" bindtap="addNewUser">
-          <text class="option-text">新增档案</text>
+          <text class="option-text">新增用户</text>
         </view>
       </scroll-view>
     </view>
@@ -139,7 +154,7 @@
         </view>
         <view 
           class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
-          wx:for="{{otherUsers}}" 
+          wx:for="{{subUsers}}" 
           wx:key="id"
           bindtap="selectUser"
           data-user="{{item}}"
@@ -148,13 +163,45 @@
           <text class="option-check" wx:if="{{selectedUser && selectedUser.id === item.id}}">✅</text>
         </view>
         <view class="selector-option add-option" bindtap="addNewUser">
-          <text class="option-text">新增档案</text>
+          <text class="option-text">新增用户</text>
         </view>
       </scroll-view>
     </view>
   </view>
 
-  <!-- 用户信息输入弹窗 - 第一步：出生年份 -->
+  <!-- 用户信息输入弹窗 - 第一步：昵称 -->
+  <t-popup
+    visible="{{showNicknamePopup}}"
+    placement="bottom"
+    bind:close="closeNicknamePopup"
+  >
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">新增用户</text>
+        <text class="popup-close" bindtap="closeNicknamePopup">✕</text>
+      </view>
+      
+      <view class="form-content">
+        <view class="form-item">
+          <text class="form-label">用户昵称</text>
+          <input 
+            class="form-input" 
+            placeholder="请输入用户昵称" 
+            value="{{userForm.nickname}}"
+            bindinput="onNicknameInput"
+            maxlength="20"
+          />
+        </view>
+      </view>
+      
+      <view class="popup-actions">
+        <button class="popup-btn cancel-btn" bindtap="closeNicknamePopup">取消</button>
+        <button class="popup-btn confirm-btn" bindtap="nextUserStep">下一步</button>
+      </view>
+    </view>
+  </t-popup>
+
+  <!-- 用户信息输入弹窗 - 第二步：出生年份 -->
   <t-popup
     visible="{{showBirthYearPopup}}"
     placement="bottom"
@@ -176,7 +223,7 @@
       </view>
       
       <view class="popup-actions">
-        <button class="popup-btn cancel-btn" bindtap="closeBirthYearPopup">取消</button>
+        <button class="popup-btn cancel-btn" bindtap="prevUserStep">上一步</button>
         <button class="popup-btn confirm-btn" bindtap="nextUserStep">下一步</button>
       </view>
     </view>

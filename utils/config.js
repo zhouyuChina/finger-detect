@@ -58,7 +58,9 @@ const config = {
       refreshToken: '/auth/refresh',
       wxLogin: '/auth/wx-login',
       getToken: '/miniprogram/auth',
-      stats: '/miniprogram/stats' // 用户统计信息
+      stats: '/miniprogram/stats', // 用户统计信息
+      getUsers: '/miniprogram/users', // 获取子用户列表
+      createSubUser: '/miniprogram/users' // 创建子用户
     },
 
     // 检测相关
@@ -102,11 +104,11 @@ const config = {
 
     // 档案相关
     profile: {
-      list: '/profile/list',
-      create: '/profile/create',
-      update: '/profile/update',
-      delete: '/profile/delete',
-      detail: '/profile/detail'
+      list: '/miniprogram/archives', // 获取用户档案列表
+      create: '/miniprogram/archives', // 创建档案
+      update: '/miniprogram/archives', // 更新档案
+      delete: '/miniprogram/archives', // 删除档案
+      detail: '/miniprogram/archives' // 获取档案详情
     },
 
     // 记录相关

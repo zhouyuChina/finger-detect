@@ -57,6 +57,16 @@ const userApi = {
   // 获取用户统计信息
   getStats() {
     return request.get(config.api.user.stats)
+  },
+
+  // 获取子用户列表
+  getUsers() {
+    return request.get(config.api.user.getUsers)
+  },
+
+  // 创建子用户
+  createSubUser(data) {
+    return request.post(config.api.user.createSubUser, data)
   }
 }
 
@@ -210,6 +220,11 @@ const profileApi = {
   // 获取档案列表
   getList(params = {}) {
     return request.get(config.api.profile.list, params)
+  },
+
+  // 获取用户档案列表（新接口）
+  getArchives(username, params = {}) {
+    return request.get(`${config.api.profile.list}?username=${username}`, params)
   },
 
   // 创建档案

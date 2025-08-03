@@ -1,32 +1,29 @@
 // create-profile.js
+const api = require('../../utils/api.js')
+const storage = require('../../utils/storage.js')
+const common = require('../../utils/common.js')
+const config = require('../../utils/config.js')
+
 Page({
   data: {
     currentStep: 1, // 当前步骤：1-档案信息，2-拍照检测，3-完成
     
     // 用户相关
-    myselfInfo: null, // 本人信息
-    otherUsers: [
-      { id: 1, nickname: '张明', age: 32, address: '北京市朝阳区' },
-      { id: 2, nickname: '李阿姨', age: 58, address: '上海市浦东新区' },
-      { id: 3, nickname: '王五', age: 25, address: '广州市天河区' },
-      { id: 4, nickname: '赵六', age: 35, address: '深圳市南山区' },
-      { id: 5, nickname: '钱七', age: 29, address: '杭州市西湖区' },
-      { id: 6, nickname: '孙八', age: 31, address: '成都市锦江区' },
-      { id: 7, nickname: '周九', age: 27, address: '武汉市江汉区' },
-      { id: 8, nickname: '吴十', age: 33, address: '南京市鼓楼区' },
-      { id: 9, nickname: '郑十一', age: 26, address: '西安市雁塔区' },
-      { id: 10, nickname: '王十二', age: 30, address: '重庆市渝中区' },
-      { id: 11, nickname: '刘十三', age: 28, address: '青岛市市南区' },
-      { id: 12, nickname: '陈十四', age: 34, address: '大连市中山区' }
-    ],
+    wechatUser: null, // 微信用户信息
+    subUsers: [], // 子用户列表
+    currentSubUser: null, // 当前选中的子用户
     selectedUser: null, // 当前选择的用户
     selectedUserProfiles: [], // 当前用户的档案列表
+    loading: false, // 加载状态
+    error: false, // 错误状态
+    errorMessage: '', // 错误信息
     
     // 档案相关
     selectedProfile: null, // 当前选择的档案
     
     // 弹窗控制
     showUserSelector: false,
+    showNicknamePopup: false,
     showBirthYearPopup: false,
     showAddressPopup: false,
     showBirthYearSelector: false,
@@ -125,12 +122,11 @@ Page({
     },
     
     // 用户创建步骤
-    userCreateStep: 1 // 1-出生年份，2-地址
+    userCreateStep: 1 // 1-昵称，2-出生年份，3-地址
   },
 
   onLoad() {
-    // 页面加载时检查本人信息
-    this.checkMyselfInfo();
+    console.log('Create-profile页面加载')
     
     // 生成出生年份选项（1950-2020）
     const currentYear = new Date().getFullYear();
@@ -140,19 +136,138 @@ Page({
     }
     this.setData({ birthYearOptions });
     
-    // 延迟显示用户选择器，确保页面完全加载
-    setTimeout(() => {
-      this.setData({ showUserSelector: true });
-    }, 500);
+    // 加载用户数据
+    this.loadUsers();
   },
 
-  // 检查本人信息
-  checkMyselfInfo() {
-    // 这里可以从本地存储或服务器获取本人信息
-    const myselfInfo = wx.getStorageSync('myselfInfo');
-    if (myselfInfo) {
-      this.setData({ myselfInfo });
+  // 加载用户数据
+  async loadUsers() {
+    try {
+      this.setData({ loading: true, error: false })
+      
+      console.log('开始加载用户数据')
+      const response = await api.user.getUsers()
+      console.log('用户数据接口响应:', response)
+      
+      if (response.success && response.data) {
+        const { wechatUser, subUsers, currentSubUser } = response.data
+        
+        // 格式化用户数据
+        const formattedSubUsers = this.formatSubUsers(subUsers)
+        
+        this.setData({ 
+          wechatUser,
+          subUsers: formattedSubUsers,
+          currentSubUser
+        })
+        
+        console.log('用户数据加载成功，微信用户:', wechatUser?.nickname, '子用户数量:', formattedSubUsers.length)
+        
+        // 延迟显示用户选择器，确保页面完全加载
+        setTimeout(() => {
+          this.setData({ showUserSelector: true });
+        }, 500);
+      } else {
+        console.warn('用户数据接口返回错误:', response)
+        this.handleError(response.message || '获取用户数据失败')
+      }
+    } catch (error) {
+      console.error('加载用户数据失败:', error)
+      this.handleError('网络错误，请稍后重试')
+    } finally {
+      this.setData({ loading: false })
     }
+  },
+
+  // 格式化子用户数据
+  formatSubUsers(subUsers) {
+    if (!Array.isArray(subUsers)) {
+      return []
+    }
+
+    return subUsers.map(user => ({
+      id: user.id,
+      nickname: user.realName || user.username || '未知用户',
+      username: user.username,
+      age: user.age || 0,
+      address: user.address || '未知地址',
+      phone: user.phone || '',
+      email: user.email || '',
+      gender: user.gender || '0',
+      archives: user.archives || 0,
+      photos: user.photos || 0,
+      reports: user.reports || 0,
+      remark: user.remark || '',
+      status: user.status || 'active',
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    }))
+  },
+
+  // 格式化档案数据
+  formatArchives(archives) {
+    if (!Array.isArray(archives)) {
+      return []
+    }
+
+    return archives.map(archive => ({
+      id: archive.id,
+      name: archive.archiveName,
+      bodyPart: this.getBodyPartName(archive.bodyPart),
+      detailPart: this.getDetailPartName(archive.bodyPart),
+      activity: archive.activity,
+      photoCount: archive.photoCount || 0,
+      detectionTime: archive.detectionTime,
+      createdAt: archive.createdAt,
+      updatedAt: archive.updatedAt
+    }))
+  },
+
+  // 获取身体部位名称
+  getBodyPartName(bodyPart) {
+    const partMap = {
+      'fingerprint': '手指',
+      'face': '面部',
+      'iris': '虹膜',
+      'voice': '声音'
+    }
+    return partMap[bodyPart] || '未知部位'
+  },
+
+  // 获取详细部位名称
+  getDetailPartName(bodyPart) {
+    const detailMap = {
+      'fingerprint': '指纹',
+      'face': '面部特征',
+      'iris': '虹膜特征',
+      'voice': '声纹特征'
+    }
+    return detailMap[bodyPart] || '未知特征'
+  },
+
+  // 获取身体部位值
+  getBodyPartValue(bodyPart) {
+    const valueMap = {
+      'leftHand': 'fingerprint',
+      'rightHand': 'fingerprint',
+      'leftFoot': 'fingerprint',
+      'rightFoot': 'fingerprint'
+    }
+    return valueMap[bodyPart] || 'fingerprint'
+  },
+
+  // 处理错误
+  handleError(message) {
+    this.setData({ 
+      error: true, 
+      errorMessage: message 
+    })
+    common.showError(message)
+  },
+
+  // 重新加载
+  onRetry() {
+    this.loadUsers()
   },
 
   // 显示用户选择弹窗
@@ -183,21 +298,40 @@ Page({
     }
   },
 
-  // 选择本人
+  // 选择本人（微信用户）
   selectMyself() {
-    if (this.data.myselfInfo) {
-      // 如果已有信息，直接选择
+    if (this.data.wechatUser) {
+      const myselfUser = {
+        id: 'myself',
+        nickname: this.data.wechatUser.nickname || '本人',
+        age: this.calculateAge(this.data.wechatUser.registerTime),
+        address: `${this.data.wechatUser.country || ''}${this.data.wechatUser.province || ''}${this.data.wechatUser.city || ''}`,
+        gender: this.data.wechatUser.gender || '0',
+        avatar: this.data.wechatUser.avatar || this.data.wechatUser.avatarUrl
+      }
+      
       this.setData({
-        selectedUser: { id: 'myself', ...this.data.myselfInfo }
+        selectedUser: myselfUser
       });
     } else {
-      // 如果没有信息，弹出设置弹窗
-      this.setData({
-        isEditingMyself: true,
-        showUserSelector: false,
-        showUserInfoPopup: true
+      wx.showToast({
+        title: '微信用户信息获取失败',
+        icon: 'none'
       });
     }
+  },
+
+  // 计算年龄
+  calculateAge(birthDate) {
+    if (!birthDate) return 0
+    const birth = new Date(birthDate)
+    const today = new Date()
+    let age = today.getFullYear() - birth.getFullYear()
+    const monthDiff = today.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age
   },
 
   // 选择其他用户
@@ -212,21 +346,54 @@ Page({
   addNewUser() {
     this.setData({
       isEditingMyself: false,
-      userForm: { nickname: '新用户', birthYear: '', province: '', city: '', district: '' },
+      userForm: { nickname: '', birthYear: '', province: '', city: '', district: '' },
       userCreateStep: 1,
       showUserSelector: false,
-      showBirthYearPopup: true
+      showNicknamePopup: true
     });
   },
 
   // 加载用户档案
-  loadUserProfiles(userId) {
-    // 模拟加载档案数据
-    const profiles = [
-      { id: 1, name: '档案1', bodyPart: '左手', detailPart: '大拇指' },
-      { id: 2, name: '档案2', bodyPart: '右手', detailPart: '食指' }
-    ];
-    this.setData({ selectedUserProfiles: profiles });
+  async loadUserProfiles(userId) {
+    try {
+      console.log('开始加载用户档案，用户ID:', userId)
+      
+      // 如果是本人，使用微信用户信息
+      if (userId === 'myself') {
+        // 本人暂时没有档案，显示空状态
+        this.setData({ selectedUserProfiles: [] });
+        return;
+      }
+      
+      // 获取用户信息
+      const selectedUser = this.data.selectedUser;
+      if (!selectedUser || !selectedUser.username) {
+        console.warn('用户信息不完整，无法获取档案')
+        this.setData({ selectedUserProfiles: [] });
+        return;
+      }
+      
+      // 调用档案列表接口
+      const response = await api.profile.getArchives(selectedUser.username)
+      console.log('档案列表接口响应:', response)
+      
+      if (response.success && response.data) {
+        const archives = response.data.archives || []
+        console.log('获取到档案列表:', archives)
+        
+        // 格式化档案数据
+        const formattedProfiles = this.formatArchives(archives)
+        this.setData({ selectedUserProfiles: formattedProfiles });
+      } else {
+        console.warn('档案列表接口返回错误:', response)
+        // 如果接口失败，显示空状态
+        this.setData({ selectedUserProfiles: [] });
+      }
+    } catch (error) {
+      console.error('加载用户档案失败:', error)
+      // 如果接口失败，显示空状态
+      this.setData({ selectedUserProfiles: [] });
+    }
   },
 
   // 选择档案
@@ -274,48 +441,96 @@ Page({
   },
 
   // 选择详细部位
-  selectDetailPart(e) {
+  async selectDetailPart(e) {
     const part = e.currentTarget.dataset.part;
     const bodyPart = this.data.selectedBodyPart;
     
-    // 创建新档案
-    const newProfile = {
-      id: Date.now(),
-      name: `${bodyPart.name}${part.name}`,
-      bodyPart: bodyPart.name,
-      detailPart: part.name
-    };
+    try {
+      // 获取用户信息
+      const selectedUser = this.data.selectedUser;
+      if (!selectedUser || !selectedUser.username) {
+        wx.showToast({
+          title: '用户信息不完整',
+          icon: 'none'
+        });
+        return;
+      }
 
-    // 添加到档案列表
-    const profiles = [...this.data.selectedUserProfiles, newProfile];
-    this.setData({
-      selectedUserProfiles: profiles,
-      selectedProfile: newProfile,
-      showDetailPartPopup: false
-    });
+      // 准备档案数据
+      const archiveData = {
+        username: selectedUser.username,
+        archiveName: `${bodyPart.name}${part.name}`,
+        bodyPart: this.getBodyPartValue(bodyPart.value),
+        activity: 'medium',
+        photoCount: 0
+      };
 
-    wx.showToast({
-      title: '档案创建成功',
-      icon: 'success'
-    });
+      console.log('创建档案数据:', archiveData)
+      
+      // 调用创建档案接口
+      const response = await api.profile.create(archiveData)
+      console.log('创建档案接口响应:', response)
+      
+      if (response.success && response.data) {
+        const newArchive = response.data
+        
+        // 重新加载档案列表
+        await this.loadUserProfiles(selectedUser.id)
+        
+        // 设置新创建的档案为选中状态
+        const formattedArchive = this.formatArchives([newArchive])[0]
+        this.setData({
+          selectedProfile: formattedArchive,
+          showDetailPartPopup: false
+        });
 
-    // 创建档案后直接跳转到拍照页面
-    setTimeout(() => {
-      wx.navigateTo({
-        url: '/pages/photo-detection/photo-detection'
+        wx.showToast({
+          title: '档案创建成功',
+          icon: 'success'
+        });
+
+        // 创建档案后直接跳转到拍照页面
+        setTimeout(() => {
+          wx.navigateTo({
+            url: '/pages/photo-detection/photo-detection'
+          });
+        }, 1000);
+      } else {
+        console.warn('创建档案接口返回错误:', response)
+        wx.showToast({
+          title: response.message || '创建档案失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('创建档案失败:', error)
+      wx.showToast({
+        title: '创建档案失败，请重试',
+        icon: 'none'
       });
-    }, 1000);
+    }
   },
-
-
-
-
 
   // 用户创建步骤控制
   nextUserStep() {
     const { userCreateStep, userForm } = this.data;
     
     if (userCreateStep === 1) {
+      // 验证昵称
+      if (!userForm.nickname || userForm.nickname.trim() === '') {
+        wx.showToast({
+          title: '请输入用户昵称',
+          icon: 'none'
+        });
+        return;
+      }
+      // 进入第二步
+      this.setData({
+        userCreateStep: 2,
+        showNicknamePopup: false,
+        showBirthYearPopup: true
+      });
+    } else if (userCreateStep === 2) {
       // 验证出生年份
       if (!userForm.birthYear) {
         wx.showToast({
@@ -324,9 +539,9 @@ Page({
         });
         return;
       }
-      // 进入第二步
+      // 进入第三步
       this.setData({
-        userCreateStep: 2,
+        userCreateStep: 3,
         showBirthYearPopup: false,
         showAddressPopup: true
       });
@@ -340,10 +555,24 @@ Page({
       // 返回第一步
       this.setData({
         userCreateStep: 1,
+        showBirthYearPopup: false,
+        showNicknamePopup: true
+      });
+    } else if (userCreateStep === 3) {
+      // 返回第二步
+      this.setData({
+        userCreateStep: 2,
         showAddressPopup: false,
         showBirthYearPopup: true
       });
     }
+  },
+
+  // 昵称输入处理
+  onNicknameInput(e) {
+    this.setData({
+      'userForm.nickname': e.detail.value
+    });
   },
 
   // 出生年份选择
@@ -497,6 +726,13 @@ Page({
   },
 
   // 关闭弹窗方法
+  closeNicknamePopup() {
+    this.setData({ 
+      showNicknamePopup: false,
+      userCreateStep: 1
+    });
+  },
+
   closeBirthYearPopup() {
     this.setData({ 
       showBirthYearPopup: false,
@@ -512,7 +748,7 @@ Page({
   },
 
   // 保存用户信息
-  saveUserInfo() {
+  async saveUserInfo() {
     const { nickname, birthYear, province, city, district } = this.data.userForm;
     
     if (!nickname || !birthYear || !province || !city || !district) {
@@ -543,25 +779,56 @@ Page({
       this.loadUserProfiles('myself');
     } else {
       // 创建新用户
-      const newUser = {
-        id: Date.now(),
-        ...userInfo
-      };
-      
-      const otherUsers = [...this.data.otherUsers, newUser];
-      this.setData({
-        otherUsers,
-        selectedUser: newUser,
-        showAddressPopup: false,
-        currentStep: 2
-      });
-      this.loadUserProfiles(newUser.id);
-    }
+      try {
+        const userData = {
+          username: nickname,
+          realName: nickname,
+          age: age,
+          address: address,
+          province: province,
+          city: city,
+          district: district
+        };
 
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
-    });
+        console.log('创建子用户数据:', userData)
+        
+        // 调用创建子用户接口
+        const response = await api.user.createSubUser(userData)
+        console.log('创建子用户接口响应:', response)
+        
+        if (response.success && response.data) {
+          const newUser = response.data.user
+          
+          // 重新加载用户列表以获取最新数据
+          await this.loadUsers()
+          
+          // 设置新创建的用户为选中状态
+          this.setData({
+            selectedUser: newUser,
+            showAddressPopup: false,
+            currentStep: 2
+          });
+          this.loadUserProfiles(newUser.id);
+          
+          wx.showToast({
+            title: '用户创建成功',
+            icon: 'success'
+          });
+        } else {
+          console.warn('创建子用户接口返回错误:', response)
+          wx.showToast({
+            title: response.message || '创建用户失败',
+            icon: 'none'
+          });
+        }
+      } catch (error) {
+        console.error('创建子用户失败:', error)
+        wx.showToast({
+          title: '创建用户失败，请重试',
+          icon: 'none'
+        });
+      }
+    }
   },
 
   // 弹窗控制方法
@@ -591,7 +858,5 @@ Page({
         selectedProfile: null
       });
     }
-  },
-
-  // 已移除completeProfile方法，选择档案后直接跳转
+  }
 }) 
