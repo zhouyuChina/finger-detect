@@ -23,18 +23,39 @@ Page({
       // 从服务器获取消息数据
       const response = await api.message.getList({ limit: 20 })
       console.log('Message页面消息响应:', response)
+      console.log('Message页面响应类型:', typeof response)
+      console.log('Message页面响应数据结构:', JSON.stringify(response, null, 2))
       
-      if (response.code === 200 && response.data) {
-        const messageList = this.formatMessageData(response.data)
-        this.setData({ messageList })
-        
-        // 缓存数据
-        storage.setMessages(messageList)
-        console.log('Message页面加载成功，消息数量:', messageList.length)
+      let messageData = null
+      
+      // 处理不同的响应格式（与首页保持一致）
+      if (response.success && response.data && response.data.list) {
+        // 格式：{success: true, data: {list: [...], pagination: {...}}}
+        messageData = response.data.list
+      } else if (response.success && response.data) {
+        // 格式：{success: true, data: [...]}
+        messageData = response.data
+      } else if (response.code === 200 && response.data) {
+        // 格式：{code: 200, data: [...]}
+        messageData = response.data
+      } else if (Array.isArray(response)) {
+        // 格式：直接返回数组
+        messageData = response
       } else {
         console.warn('Message接口返回数据格式错误:', response)
         this.setData({ messageList: [] })
+        return
       }
+      
+      const messageList = this.formatMessageData(messageData)
+      console.log('Message页面格式化后的数据:', messageList)
+      console.log('Message页面格式化后的数据长度:', messageList.length)
+      
+      this.setData({ messageList })
+      
+      // 缓存数据
+      storage.setMessages(messageList)
+      console.log('Message页面加载成功，消息数量:', messageList.length)
     } catch (error) {
       console.error('Message页面加载消息失败:', error)
       this.setData({ messageList: [] })
