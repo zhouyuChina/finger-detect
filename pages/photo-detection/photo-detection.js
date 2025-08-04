@@ -184,20 +184,20 @@ Page({
     })
 
     try {
-      // 准备档案数据
+      // 准备检测数据
       const profile = this.data.profile
-      const archiveData = {
+      const detectionData = {
         username: profile.username,
         archiveName: profile.name,
-        bodyPart: this.getBodyPartValue(profile.name), // 获取bodyPart值
+        detectionType: this.getDetectionType(profile.name), // 获取检测类型
         imageUrl: this.data.photoPath // 照片路径
       }
 
-      console.log('保存档案数据:', archiveData)
+      console.log('保存检测数据:', detectionData)
       
-      // 调用档案接口保存照片
-      const response = await api.profile.create(archiveData)
-      console.log('档案保存接口响应:', response)
+      // 调用检测接口保存照片
+      const response = await api.detection.create(detectionData)
+      console.log('检测保存接口响应:', response)
       
       wx.hideLoading()
       
@@ -210,14 +210,21 @@ Page({
         // 更新档案的照片数量
         this.updateProfilePhotoCount(this.data.profile.id)
         
-        // 跳转到恢复记录页面
+        // 跳转到恢复记录页面（tabBar页面）
+        console.log('准备跳转到恢复记录页面，profileId:', this.data.profile.id)
         setTimeout(() => {
-          wx.redirectTo({
-            url: `/pages/records-compare/records-compare?profileId=${this.data.profile.id}`
+          wx.switchTab({
+            url: '/pages/records-compare/records-compare',
+            success: () => {
+              console.log('跳转到tabBar页面成功')
+            },
+            fail: (error) => {
+              console.error('跳转到tabBar页面失败:', error)
+            }
           })
         }, 1500)
       } else {
-        console.warn('档案保存接口返回错误:', response)
+        console.warn('检测保存接口返回错误:', response)
         wx.showToast({
           title: response.message || '保存失败',
           icon: 'none'
