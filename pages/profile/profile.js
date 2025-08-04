@@ -46,14 +46,26 @@ Page({
     try {
       this.setData({ loading: true })
       
-      // 并行加载用户信息和统计信息
-      const [userInfoRes, statsRes] = await Promise.all([
+      // 并行加载用户信息、统计信息、子用户信息、档案信息和未读消息数量
+      const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes] = await Promise.all([
         api.user.getProfile().catch(error => {
           console.warn('获取用户信息失败:', error)
           return null
         }),
         api.user.getStats().catch(error => {
           console.warn('获取用户统计失败:', error)
+          return null
+        }),
+        api.user.getUsers().catch(error => {
+          console.warn('获取子用户列表失败:', error)
+          return null
+        }),
+        api.profile.getAllArchives().catch(error => {
+          console.warn('获取档案列表失败:', error)
+          return null
+        }),
+        api.message.getUnreadCount().catch(error => {
+          console.warn('获取未读消息数量失败:', error)
           return null
         })
       ])
@@ -74,23 +86,16 @@ Page({
         })
       }
 
-      // 处理统计信息
-      if (statsRes && statsRes.code === 200 && statsRes.data) {
-        const stats = this.formatStats(statsRes.data)
-        this.setData({ stats })
-        console.log('统计信息加载成功:', stats)
-      } else {
-        console.log('使用默认统计信息')
-        this.setData({
-          stats: {
-            totalRecords: 0,
-            totalReports: 0,
-            familyMembers: 0,
-            totalDetections: 0,
-            unreadMessages: 0
-          }
-        })
-      }
+      // 处理统计信息，整合多个接口的数据
+      const stats = this.formatStats({
+        ...(statsRes?.data || {}),
+        subUsers: subUsersRes?.data?.subUsers?.length || 0,
+        totalArchives: archivesRes?.data?.totalAll || 0,
+        totalDetections: archivesRes?.data?.totalDetections || 0,
+        unreadMessages: unreadMessagesRes?.data?.count || unreadMessagesRes?.data || 0
+      })
+      this.setData({ stats })
+      console.log('统计信息加载成功:', stats)
 
     } catch (error) {
       console.error('加载用户数据失败:', error)
@@ -112,12 +117,24 @@ Page({
   // 格式化统计信息
   formatStats(data) {
     return {
-      totalRecords: data.totalRecords || data.photoRecords || 0,
-      totalReports: data.totalReports || data.reportRecords || 0,
-      familyMembers: data.familyMembers || data.profileRecords || 0,
-      totalDetections: data.totalDetections || data.detectionCount || 0,
-      unreadMessages: data.unreadMessages || data.unreadCount || 0
+      totalRecords: this.ensureNumber(data.subUsers || data.totalUsers || data.totalRecords) || 0, // 用户数目（子用户数量）
+      totalReports: this.ensureNumber(data.totalArchives || data.totalReports || data.reportRecords) || 0, // 建档记录（档案数量）
+      familyMembers: this.ensureNumber(data.totalDetections || data.detectionCount || data.familyMembers) || 0, // 检测记录（检测数量）
+      totalDetections: this.ensureNumber(data.totalDetections || data.detectionCount) || 0, // 保留原有字段，用于其他功能
+      unreadMessages: this.ensureNumber(data.unreadMessages || data.unreadCount) || 0 // 未读消息数量
     }
+  },
+
+  // 确保返回数字类型
+  ensureNumber(value) {
+    if (typeof value === 'number') return value
+    if (typeof value === 'string') {
+      const num = parseInt(value, 10)
+      return isNaN(num) ? 0 : num
+    }
+    if (Array.isArray(value)) return value.length
+    if (value && typeof value === 'object') return 0
+    return 0
   },
 
   // 处理头像URL
@@ -240,23 +257,24 @@ Page({
   },
 
   // 查看检测记录
+  // 查看用户数目（子用户管理）
   onViewRecords() {
     wx.navigateTo({
-      url: '/pages/records/records'
+      url: '/pages/create-profile/create-profile'
     })
   },
 
-  // 查看报告记录
+  // 查看建档记录（档案列表）
   onViewReports() {
     wx.navigateTo({
-      url: '/pages/records/records'
+      url: '/pages/records-compare/records-compare'
     })
   },
 
-  // 查看建档记录
+  // 查看检测记录
   onViewFamily() {
     wx.navigateTo({
-      url: '/pages/my-profile/my-profile'
+      url: '/pages/user-records/user-records'
     })
   },
 

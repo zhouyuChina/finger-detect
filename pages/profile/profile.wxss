@@ -86,12 +86,6 @@
   padding: 20rpx 10rpx;
   border-radius: 12rpx;
   background-color: #f8f9fa;
-  transition: all 0.3s ease;
-}
-
-.stats-item:active {
-  background-color: #e9ecef;
-  transform: scale(0.95);
 }
 
 .stats-number {

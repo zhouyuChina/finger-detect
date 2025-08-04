@@ -33,19 +33,19 @@
   <!-- 统计信息 -->
   <view class="stats-section">
     <view class="stats-grid">
-      <view class="stats-item" bindtap="onViewRecords">
+      <view class="stats-item">
         <text class="stats-number">{{stats.totalRecords}}</text>
         <text class="stats-label">用户数目</text>
       </view>
-      <view class="stats-item" bindtap="onViewReports">
+      <view class="stats-item">
         <text class="stats-number">{{stats.totalReports}}</text>
         <text class="stats-label">建档记录</text>
       </view>
-      <view class="stats-item" bindtap="onViewFamily">
+      <view class="stats-item">
         <text class="stats-number">{{stats.familyMembers}}</text>
         <text class="stats-label">检测记录</text>
       </view>
-      <view class="stats-item" bindtap="onSystemMessages">
+      <view class="stats-item">
         <text class="stats-number">{{stats.unreadMessages}}</text>
         <text class="stats-label">未读消息</text>
       </view>
@@ -56,16 +56,9 @@
   <view class="menu-section">
     <t-cell-group theme="card">
       <t-cell 
-        title="我的档案" 
-        description="管理个人健康档案"
+        title="用户中心" 
+        description="管理我的用户"
         bindtap="onMyProfile"
-      >
-        <text slot="note" class="arrow-icon">›</text>
-      </t-cell>
-      <t-cell 
-        title="检测记录" 
-        description="查看历史检测记录"
-        bindtap="onMyRecords"
       >
         <text slot="note" class="arrow-icon">›</text>
       </t-cell>
