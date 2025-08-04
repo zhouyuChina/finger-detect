@@ -5,62 +5,81 @@
     <view class="nav-left" bindtap="onBack">
       <text class="nav-icon">←</text>
     </view>
-    <view class="nav-title">{{currentRecord.part}} - 检测历史</view>
+    <view class="nav-title">{{archiveName}} - 检测历史</view>
     <view class="nav-right">
       <text class="nav-icon" bindtap="onShare">📤</text>
     </view>
   </view>
 
+  <!-- 档案信息 -->
+  <view class="archive-info" wx:if="{{archive.id || detections.length > 0}}">
+    <view class="info-item">
+      <text class="info-label">档案名称：</text>
+      <text class="info-value">{{archiveName}}</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">检测次数：</text>
+      <text class="info-value">{{detections.length}} 次</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">用户名：</text>
+      <text class="info-value">{{username}}</text>
+    </view>
+  </view>
+
   <!-- 大图片展示区域 -->
   <view class="main-image-section">
-    <view wx:if="{{photoList.length === 0}}" class="loading-container">
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-container">
       <view class="loading-spinner"></view>
       <text class="loading-text">加载中...</text>
     </view>
+    
+    <!-- 空状态 -->
+    <view wx:elif="{{!loading && detections.length === 0}}" class="empty-container">
+      <text class="empty-text">暂无检测记录</text>
+      <text class="empty-desc">点击下方按钮开始检测</text>
+    </view>
+    
+    <!-- 图片轮播 -->
     <swiper wx:else class="main-swiper" current="{{currentIndex}}" bindchange="onSwiperChange">
-      <swiper-item wx:for="{{photoList}}" wx:key="id">
+      <swiper-item wx:for="{{detections}}" wx:key="id">
         <view class="main-image-container">
           <image 
             src="{{item.imagePath}}" 
             mode="aspectFit" 
             class="main-image"
             catchtap="onImageTap"
-            data-index="{{index}}"
             binderror="onImageError"
             bindload="onImageLoad"
           />
           <view class="image-info">
-            <text class="image-date">{{item.date}}</text>
-            <text class="image-desc">{{item.description}}</text>
+            <text class="image-date">{{item.uploadTime}}</text>
+            <text class="image-status">状态：{{item.status}}</text>
+            <text class="image-confidence" wx:if="{{item.confidence > 0}}">置信度：{{item.confidencePercent}}%</text>
           </view>
         </view>
       </swiper-item>
     </swiper>
     
     <!-- 左右切换按钮 -->
-    <view class="navigation-buttons" wx:if="{{photoList.length > 1}}">
-      <view wx:if="{{currentIndex > 0}}" class="nav-btn prev-btn" catchtap="onPrevImage">
+    <view class="navigation-buttons" wx:if="{{detections.length > 1}}">
+      <view class="nav-btn prev-btn" catchtap="onPrevImage">
         <text class="nav-icon">‹</text>
       </view>
-      <view wx:else class="nav-btn prev-btn disabled" catchtap="onPrevImage">
-        <text class="nav-icon">‹</text>
-      </view>
-      <view wx:if="{{currentIndex < photoList.length - 1}}" class="nav-btn next-btn" catchtap="onNextImage">
-        <text class="nav-icon">›</text>
-      </view>
-      <view wx:else class="nav-btn next-btn disabled" catchtap="onNextImage">
+      <view class="nav-btn next-btn" catchtap="onNextImage">
         <text class="nav-icon">›</text>
       </view>
     </view>
     
     <!-- 图片指示器 -->
-    <view class="image-indicator" wx:if="{{photoList.length > 0}}">
-      <text class="indicator-text">{{currentIndex + 1}} / {{photoList.length}}</text>
+    <view class="image-indicator" wx:if="{{detections.length > 0}}">
+      <text class="indicator-text">{{currentIndex + 1}} / {{detections.length}}</text>
     </view>
   </view>
 
   <!-- 小图片列表 -->
-  <view class="thumbnail-section">
+  <view class="thumbnail-section" wx:if="{{detections.length > 0}}">
     <scroll-view 
       class="thumbnail-list" 
       scroll-x="true" 
@@ -73,7 +92,7 @@
       <view class="thumbnail-container">
         <view 
           class="thumbnail-item {{index === currentIndex ? 'active' : ''}}" 
-          wx:for="{{photoList}}" 
+          wx:for="{{detections}}" 
           wx:key="id"
           bindtap="onThumbnailTap"
           data-index="{{index}}"
@@ -86,6 +105,9 @@
           <view class="thumbnail-overlay" wx:if="{{index === currentIndex}}">
             <text class="overlay-icon">✓</text>
           </view>
+          <view class="thumbnail-status" wx:if="{{item.status !== 'normal'}}">
+            <text class="status-text">{{item.status}}</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -94,7 +116,7 @@
   <!-- 操作按钮 -->
   <view class="action-section">
     <button class="action-btn primary" bindtap="onNewPhoto">
-      <text>新增拍照</text>
+      <text>新增检测</text>
     </button>
   </view>
 </view> 

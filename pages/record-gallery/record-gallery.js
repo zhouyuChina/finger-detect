@@ -1,212 +1,155 @@
 // record-gallery.js
+const api = require('../../utils/api.js')
+const common = require('../../utils/common.js')
+
 Page({
   data: {
-    recordId: null,
-    userId: null,
-    part: '',
+    // 档案信息
+    archiveId: '',
+    username: '',
+    archiveName: '',
+    archive: {},
+    
+    // 检测记录
+    detections: [],
+    loading: false,
+    
+    // 图片浏览
     currentIndex: 0,
     scrollLeft: 0,
-    currentRecord: {},
-    // 照片列表
-    photoList: [
-      {
-        id: 1,
-        imagePath: '/images/banner1.png',
-        uploadTime: '2024-07-20 10:30',
-        status: 'normal'
-      },
-      {
-        id: 2,
-        imagePath: '/images/banner2.png',
-        uploadTime: '2024-07-19 15:20',
-        status: 'normal'
-      },
-      {
-        id: 3,
-        imagePath: '/images/banner3.png',
-        uploadTime: '2024-07-18 09:15',
-        status: 'normal'
-      },
-      {
-        id: 4,
-        imagePath: '/images/default-avatar.png',
-        uploadTime: '2024-07-17 14:45',
-        status: 'normal'
-      },
-      {
-        id: 5,
-        imagePath: '/images/profile-avatar.png',
-        uploadTime: '2024-07-16 11:30',
-        status: 'normal'
-      },
-      {
-        id: 6,
-        imagePath: '/images/banner1.png',
-        uploadTime: '2024-07-15 16:20',
-        status: 'normal'
-      },
-      {
-        id: 7,
-        imagePath: '/images/banner2.png',
-        uploadTime: '2024-07-14 13:10',
-        status: 'normal'
-      },
-      {
-        id: 8,
-        imagePath: '/images/banner3.png',
-        uploadTime: '2024-07-13 08:45',
-        status: 'normal'
-      },
-      {
-        id: 9,
-        imagePath: '/images/default-avatar.png',
-        uploadTime: '2024-07-12 12:30',
-        status: 'normal'
-      },
-      {
-        id: 10,
-        imagePath: '/images/profile-avatar.png',
-        uploadTime: '2024-07-11 17:15',
-        status: 'normal'
-      }
-    ]
+    
+    // 分页信息
+    pagination: {
+      page: 1,
+      limit: 1000, // 设置足够大的数，获取所有记录
+      total: 0,
+      totalPages: 1
+    }
   },
 
   onLoad(options) {
-    const { recordId, userId, part } = options
+    const { username, archiveName, archiveId } = options
+    
     this.setData({
-      recordId: recordId,
-      userId: userId,
-      part: part,
-      currentRecord: {
-        part: part
-      }
+      username: decodeURIComponent(username || ''),
+      archiveName: decodeURIComponent(archiveName || ''),
+      archiveId: archiveId || ''
     })
     
     // 设置导航栏标题
     wx.setNavigationBarTitle({
-      title: `${part} - 检测历史`
+      title: `${decodeURIComponent(archiveName || '')} - 检测历史`
     })
     
-    // 直接更新数据，不模拟加载延迟
-    this.updatePhotoList()
+    // 加载档案检测记录
+    this.loadArchiveDetections()
   },
 
-  // 直接更新图片列表
-  updatePhotoList() {
-    // 根据部位更新描述
-    const updatedPhotoList = this.data.photoList.map(item => ({
-      ...item,
-      description: `${this.data.part} - ${item.description}`,
-      analysis: `${this.data.part}检测：${item.analysis}`
-    }))
-    
-    this.setData({
-      photoList: updatedPhotoList
-    })
+  onShow() {
+    // 页面显示时刷新数据
+    this.loadArchiveDetections()
   },
 
-  // 加载拍照历史（保留用于后续API调用）
-  loadPhotoHistory() {
-    // 模拟API调用延迟
-    wx.showLoading({
-      title: '加载中...'
-    })
-    
-    setTimeout(() => {
-      // 根据部位生成不同的mock数据
-      const mockData = this.generateMockData()
+  // 加载档案检测记录
+  async loadArchiveDetections() {
+    try {
+      this.setData({ loading: true })
       
-      this.setData({
-        photoList: mockData
-      })
-      
-      wx.hideLoading()
-    }, 1000)
-  },
-
-  // 生成mock数据
-  generateMockData() {
-    const { part } = this.data
-    const baseData = [
-      {
-        id: 1,
-        imagePath: '/images/banner1.png',
-        date: '2025年7月2日 15:30',
-        description: '检测结果：正常',
-        analysis: '各项指标均在正常范围内'
-      },
-      {
-        id: 2,
-        imagePath: '/images/banner2.png',
-        date: '2025年6月28日 14:20',
-        description: '检测结果：轻微异常',
-        analysis: '建议定期复查'
-      },
-      {
-        id: 3,
-        imagePath: '/images/banner3.png',
-        date: '2025年6月25日 10:15',
-        description: '检测结果：正常',
-        analysis: '恢复情况良好'
-      },
-      {
-        id: 4,
-        imagePath: '/images/default-avatar.png',
-        date: '2025年6月20日 16:45',
-        description: '检测结果：正常',
-        analysis: '治疗效果显著'
-      },
-      {
-        id: 5,
-        imagePath: '/images/profile-avatar.png',
-        date: '2025年6月15日 09:30',
-        description: '检测结果：异常',
-        analysis: '需要进一步治疗'
-      },
-      {
-        id: 6,
-        imagePath: '/images/banner1.png',
-        date: '2025年6月10日 11:20',
-        description: '检测结果：正常',
-        analysis: '恢复进展良好'
-      },
-      {
-        id: 7,
-        imagePath: '/images/banner2.png',
-        date: '2025年6月5日 16:30',
-        description: '检测结果：轻微异常',
-        analysis: '需要继续观察'
-      },
-      {
-        id: 8,
-        imagePath: '/images/banner3.png',
-        date: '2025年5月30日 13:45',
-        description: '检测结果：正常',
-        analysis: '治疗效果良好'
-      },
-      {
-        id: 9,
-        imagePath: '/images/default-avatar.png',
-        date: '2025年5月25日 09:15',
-        description: '检测结果：轻微异常',
-        analysis: '需要继续观察'
-      },
-      {
-        id: 10,
-        imagePath: '/images/profile-avatar.png',
-        date: '2025年5月20日 14:30',
-        description: '检测结果：正常',
-        analysis: '恢复情况良好'
+      const params = {
+        username: this.data.username,
+        archiveName: this.data.archiveName,
+        page: this.data.pagination.page,
+        limit: this.data.pagination.limit
       }
-    ]
+      
+      console.log('加载档案检测记录，参数:', params)
+      
+      const response = await api.profile.getArchiveDetections(params)
+      console.log('档案检测记录响应:', response)
+      
+      if (response.success && response.data) {
+        const { report, images, pagination, subUser } = response.data
+        
+        console.log('原始检测记录数据:', images)
+        console.log('检测记录数组长度:', images ? images.length : 0)
+        
+        // 格式化检测记录
+        const formattedDetections = this.formatDetections(images)
+        
+        console.log('格式化后的检测记录:', formattedDetections)
+        console.log('格式化后数组长度:', formattedDetections.length)
+        
+        this.setData({
+          archive: report || {},
+          detections: formattedDetections,
+          pagination: pagination || this.data.pagination
+        })
+        
+        console.log('档案检测记录加载成功，数量:', formattedDetections.length)
+        console.log('当前页面数据状态:', {
+          loading: this.data.loading,
+          detectionsLength: this.data.detections.length,
+          archive: this.data.archive
+        })
+      } else {
+        console.warn('获取档案检测记录失败:', response)
+        common.showError(response.message || '获取档案检测记录失败')
+      }
+    } catch (error) {
+      console.error('加载档案检测记录失败:', error)
+      common.showError('加载档案检测记录失败')
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  // 格式化检测记录
+  formatDetections(detections) {
+    if (!Array.isArray(detections)) {
+      return []
+    }
     
-    // 根据部位添加特定的描述
-    return baseData.map(item => ({
-      ...item,
-      description: `${part} - ${item.description}`,
-      analysis: `${part}检测：${item.analysis}`
-    }))
+    return detections.map(detection => {
+      const confidence = detection.confidence || 0
+      return {
+        id: detection.id,
+        imagePath: detection.imageUrl,
+        uploadTime: this.formatTime(detection.detectionTime || detection.createdAt),
+        status: detection.result || 'normal',
+        confidence: confidence,
+        confidencePercent: confidence > 0 ? (confidence * 100).toFixed(1) : '0.0',
+        detectionType: detection.detectionType,
+        remark: detection.remark,
+        originalData: detection
+      }
+    })
+  },
+
+  // 格式化时间
+  formatTime(timeStr) {
+    if (!timeStr) return ''
+    
+    try {
+      const date = new Date(timeStr)
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch (error) {
+      return timeStr
+    }
+  },
+
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.loadArchiveDetections().then(() => {
+      wx.stopPullDownRefresh()
+    }).catch(() => {
+      wx.stopPullDownRefresh()
+    })
   },
 
   // 返回上一页
@@ -214,160 +157,124 @@ Page({
     wx.navigateBack()
   },
 
-
-
-  // Swiper切换事件
+  // 轮播图切换
   onSwiperChange(e) {
-    
-    const { current } = e.detail
+    const current = e.detail.current
     this.setData({
       currentIndex: current
     })
+    this.scrollThumbnailToView(current)
   },
 
-  // 点击大图片
+  // 图片点击 - 预览大图
   onImageTap() {
-    // console.log('e', e)
-    // // 取消点击大图片的刷新功能，只保留预览功能
-    // const { index } = e.currentTarget.dataset
-    // const currentPhoto = this.data.photoList[index]
+    const { detections, currentIndex } = this.data
+    if (detections.length === 0) return
     
-
+    const currentImage = detections[currentIndex]
+    if (!currentImage || !currentImage.imagePath) return
+    
+    // 准备预览图片列表
+    const urls = detections
+      .filter(item => item.imagePath)
+      .map(item => item.imagePath)
+    
+    wx.previewImage({
+      current: currentImage.imagePath,
+      urls: urls
+    })
   },
 
-  // 点击缩略图
+  // 缩略图点击
   onThumbnailTap(e) {
-    const { index } = e.currentTarget.dataset
+    const index = e.currentTarget.dataset.index
     this.setData({
       currentIndex: index
     })
-    
-    // 滚动缩略图到可见区域
     this.scrollThumbnailToView(index)
   },
 
-  // 滚动缩略图到可见区域
+  // 滚动缩略图到指定位置
   scrollThumbnailToView(index) {
-    // 使用选择器获取缩略图元素并滚动到可见区域
-    const query = wx.createSelectorQuery()
-    query.select('.thumbnail-list').boundingClientRect()
-    query.selectAll('.thumbnail-item').boundingClientRect()
-    query.exec((res) => {
-      if (res[0] && res[1]) {
-        const container = res[0]
-        const items = res[1]
-        if (items[index]) {
-          const item = items[index]
-          const scrollLeft = item.left - container.left - (container.width - item.width) / 2
-          
-          // 使用scroll-left属性滚动
-          this.setData({
-            scrollLeft: scrollLeft
-          })
-        }
-      }
+    const { detections } = this.data
+    if (detections.length === 0) return
+    
+    // 计算滚动位置
+    const itemWidth = 120 // 缩略图宽度
+    const containerWidth = 750 // 容器宽度（rpx）
+    const scrollLeft = Math.max(0, index * itemWidth - containerWidth / 2 + itemWidth / 2)
+    
+    this.setData({
+      scrollLeft: scrollLeft
     })
   },
 
-  // 处理scroll-view的滚动事件
+  // 缩略图滚动
   onThumbnailScroll(e) {
-    // 可以在这里处理滚动事件，比如更新当前可见的缩略图
+    this.setData({
+      scrollLeft: e.detail.scrollLeft
+    })
   },
 
   // 上一张图片
   onPrevImage() {
-    // 如果是第一张，直接返回，不执行任何操作
-    if (this.data.currentIndex === 0) {
-      wx.showToast({
-        title: '已经是第一张了',
-        icon: 'none',
-        duration: 1000
-      })
-      return
-    }
+    const { currentIndex, detections } = this.data
+    if (detections.length === 0) return
     
-    const newIndex = this.data.currentIndex - 1
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : detections.length - 1
     this.setData({
       currentIndex: newIndex
     })
-    // 滚动缩略图到可见区域
-    setTimeout(() => {
-      this.scrollThumbnailToView(newIndex)
-    }, 100)
+    this.scrollThumbnailToView(newIndex)
   },
 
   // 下一张图片
   onNextImage() {
-    // 如果是最后一张，直接返回，不执行任何操作
-    if (this.data.currentIndex === this.data.photoList.length - 1) {
-      wx.showToast({
-        title: '已经是最后一张了',
-        icon: 'none',
-        duration: 1000
-      })
-      return
-    }
+    const { currentIndex, detections } = this.data
+    if (detections.length === 0) return
     
-    const newIndex = this.data.currentIndex + 1
+    const newIndex = currentIndex < detections.length - 1 ? currentIndex + 1 : 0
     this.setData({
       currentIndex: newIndex
     })
-    // 滚动缩略图到可见区域
-    setTimeout(() => {
-      this.scrollThumbnailToView(newIndex)
-    }, 100)
+    this.scrollThumbnailToView(newIndex)
   },
 
   // 图片加载成功
   onImageLoad(e) {
-    // 图片加载成功处理
+    console.log('图片加载成功:', e.detail)
   },
 
   // 图片加载失败
   onImageError(e) {
-    // 图片加载失败处理
-    const { index } = e.currentTarget.dataset
-    
-    // 设置默认图片
-    const photoList = this.data.photoList
-    photoList[index].imagePath = '/images/default-avatar.png'
-    
-    this.setData({
-      photoList: photoList
-    })
+    console.error('图片加载失败:', e.detail)
+    // 可以设置默认图片
   },
 
-  // 新增拍照
+  // 新增照片
   onNewPhoto() {
-    wx.showModal({
-      title: '新增拍照',
-      content: `确定要为${this.data.part}新增拍照检测吗？`,
-      success: (res) => {
-        if (res.confirm) {
-          wx.navigateTo({
-            url: `/pages/photo-detection/photo-detection?userId=${this.data.userId}&part=${this.data.part}&recordId=${this.data.recordId}`
-          })
-        }
-      }
+    // 跳转到拍照检测页面
+    wx.navigateTo({
+      url: `/pages/photo-detection/photo-detection?archiveId=${this.data.archiveId}&archiveName=${encodeURIComponent(this.data.archiveName)}&username=${encodeURIComponent(this.data.username)}`
     })
   },
 
   // 分享给朋友
   onShareAppMessage() {
-    const currentPhoto = this.data.photoList[this.data.currentIndex]
+    const { archiveName, detections } = this.data
     return {
-      title: `${this.data.part}检测历史 - ${currentPhoto.date}`,
-      path: `/pages/record-gallery/record-gallery?recordId=${this.data.recordId}&userId=${this.data.userId}&part=${this.data.part}`,
-      imageUrl: currentPhoto.imagePath
+      title: `${archiveName} - 检测历史`,
+      path: `/pages/record-gallery/record-gallery?username=${encodeURIComponent(this.data.username)}&archiveName=${encodeURIComponent(archiveName)}&archiveId=${this.data.archiveId}`,
+      imageUrl: detections.length > 0 ? detections[0].imagePath : ''
     }
   },
 
   // 分享到朋友圈
   onShareTimeline() {
-    const currentPhoto = this.data.photoList[this.data.currentIndex]
+    const { archiveName, detections } = this.data
     return {
-      title: `${this.data.part}检测历史 - ${currentPhoto.date}`,
-      imageUrl: currentPhoto.imagePath
+      title: `${archiveName} - 检测历史`,
+      imageUrl: detections.length > 0 ? detections[0].imagePath : ''
     }
   }
 }) 

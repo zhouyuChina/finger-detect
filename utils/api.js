@@ -255,6 +255,11 @@ const profileApi = {
   // 获取所有档案列表（包括本人和其他用户）
   getAllArchives(params = {}) {
     return request.get(config.api.profile.allArchives, params)
+  },
+
+  // 获取档案检测记录
+  getArchiveDetections(params = {}) {
+    return request.get(config.api.profile.archiveDetections, params)
   }
 }
 

@@ -232,9 +232,9 @@ Page({
     const record = allRecords.find(item => item.id === id)
     
     if (record) {
-      // 跳转到用户档案页面
+      // 跳转到档案图片墙页面
       wx.navigateTo({
-        url: `/pages/user-records/user-records?id=${id}&name=${encodeURIComponent(record.name)}&username=${encodeURIComponent(record.username || '')}`
+        url: `/pages/record-gallery/record-gallery?username=${encodeURIComponent(record.username || '')}&archiveName=${encodeURIComponent(record.name)}&archiveId=${id}`
       })
     }
   },
