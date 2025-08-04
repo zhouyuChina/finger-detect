@@ -64,7 +64,6 @@
         >
           <view class="profile-info">
             <view class="profile-name">{{item.name}}</view>
-            <view class="profile-desc">{{item.bodyPart}} - {{item.detailPart}}</view>
             <view class="profile-meta">
               <text class="meta-item">活跃度: {{item.activity}}</text>
               <text class="meta-item">检测: {{item.photoCount}}次</text>

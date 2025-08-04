@@ -219,18 +219,9 @@ Page({
     }
 
     return archives.map(archive => {
-      console.log('格式化档案数据:', {
-        id: archive.id,
-        archiveName: archive.archiveName,
-        bodyPart: archive.bodyPart,
-        bodyPartType: typeof archive.bodyPart
-      })
-      
       return {
         id: archive.id,
         name: archive.archiveName,
-        bodyPart: this.getBodyPartName(archive.bodyPart),
-        detailPart: this.getDetailPartName(archive.bodyPart),
         activity: archive.activity,
         photoCount: archive.photoCount || 0,
         detectionTime: archive.detectionTime,
@@ -244,82 +235,7 @@ Page({
     })
   },
 
-  // 获取身体部位名称
-  getBodyPartName(bodyPart) {
-    // 根据bodyPart值判断是手还是脚
-    if (bodyPart && typeof bodyPart === 'string') {
-      if (bodyPart.includes('hand')) {
-        return '手指'
-      } else if (bodyPart.includes('foot')) {
-        return '脚趾'
-      } else if (bodyPart.includes('fingerprint')) {
-        return '手指'
-      } else if (bodyPart.includes('face')) {
-        return '面部'
-      } else if (bodyPart.includes('iris')) {
-        return '虹膜'
-      } else if (bodyPart.includes('voice')) {
-        return '声音'
-      }
-    }
-    
-    // 兼容旧的映射表
-    const partMap = {
-      'fingerprint': '手指',
-      'face': '面部',
-      'iris': '虹膜',
-      'voice': '声音'
-    }
-    return partMap[bodyPart] || '未知部位'
-  },
 
-  // 获取详细部位名称
-  getDetailPartName(bodyPart) {
-    // 根据bodyPart值获取具体的部位名称
-    if (bodyPart && typeof bodyPart === 'string') {
-      // 手指相关
-      if (bodyPart.includes('thumb')) {
-        return '大拇指'
-      } else if (bodyPart.includes('index')) {
-        return '食指'
-      } else if (bodyPart.includes('middle')) {
-        return '中指'
-      } else if (bodyPart.includes('ring')) {
-        return '无名指'
-      } else if (bodyPart.includes('little')) {
-        return '小指'
-      }
-      // 脚趾相关
-      else if (bodyPart.includes('big')) {
-        return '大脚趾'
-      } else if (bodyPart.includes('second')) {
-        return '第二脚趾'
-      } else if (bodyPart.includes('third')) {
-        return '第三脚趾'
-      } else if (bodyPart.includes('fourth')) {
-        return '第四脚趾'
-      }
-      // 其他特征
-      else if (bodyPart.includes('fingerprint')) {
-        return '指纹'
-      } else if (bodyPart.includes('face')) {
-        return '面部特征'
-      } else if (bodyPart.includes('iris')) {
-        return '虹膜特征'
-      } else if (bodyPart.includes('voice')) {
-        return '声纹特征'
-      }
-    }
-    
-    // 兼容旧的映射表
-    const detailMap = {
-      'fingerprint': '指纹',
-      'face': '面部特征',
-      'iris': '虹膜特征',
-      'voice': '声纹特征'
-    }
-    return detailMap[bodyPart] || '未知特征'
-  },
 
   // 获取身体部位值（根据档案名称）
   getBodyPartValueFromArchiveName(archiveName) {
