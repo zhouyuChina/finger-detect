@@ -67,6 +67,16 @@ const userApi = {
   // 创建子用户
   createSubUser(data) {
     return request.post(config.api.user.createSubUser, data)
+  },
+
+  // 获取单个子用户信息
+  getSubUser(id) {
+    return request.get(`${config.api.user.getSubUser}/${id}`)
+  },
+
+  // 更新子用户信息
+  updateSubUser(id, data) {
+    return request.put(`${config.api.user.updateSubUser}/${id}`, data)
   }
 }
 

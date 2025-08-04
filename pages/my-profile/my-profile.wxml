@@ -149,6 +149,15 @@
             hover
             bindtap="editAddress"
           />
+          
+          <!-- 手机号 -->
+          <t-cell 
+            title="手机号" 
+            description="{{editingProfile.phone}}" 
+            arrow 
+            hover
+            bindtap="editPhone"
+          />
         </t-cell-group>
       </view>
 

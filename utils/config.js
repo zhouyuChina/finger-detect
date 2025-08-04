@@ -60,7 +60,9 @@ const config = {
       getToken: '/miniprogram/auth',
       stats: '/miniprogram/stats', // 用户统计信息
       getUsers: '/miniprogram/users', // 获取子用户列表
-      createSubUser: '/miniprogram/users' // 创建子用户
+      createSubUser: '/miniprogram/users', // 创建子用户
+      getSubUser: '/miniprogram/subusers', // 获取单个子用户信息
+      updateSubUser: '/miniprogram/subusers' // 更新子用户信息
     },
 
     // 检测相关

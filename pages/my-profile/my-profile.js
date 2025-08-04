@@ -194,7 +194,7 @@ Page({
   },
 
   // 编辑档案
-  onEditProfile(e) {
+  async onEditProfile(e) {
     const id = e.currentTarget.dataset.id;
     const profile = this.data.profiles.find(p => p.id === id);
     
@@ -206,11 +206,58 @@ Page({
       return;
     }
     
-    // 设置编辑的档案信息
-    this.setData({
-      editingProfile: { ...profile },
-      showEditPopup: true
+    // 显示加载中
+    wx.showLoading({
+      title: '加载中...'
     });
+    
+    try {
+      // 获取最新的用户信息
+      const response = await api.user.getSubUser(id)
+      console.log('获取用户详情响应:', response)
+      
+      wx.hideLoading()
+      
+      if (response.success && response.data) {
+        const userData = response.data
+        // 设置编辑的档案信息
+        this.setData({
+          editingProfile: {
+            id: userData.id,
+            name: userData.realName || userData.username || '',
+            gender: userData.gender || '',
+            age: userData.age || '',
+            address: userData.address || '',
+            relationship: this.getRelationshipFromUser(userData),
+            phone: userData.phone || ''
+          },
+          showEditPopup: true
+        });
+      } else {
+        console.warn('获取用户详情失败:', response)
+        // 使用本地数据作为备选
+        this.setData({
+          editingProfile: { ...profile },
+          showEditPopup: true
+        });
+        wx.showToast({
+          title: '获取最新信息失败，使用本地数据',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      wx.hideLoading()
+      console.error('获取用户详情失败:', error)
+      // 使用本地数据作为备选
+      this.setData({
+        editingProfile: { ...profile },
+        showEditPopup: true
+      });
+      wx.showToast({
+        title: '获取最新信息失败，使用本地数据',
+        icon: 'none'
+      });
+    }
   },
 
   // 弹窗状态变化
@@ -337,7 +384,8 @@ Page({
   },
 
   // 保存档案信息
-  saveProfile() {
+  // 保存档案信息
+  async saveProfile() {
     const { editingProfile } = this.data;
     
     // 验证必填字段
@@ -362,31 +410,64 @@ Page({
       title: '保存中...'
     });
 
-    // 模拟保存操作
-    setTimeout(() => {
-      wx.hideLoading();
+    try {
+      // 准备更新数据
+      const updateData = {
+        realName: editingProfile.name,
+        age: parseInt(editingProfile.age),
+        gender: editingProfile.gender,
+        address: editingProfile.address,
+        phone: editingProfile.phone
+      }
+
+      console.log('更新用户数据:', updateData)
       
-      // 更新档案列表
-      const profiles = this.data.profiles.map(p => {
-        if (p.id === editingProfile.id) {
-          return { ...p, ...editingProfile };
-        }
-        return p;
-      });
+      // 调用更新接口
+      const response = await api.user.updateSubUser(editingProfile.id, updateData)
+      console.log('更新用户响应:', response)
       
-      this.setData({ 
-        profiles,
-        showEditPopup: false 
-      });
+      wx.hideLoading()
       
-      this.calculateStats();
-      this.filterProfiles();
-      
+      if (response.success || response.code === 200) {
+        // 更新本地数据
+        const profiles = this.data.profiles.map(p => {
+          if (p.id === editingProfile.id) {
+            return { 
+              ...p, 
+              ...editingProfile,
+              updateTime: this.formatTime(new Date())
+            };
+          }
+          return p;
+        });
+        
+        this.setData({ 
+          profiles,
+          showEditPopup: false 
+        });
+        
+        this.calculateStats();
+        this.filterProfiles();
+        
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
+        });
+      } else {
+        console.warn('更新用户失败:', response)
+        wx.showToast({
+          title: response.message || '保存失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      wx.hideLoading()
+      console.error('保存失败:', error)
       wx.showToast({
-        title: '保存成功',
-        icon: 'success'
+        title: '保存失败，请重试',
+        icon: 'none'
       });
-    }, 1000);
+    }
   },
 
   // 删除档案
