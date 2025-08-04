@@ -117,10 +117,6 @@
       </view>
       
       <scroll-view class="selector-options" scroll-y="true">
-        <view class="selector-option {{selectedUser && selectedUser.id === 'myself' ? 'selected' : ''}}" bindtap="selectMyself">
-          <text class="option-text">本人</text>
-          <text class="option-check" wx:if="{{selectedUser && selectedUser.id === 'myself'}}">✅</text>
-        </view>
         <view 
           class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
           wx:for="{{subUsers}}" 
@@ -149,10 +145,6 @@
       </view>
       
       <scroll-view class="selector-options" scroll-y="true">
-        <view class="selector-option {{selectedUser && selectedUser.id === 'myself' ? 'selected' : ''}}" bindtap="selectMyself">
-          <text class="option-text">本人</text>
-          <text class="option-check" wx:if="{{selectedUser && selectedUser.id === 'myself'}}">✅</text>
-        </view>
         <view 
           class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
           wx:for="{{subUsers}}" 

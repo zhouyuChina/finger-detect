@@ -310,34 +310,7 @@ Page({
     }
   },
 
-  // 选择本人（微信用户）
-  selectMyself() {
-    console.log('选择本人，当前微信用户信息:', this.data.wechatUser)
-    
-    if (this.data.wechatUser) {
-      const myselfUser = {
-        id: 'myself',
-        username: this.data.wechatUser.openid || 'myself', // 添加 username 字段
-        nickname: this.data.wechatUser.nickname || '本人',
-        age: this.calculateAge(this.data.wechatUser.registerTime),
-        address: `${this.data.wechatUser.country || ''}${this.data.wechatUser.province || ''}${this.data.wechatUser.city || ''}`,
-        gender: this.data.wechatUser.gender || '0',
-        avatar: this.data.wechatUser.avatar || this.data.wechatUser.avatarUrl
-      }
-      
-      console.log('选择本人，构建的用户信息:', myselfUser)
-      
-      this.setData({
-        selectedUser: myselfUser
-      });
-    } else {
-      console.error('微信用户信息不存在')
-      wx.showToast({
-        title: '微信用户信息获取失败',
-        icon: 'none'
-      });
-    }
-  },
+
 
   // 计算年龄
   calculateAge(birthDate) {
@@ -376,32 +349,7 @@ Page({
     try {
       console.log('开始加载用户档案，用户ID:', userId)
       
-      // 如果是本人，尝试获取档案
-      if (userId === 'myself') {
-        const selectedUser = this.data.selectedUser;
-        if (selectedUser && selectedUser.username) {
-          // 尝试获取本人的档案
-          console.log('准备调用档案接口，本人用户名:', selectedUser.username)
-          const response = await api.profile.getArchives(selectedUser.username)
-          console.log('本人档案接口响应:', response)
-          
-          if (response.success && response.data) {
-            const archives = response.data.archives || []
-            console.log('获取到本人档案列表:', archives)
-            
-            const formattedProfiles = this.formatArchives(archives)
-            this.setData({ selectedUserProfiles: formattedProfiles });
-          } else {
-            // 如果接口失败或没有档案，显示空状态
-            console.log('本人暂无档案或接口失败')
-            this.setData({ selectedUserProfiles: [] });
-          }
-        } else {
-          console.warn('本人用户信息不完整')
-          this.setData({ selectedUserProfiles: [] });
-        }
-        return;
-      }
+
       
       // 获取用户信息
       const selectedUser = this.data.selectedUser;
