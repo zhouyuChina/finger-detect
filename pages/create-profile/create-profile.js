@@ -518,9 +518,7 @@ Page({
       const archiveData = {
         username: selectedUser.username,
         archiveName: archiveName,
-        bodyPart: this.getBodyPartValueFromArchiveName(archiveName),
-        activity: 'medium',
-        photoCount: 0
+        bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
       };
 
       console.log('创建档案数据:', archiveData)

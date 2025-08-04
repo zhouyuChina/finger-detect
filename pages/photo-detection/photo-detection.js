@@ -190,8 +190,6 @@ Page({
         username: profile.username,
         archiveName: profile.name,
         bodyPart: this.getBodyPartValue(profile.name), // 获取bodyPart值
-        activity: profile.activity || 'medium',
-        photoCount: (profile.photoCount || 0) + 1, // 增加照片数量
         imageUrl: this.data.photoPath // 照片路径
       }
 
