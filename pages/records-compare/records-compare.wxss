@@ -72,7 +72,7 @@
 }
 
 /* 检测部位样式 */
-.detection-part {
+.body-part {
   font-size: 28rpx;
   color: #333;
   font-weight: 500;
@@ -81,6 +81,25 @@
 /* 更新时间样式 */
 .update-time {
   font-size: 24rpx;
+  color: #999;
+}
+
+/* 检测次数样式 */
+.record-count {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.loading-text {
+  font-size: 28rpx;
   color: #999;
 }
 

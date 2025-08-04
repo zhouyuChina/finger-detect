@@ -1,9 +1,9 @@
-<!--records.wxml-->
+<!--records-compare.wxml-->
 <view class="container">
   <!-- 搜索栏 -->
   <view class="search-section">
     <t-search 
-      placeholder="搜索档案或记录" 
+      placeholder="搜索档案名称" 
       bind:submit="onSearch"
       bind:change="onSearchChange"
       value="{{searchValue}}"
@@ -19,12 +19,17 @@
     >
       <t-tab-panel label="全部档案" value="all">
         <view class="tab-content">
-          <view class="record-stats">
-            <text class="stats-text">共 {{totalCount}} 个档案</text>
-            <text class="stats-desc">检测时间：{{lastDetectionTime}}</text>
+          <!-- 加载状态 -->
+          <view class="loading-container" wx:if="{{loading}}">
+            <text class="loading-text">加载中...</text>
           </view>
           
-          <view class="record-list" wx:if="{{filteredRecords.length > 0}}">
+          <view class="record-stats" wx:if="{{!loading}}">
+            <text class="stats-text">共 {{totalCount}} 个档案</text>
+            <text class="stats-desc">本人档案：{{totalOwn}} | 其他档案：{{totalOthers}}</text>
+          </view>
+          
+          <view class="record-list" wx:if="{{filteredRecords.length > 0 && !loading}}">
             <t-cell 
               wx:for="{{filteredRecords}}" 
               wx:key="id"
@@ -36,8 +41,8 @@
               right-icon="chevron-right"
             >
               <view slot="description" class="cell-description">
-                <text class="detection-part">{{item.detectionPart}}</text>
                 <text class="update-time">{{item.updateTime}}</text>
+                <text class="record-count">检测次数：{{item.recordCount}}</text>
               </view>
               <view slot="note" class="record-meta">
                 <t-tag 
@@ -52,7 +57,7 @@
           
           <!-- 空状态 -->
           <t-empty 
-            wx:if="{{filteredRecords.length === 0}}"
+            wx:if="{{filteredRecords.length === 0 && !loading}}"
             description="暂无档案记录"
           />
         </view>
@@ -60,7 +65,12 @@
       
       <t-tab-panel label="我的档案" value="mine">
         <view class="tab-content">
-          <view class="record-list" wx:if="{{myRecords.length > 0}}">
+          <!-- 加载状态 -->
+          <view class="loading-container" wx:if="{{loading}}">
+            <text class="loading-text">加载中...</text>
+          </view>
+          
+          <view class="record-list" wx:if="{{myRecords.length > 0 && !loading}}">
             <t-cell 
               wx:for="{{myRecords}}" 
               wx:key="id"
@@ -72,8 +82,8 @@
               right-icon="chevron-right"
             >
               <view slot="description" class="cell-description">
-                <text class="detection-part">{{item.detectionPart}}</text>
                 <text class="update-time">{{item.updateTime}}</text>
+                <text class="record-count">检测次数：{{item.recordCount}}</text>
               </view>
               <view slot="note" class="record-meta">
                 <t-tag theme="primary" size="small">我的</t-tag>
@@ -83,7 +93,7 @@
           
           <!-- 空状态 -->
           <t-empty 
-            wx:if="{{myRecords.length === 0}}"
+            wx:if="{{myRecords.length === 0 && !loading}}"
             description="暂无我的档案"
           />
         </view>
@@ -91,7 +101,12 @@
       
       <t-tab-panel label="其他档案" value="others">
         <view class="tab-content">
-          <view class="record-list" wx:if="{{otherRecords.length > 0}}">
+          <!-- 加载状态 -->
+          <view class="loading-container" wx:if="{{loading}}">
+            <text class="loading-text">加载中...</text>
+          </view>
+          
+          <view class="record-list" wx:if="{{otherRecords.length > 0 && !loading}}">
             <t-cell 
               wx:for="{{otherRecords}}" 
               wx:key="id"
@@ -103,8 +118,8 @@
               right-icon="chevron-right"
             >
               <view slot="description" class="cell-description">
-                <text class="detection-part">{{item.detectionPart}}</text>
                 <text class="update-time">{{item.updateTime}}</text>
+                <text class="record-count">检测次数：{{item.recordCount}}</text>
               </view>
               <view slot="note" class="record-meta">
                 <t-tag theme="default" size="small">其他</t-tag>
@@ -114,7 +129,7 @@
           
           <!-- 空状态 -->
           <t-empty 
-            wx:if="{{otherRecords.length === 0}}"
+            wx:if="{{otherRecords.length === 0 && !loading}}"
             description="暂无其他档案"
           />
         </view>

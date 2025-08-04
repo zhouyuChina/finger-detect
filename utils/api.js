@@ -250,6 +250,11 @@ const profileApi = {
   // 获取档案详情
   getDetail(id) {
     return request.get(`${config.api.profile.detail}/${id}`)
+  },
+
+  // 获取所有档案列表（包括本人和其他用户）
+  getAllArchives(params = {}) {
+    return request.get(config.api.profile.allArchives, params)
   }
 }
 
