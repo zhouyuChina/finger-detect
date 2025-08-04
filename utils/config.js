@@ -15,7 +15,7 @@ const ENV_CONFIG = {
 }
 
 // 当前使用的环境 - 修改这里来切换环境
-const CURRENT_ENV = 'TEST' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
+const CURRENT_ENV = 'LOCAL' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
 
 const baseUrl = ENV_CONFIG[CURRENT_ENV].baseUrl
 

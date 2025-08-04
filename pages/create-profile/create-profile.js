@@ -421,6 +421,10 @@ Page({
         console.log('原始档案数据:', archives)
         const formattedProfiles = this.formatArchives(archives)
         console.log('格式化后的档案数据:', formattedProfiles)
+        
+        // 为每个档案获取检测次数
+        await this.loadDetectionCounts(formattedProfiles)
+        
         this.setData({ selectedUserProfiles: formattedProfiles });
       } else {
         console.warn('档案列表接口返回错误:', response)
@@ -462,6 +466,80 @@ Page({
   // 新增档案
   addNewProfile() {
     this.setData({ showBodyPartPopup: true });
+  },
+
+  // 刷新档案列表
+  refreshProfiles() {
+    if (this.data.selectedUser && this.data.selectedUser.username) {
+      console.log('手动刷新档案列表')
+      this.loadUserProfiles(this.data.selectedUser.id);
+    } else {
+      wx.showToast({
+        title: '请先选择用户',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 为档案列表加载检测次数
+  async loadDetectionCounts(profiles) {
+    try {
+      console.log('开始为档案加载检测次数')
+      
+      const username = this.data.selectedUser?.username
+      if (!username) {
+        console.warn('缺少用户名，无法获取检测次数')
+        return
+      }
+      
+      // 一次性获取所有检测记录，然后按档案名称分组统计
+      try {
+        const detectionResponse = await api.detection.getList({
+          username: username
+        })
+        
+        console.log('检测记录响应:', detectionResponse)
+        
+        if (detectionResponse.success && detectionResponse.data) {
+          const detections = detectionResponse.data.detections || detectionResponse.data || []
+          console.log('获取到的检测记录:', detections)
+          
+          // 按档案名称统计检测次数
+          const detectionCounts = {}
+          detections.forEach(detection => {
+            const archiveName = detection.archiveName
+            if (archiveName) {
+              detectionCounts[archiveName] = (detectionCounts[archiveName] || 0) + 1
+            }
+          })
+          
+          console.log('按档案名称统计的检测次数:', detectionCounts)
+          
+          // 更新每个档案的检测次数
+          profiles.forEach((profile, index) => {
+            const count = detectionCounts[profile.name] || 0
+            profiles[index].photoCount = count
+            console.log(`档案"${profile.name}"的检测次数:`, count)
+          })
+        } else {
+          console.warn('获取检测记录失败:', detectionResponse)
+          // 如果获取失败，所有档案的检测次数设为0
+          profiles.forEach((profile, index) => {
+            profiles[index].photoCount = 0
+          })
+        }
+      } catch (error) {
+        console.error('获取检测记录出错:', error)
+        // 如果出错，所有档案的检测次数设为0
+        profiles.forEach((profile, index) => {
+          profiles[index].photoCount = 0
+        })
+      }
+      
+      console.log('所有档案的检测次数加载完成:', profiles.map(p => ({ name: p.name, photoCount: p.photoCount })))
+    } catch (error) {
+      console.error('加载检测次数失败:', error)
+    }
   },
 
   // 选择身体部位
