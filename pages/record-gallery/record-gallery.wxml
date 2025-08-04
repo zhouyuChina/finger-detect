@@ -22,8 +22,8 @@
       <text class="info-value">{{detections.length}} 次</text>
     </view>
     <view class="info-item">
-      <text class="info-label">用户名：</text>
-      <text class="info-value">{{username}}</text>
+      <text class="info-label">档案ID：</text>
+      <text class="info-value">{{archiveId}}</text>
     </view>
   </view>
 

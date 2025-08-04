@@ -66,9 +66,14 @@ Page({
           ownSubUserId 
         } = response.data
         
+        // 先设置ownSubUserId，然后格式化档案数据
+        this.setData({
+          ownSubUserId: ownSubUserId || ''
+        })
+        
         // 格式化档案数据
-        const formattedOwnArchives = this.formatArchives(ownArchives, 'mine')
-        const formattedOtherArchives = this.formatArchives(otherArchives, 'others')
+        const formattedOwnArchives = this.formatArchives(ownArchives, 'mine', ownSubUserId)
+        const formattedOtherArchives = this.formatArchives(otherArchives, 'others', ownSubUserId)
         
         this.setData({
           ownArchives: formattedOwnArchives,
@@ -76,8 +81,7 @@ Page({
           subUsers: subUsers || [],
           totalOwn: totalOwn || 0,
           totalOthers: totalOthers || 0,
-          totalAll: totalAll || 0,
-          ownSubUserId: ownSubUserId || ''
+          totalAll: totalAll || 0
         })
         
         // 合并所有档案并筛选
@@ -95,7 +99,7 @@ Page({
   },
 
   // 格式化档案数据
-  formatArchives(archives, type) {
+  formatArchives(archives, type, ownSubUserId = '') {
     if (!Array.isArray(archives)) {
       return []
     }
@@ -108,6 +112,7 @@ Page({
       updateTime: this.formatTime(archive.updatedAt || archive.updateTime),
       recordCount: archive.totalDetections || archive.photoCount || archive.recordCount || 0,
       username: archive.username,
+      subUserId: archive.subUserId || archive.userId || (type === 'mine' ? ownSubUserId : ''), // 添加subUserId字段
       bodyPart: archive.bodyPart,
       createdAt: this.formatTime(archive.createdAt),
       originalData: archive
@@ -234,7 +239,7 @@ Page({
     if (record) {
       // 跳转到档案图片墙页面
       wx.navigateTo({
-        url: `/pages/record-gallery/record-gallery?username=${encodeURIComponent(record.username || '')}&archiveName=${encodeURIComponent(record.name)}&archiveId=${id}`
+        url: `/pages/record-gallery/record-gallery?subUserId=${record.subUserId || ''}&archiveName=${encodeURIComponent(record.name)}&archiveId=${id}`
       })
     }
   },

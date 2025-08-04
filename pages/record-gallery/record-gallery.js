@@ -6,7 +6,7 @@ Page({
   data: {
     // 档案信息
     archiveId: '',
-    username: '',
+    subUserId: '',
     archiveName: '',
     archive: {},
     
@@ -28,12 +28,12 @@ Page({
   },
 
   onLoad(options) {
-    const { username, archiveName, archiveId } = options
+    const { subUserId, archiveId, archiveName } = options
     
     this.setData({
-      username: decodeURIComponent(username || ''),
-      archiveName: decodeURIComponent(archiveName || ''),
-      archiveId: archiveId || ''
+      subUserId: subUserId || '',
+      archiveId: archiveId || '',
+      archiveName: decodeURIComponent(archiveName || '')
     })
     
     // 设置导航栏标题
@@ -56,8 +56,8 @@ Page({
       this.setData({ loading: true })
       
       const params = {
-        username: this.data.username,
-        archiveName: this.data.archiveName,
+        subUserId: this.data.subUserId,
+        archiveId: this.data.archiveId,
         page: this.data.pagination.page,
         limit: this.data.pagination.limit
       }
@@ -255,7 +255,7 @@ Page({
   onNewPhoto() {
     // 跳转到拍照检测页面
     wx.navigateTo({
-      url: `/pages/photo-detection/photo-detection?archiveId=${this.data.archiveId}&archiveName=${encodeURIComponent(this.data.archiveName)}&username=${encodeURIComponent(this.data.username)}`
+      url: `/pages/photo-detection/photo-detection?subUserId=${this.data.subUserId}&archiveId=${this.data.archiveId}&archiveName=${encodeURIComponent(this.data.archiveName)}`
     })
   },
 
@@ -264,7 +264,7 @@ Page({
     const { archiveName, detections } = this.data
     return {
       title: `${archiveName} - 检测历史`,
-      path: `/pages/record-gallery/record-gallery?username=${encodeURIComponent(this.data.username)}&archiveName=${encodeURIComponent(archiveName)}&archiveId=${this.data.archiveId}`,
+      path: `/pages/record-gallery/record-gallery?subUserId=${this.data.subUserId}&archiveName=${encodeURIComponent(archiveName)}&archiveId=${this.data.archiveId}`,
       imageUrl: detections.length > 0 ? detections[0].imagePath : ''
     }
   },

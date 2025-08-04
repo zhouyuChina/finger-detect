@@ -33,6 +33,22 @@ Page({
         console.error('解析档案信息失败:', error)
         this.handleError('档案信息获取失败')
       }
+    } else if (options.subUserId && options.archiveId && options.archiveName) {
+      // 从record-gallery页面跳转过来的情况
+      const profile = {
+        id: options.archiveId,
+        name: decodeURIComponent(options.archiveName),
+        subUserId: options.subUserId,
+        photoCount: 1 // 从record-gallery跳转说明已有检测记录
+      }
+      this.setData({ profile })
+      console.log('从record-gallery获取到档案信息:', profile)
+      
+      // 从record-gallery跳转说明已有检测记录，直接设置为有报告状态
+      this.setData({ 
+        hasReports: true,
+        loading: false
+      })
     } else {
       console.warn('未传递档案信息')
       this.handleError('档案信息缺失')
@@ -187,8 +203,8 @@ Page({
       // 准备检测数据
       const profile = this.data.profile
       const detectionData = {
-        username: profile.username,
-        archiveName: profile.name,
+        subUserId: profile.subUserId, // 使用subUserId
+        archiveId: profile.id,
         detectionType: this.getDetectionType(profile.name), // 获取检测类型
         imageUrl: this.data.photoPath // 照片路径
       }
@@ -250,8 +266,8 @@ Page({
       // 准备检测数据
       const profile = this.data.profile
       const detectionData = {
-        username: profile.username,
-        archiveName: profile.name,
+        subUserId: profile.subUserId, // 使用subUserId
+        archiveId: profile.id,
         detectionType: this.getDetectionType(profile.name),
         imageUrl: this.data.photoPath // 这里应该上传图片后获取URL
       }

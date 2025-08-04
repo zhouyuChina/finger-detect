@@ -111,7 +111,8 @@ const config = {
       delete: '/miniprogram/archives', // 删除档案
       detail: '/miniprogram/archives', // 获取档案详情
       allArchives: '/miniprogram/all-archives', // 获取所有档案列表（包括本人和其他用户）
-      archiveDetections: '/miniprogram/archive-detections' // 获取档案检测记录
+      archiveDetections: '/miniprogram/archive-detections', // 获取档案检测记录
+      getUser: '/miniprogram/user' // 获取子用户列表
     },
 
     // 记录相关

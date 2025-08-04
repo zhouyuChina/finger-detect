@@ -228,8 +228,9 @@ Page({
         updatedAt: archive.updatedAt,
         // 保留原始数据用于传递
         originalData: archive,
-        // 添加用户名信息
-        username: this.data.selectedUser?.username
+        // 添加用户信息
+        username: this.data.selectedUser?.username,
+        subUserId: this.data.selectedUser?.id
       }
     })
   },
@@ -377,17 +378,17 @@ Page({
       // 获取用户信息
       const selectedUser = this.data.selectedUser;
       console.log('当前选中的用户:', selectedUser)
-      if (!selectedUser || !selectedUser.username) {
+      if (!selectedUser || !selectedUser.id) {
         console.warn('用户信息不完整，无法获取档案')
         console.warn('selectedUser:', selectedUser)
-        console.warn('username:', selectedUser?.username)
+        console.warn('用户ID:', selectedUser?.id)
         this.setData({ selectedUserProfiles: [] });
         return;
       }
       
       // 调用档案列表接口
-      console.log('准备调用档案接口，用户名:', selectedUser.username)
-      const response = await api.profile.getArchives(selectedUser.username)
+      console.log('准备调用档案接口，用户ID:', selectedUser.id)
+      const response = await api.profile.getArchives(selectedUser.id)
       console.log('档案列表接口响应:', response)
       console.log('响应状态:', response.success)
       console.log('响应数据:', response.data)
@@ -454,16 +455,16 @@ Page({
     try {
       console.log('开始为档案加载检测次数')
       
-      const username = this.data.selectedUser?.username
-      if (!username) {
-        console.warn('缺少用户名，无法获取检测次数')
+      const subUserId = this.data.selectedUser?.id
+      if (!subUserId) {
+        console.warn('缺少用户ID，无法获取检测次数')
         return
       }
       
       // 一次性获取所有检测记录，然后按档案名称分组统计
       try {
         const detectionResponse = await api.detection.getList({
-          username: username
+          subUserId: this.data.selectedUser.id
         })
         
         console.log('检测记录响应:', detectionResponse)
@@ -550,8 +551,8 @@ Page({
         return;
       }
       
-      if (!selectedUser.username) {
-        console.error('用户信息不完整，缺少 username:', selectedUser)
+      if (!selectedUser.id) {
+        console.error('用户信息不完整，缺少用户ID:', selectedUser)
         wx.showToast({
           title: '用户信息不完整，请重新选择用户',
           icon: 'none'
@@ -562,7 +563,7 @@ Page({
       // 准备档案数据
       const archiveName = `${bodyPart.name}${part.name}`
       const archiveData = {
-        username: selectedUser.username,
+        subUserId: selectedUser.id,
         archiveName: archiveName,
         bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
       };

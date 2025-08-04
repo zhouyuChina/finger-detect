@@ -228,8 +228,12 @@ const profileApi = {
   },
 
   // 获取用户档案列表（新接口）
-  getArchives(username, params = {}) {
-    return request.get(`${config.api.profile.list}?username=${username}`, params)
+  getArchives(subUserId, params = {}) {
+    const queryParams = {
+      subUserId: subUserId,
+      ...params
+    }
+    return request.get(config.api.profile.list, queryParams)
   },
 
   // 创建档案
@@ -260,6 +264,11 @@ const profileApi = {
   // 获取档案检测记录
   getArchiveDetections(params = {}) {
     return request.get(config.api.profile.archiveDetections, params)
+  },
+
+  // 获取子用户列表
+  getUser() {
+    return request.get(config.api.profile.getUser)
   }
 }
 

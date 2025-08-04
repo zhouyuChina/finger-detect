@@ -35,15 +35,15 @@
     <view class="stats-grid">
       <view class="stats-item" bindtap="onViewRecords">
         <text class="stats-number">{{stats.totalRecords}}</text>
-        <text class="stats-label">拍照记录</text>
+        <text class="stats-label">用户数目</text>
       </view>
       <view class="stats-item" bindtap="onViewReports">
         <text class="stats-number">{{stats.totalReports}}</text>
-        <text class="stats-label">报告记录</text>
+        <text class="stats-label">建档记录</text>
       </view>
       <view class="stats-item" bindtap="onViewFamily">
         <text class="stats-number">{{stats.familyMembers}}</text>
-        <text class="stats-label">建档记录</text>
+        <text class="stats-label">检测记录</text>
       </view>
       <view class="stats-item" bindtap="onSystemMessages">
         <text class="stats-number">{{stats.unreadMessages}}</text>
