@@ -257,7 +257,51 @@ Page({
     return detailMap[bodyPart] || '未知特征'
   },
 
-  // 获取身体部位值
+  // 获取身体部位值（根据档案名称）
+  getBodyPartValueFromArchiveName(archiveName) {
+    // 根据档案名称映射到bodyPart值
+    const bodyPartMap = {
+      // 左手检测类型
+      '左手大拇指': 'left_hand_thumb',
+      '左手食指': 'left_hand_index',
+      '左手中指': 'left_hand_middle',
+      '左手无名指': 'left_hand_ring',
+      '左手小指': 'left_hand_little',
+      
+      // 右手检测类型
+      '右手大拇指': 'right_hand_thumb',
+      '右手食指': 'right_hand_index',
+      '右手中指': 'right_hand_middle',
+      '右手无名指': 'right_hand_ring',
+      '右手小指': 'right_hand_little',
+      
+      // 左脚检测类型
+      '左脚大脚趾': 'left_foot_big',
+      '左脚第二脚趾': 'left_foot_second',
+      '左脚第三脚趾': 'left_foot_third',
+      '左脚第四脚趾': 'left_foot_fourth',
+      '左脚小脚趾': 'left_foot_little',
+      
+      // 右脚检测类型
+      '右脚大脚趾': 'right_foot_big',
+      '右脚第二脚趾': 'right_foot_second',
+      '右脚第三脚趾': 'right_foot_third',
+      '右脚第四脚趾': 'right_foot_fourth',
+      '右脚小脚趾': 'right_foot_little'
+    }
+    
+    const bodyPart = bodyPartMap[archiveName]
+    console.log('档案名称:', archiveName, '映射到bodyPart:', bodyPart)
+    
+    if (!bodyPart) {
+      console.warn('未找到对应的bodyPart，使用默认值 left_hand_thumb')
+      return 'left_hand_thumb'
+    }
+    
+    return bodyPart
+  },
+
+  // 获取身体部位值（旧方法，保留兼容性）
   getBodyPartValue(bodyPart) {
     const valueMap = {
       'leftHand': 'fingerprint',
@@ -470,10 +514,11 @@ Page({
       }
 
       // 准备档案数据
+      const archiveName = `${bodyPart.name}${part.name}`
       const archiveData = {
         username: selectedUser.username,
-        archiveName: `${bodyPart.name}${part.name}`,
-        bodyPart: this.getBodyPartValue(bodyPart.value),
+        archiveName: archiveName,
+        bodyPart: this.getBodyPartValueFromArchiveName(archiveName),
         activity: 'medium',
         photoCount: 0
       };
