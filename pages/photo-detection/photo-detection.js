@@ -184,25 +184,47 @@ Page({
     })
 
     try {
-      // 这里应该调用保存照片到记录的接口
-      // 暂时模拟保存过程
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // 准备档案数据
+      const profile = this.data.profile
+      const archiveData = {
+        username: profile.username,
+        archiveName: profile.name,
+        bodyPart: this.getBodyPartValue(profile.name), // 获取bodyPart值
+        activity: profile.activity || 'medium',
+        photoCount: (profile.photoCount || 0) + 1, // 增加照片数量
+        imageUrl: this.data.photoPath // 照片路径
+      }
+
+      console.log('保存档案数据:', archiveData)
+      
+      // 调用档案接口保存照片
+      const response = await api.profile.create(archiveData)
+      console.log('档案保存接口响应:', response)
       
       wx.hideLoading()
-      wx.showToast({
-        title: '保存成功',
-        icon: 'success'
-      })
-
-      // 更新档案的照片数量
-      this.updateProfilePhotoCount(this.data.profile.id)
       
-      // 跳转到恢复记录页面
-      setTimeout(() => {
-        wx.redirectTo({
-          url: `/pages/records-compare/records-compare?profileId=${this.data.profile.id}`
+      if (response.success || response.code === 200) {
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
         })
-      }, 1500)
+
+        // 更新档案的照片数量
+        this.updateProfilePhotoCount(this.data.profile.id)
+        
+        // 跳转到恢复记录页面
+        setTimeout(() => {
+          wx.redirectTo({
+            url: `/pages/records-compare/records-compare?profileId=${this.data.profile.id}`
+          })
+        }, 1500)
+      } else {
+        console.warn('档案保存接口返回错误:', response)
+        wx.showToast({
+          title: response.message || '保存失败',
+          icon: 'none'
+        })
+      }
     } catch (error) {
       wx.hideLoading()
       console.error('保存失败:', error)
@@ -324,6 +346,50 @@ Page({
     }
     
     return detectionType
+  },
+
+  // 获取身体部位值（用于档案接口）
+  getBodyPartValue(archiveName) {
+    // 根据档案名称映射到bodyPart值
+    const bodyPartMap = {
+      // 左手检测类型
+      '左手大拇指': 'left_hand_thumb',
+      '左手食指': 'left_hand_index',
+      '左手中指': 'left_hand_middle',
+      '左手无名指': 'left_hand_ring',
+      '左手小指': 'left_hand_little',
+      
+      // 右手检测类型
+      '右手大拇指': 'right_hand_thumb',
+      '右手食指': 'right_hand_index',
+      '右手中指': 'right_hand_middle',
+      '右手无名指': 'right_hand_ring',
+      '右手小指': 'right_hand_little',
+      
+      // 左脚检测类型
+      '左脚大脚趾': 'left_foot_big',
+      '左脚第二脚趾': 'left_foot_second',
+      '左脚第三脚趾': 'left_foot_third',
+      '左脚第四脚趾': 'left_foot_fourth',
+      '左脚小脚趾': 'left_foot_little',
+      
+      // 右脚检测类型
+      '右脚大脚趾': 'right_foot_big',
+      '右脚第二脚趾': 'right_foot_second',
+      '右脚第三脚趾': 'right_foot_third',
+      '右脚第四脚趾': 'right_foot_fourth',
+      '右脚小脚趾': 'right_foot_little'
+    }
+    
+    const bodyPart = bodyPartMap[archiveName]
+    console.log('档案名称:', archiveName, '映射到bodyPart:', bodyPart)
+    
+    if (!bodyPart) {
+      console.warn('未找到对应的bodyPart，使用默认值 left_hand_thumb')
+      return 'left_hand_thumb'
+    }
+    
+    return bodyPart
   },
 
   // 更新档案照片数量
