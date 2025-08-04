@@ -74,7 +74,7 @@ Page({
     
     return subUsers.map(user => ({
       id: user.id,
-      name: user.realName || user.username || '未知用户',
+      name: user.username || user.realName || '未知用户', // 优先使用username
       gender: user.gender || '未知',
       age: user.age || '未知',
       relationship: this.getRelationshipFromUser(user),
@@ -224,7 +224,7 @@ Page({
         this.setData({
           editingProfile: {
             id: userData.id,
-            name: userData.realName || userData.username || '',
+            name: userData.username || userData.realName || '', // 优先使用username
             gender: userData.gender || '',
             age: userData.age || '',
             address: userData.address || '',
@@ -274,17 +274,26 @@ Page({
     });
   },
 
-  // 编辑姓名
+  // 编辑用户名
   editName() {
     wx.showModal({
-      title: '编辑姓名',
+      title: '编辑用户名',
       editable: true,
-      placeholderText: '请输入姓名',
+      placeholderText: '请输入用户名（2-20个字符）',
       content: this.data.editingProfile.name,
       success: (res) => {
         if (res.confirm && res.content.trim()) {
+          const username = res.content.trim();
+          // 验证用户名长度
+          if (username.length < 2 || username.length > 20) {
+            wx.showToast({
+              title: '用户名长度必须在2-20个字符之间',
+              icon: 'error'
+            });
+            return;
+          }
           this.setData({
-            'editingProfile.name': res.content.trim()
+            'editingProfile.name': username
           });
         }
       }
@@ -391,7 +400,16 @@ Page({
     // 验证必填字段
     if (!editingProfile.name.trim()) {
       wx.showToast({
-        title: '请输入姓名',
+        title: '请输入用户名',
+        icon: 'error'
+      });
+      return;
+    }
+
+    // 验证用户名长度（2-20个字符）
+    if (editingProfile.name.trim().length < 2 || editingProfile.name.trim().length > 20) {
+      wx.showToast({
+        title: '用户名长度必须在2-20个字符之间',
         icon: 'error'
       });
       return;
@@ -413,7 +431,8 @@ Page({
     try {
       // 准备更新数据
       const updateData = {
-        realName: editingProfile.name,
+        username: editingProfile.name, // 使用username而不是realName
+        realName: editingProfile.name, // 同时保留realName作为真实姓名
         age: parseInt(editingProfile.age),
         gender: editingProfile.gender,
         address: editingProfile.address,

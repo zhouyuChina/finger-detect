@@ -114,9 +114,9 @@
       <!-- 编辑表单 -->
       <view class="edit-form">
         <t-cell-group>
-          <!-- 姓名 -->
+          <!-- 用户名 -->
           <t-cell 
-            title="姓名" 
+            title="用户名" 
             description="{{editingProfile.name}}" 
             arrow 
             hover
