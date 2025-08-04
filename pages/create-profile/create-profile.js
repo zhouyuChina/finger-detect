@@ -222,7 +222,6 @@ Page({
       return {
         id: archive.id,
         name: archive.archiveName,
-        activity: archive.activity,
         photoCount: archive.photoCount || 0,
         detectionTime: archive.detectionTime,
         createdAt: archive.createdAt,
@@ -448,18 +447,7 @@ Page({
     this.setData({ showBodyPartPopup: true });
   },
 
-  // 刷新档案列表
-  refreshProfiles() {
-    if (this.data.selectedUser && this.data.selectedUser.username) {
-      console.log('手动刷新档案列表')
-      this.loadUserProfiles(this.data.selectedUser.id);
-    } else {
-      wx.showToast({
-        title: '请先选择用户',
-        icon: 'none'
-      });
-    }
-  },
+
 
   // 为档案列表加载检测次数
   async loadDetectionCounts(profiles) {

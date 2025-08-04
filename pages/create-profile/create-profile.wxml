@@ -65,8 +65,7 @@
           <view class="profile-info">
             <view class="profile-name">{{item.name}}</view>
             <view class="profile-meta">
-              <text class="meta-item">活跃度: {{item.activity}}</text>
-              <text class="meta-item">检测: {{item.photoCount}}次</text>
+              <text class="meta-item">检测次数: {{item.photoCount}}次</text>
             </view>
           </view>
           <view class="profile-arrow">></view>
@@ -83,9 +82,6 @@
         <view class="add-profile-btn" bindtap="addNewProfile">
           <text class="add-icon">➕</text>
           <text class="add-text">新增档案</text>
-        </view>
-        <view class="refresh-btn" bindtap="refreshProfiles">
-          <text class="refresh-text">🔄 刷新档案</text>
         </view>
       </view>
     </view>

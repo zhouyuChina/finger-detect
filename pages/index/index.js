@@ -3,8 +3,8 @@ const api = require('../../utils/api.js')
 const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
 const config = require('../../utils/config.js')
-const envDebug = require('../../utils/env-debug.js')
-const apiDebug = require('../../utils/api-debug.js')
+// const envDebug = require('../../utils/env-debug.js')
+// const apiDebug = require('../../utils/api-debug.js')
 
 Page({
   data: {
@@ -678,46 +678,46 @@ Page({
   },
 
   updateEnvInfo() {
-    const envInfo = envDebug.getCurrentEnv()
-    this.setData({
-      currentEnv: envInfo
-    })
+    // const envInfo = envDebug.getCurrentEnv()
+    // this.setData({
+    //   currentEnv: envInfo
+    // })
   },
 
   async testConnection() {
-    try {
-      this.setData({
-        'connectionStatus.success': false,
-        'connectionStatus.message': '测试中...'
-      })
-      
-      const result = await envDebug.testCurrentEnv()
-      
-      this.setData({
-        connectionStatus: {
-          success: result.success,
-          message: result.success ? '连接正常' : result.error.errMsg
-        }
-      })
-      
-      wx.showToast({
-        title: result.success ? '连接成功' : '连接失败',
-        icon: result.success ? 'success' : 'error'
-      })
-    } catch (error) {
-      console.error('测试连接失败:', error)
-      this.setData({
-        connectionStatus: {
-          success: false,
-          message: '测试失败'
-        }
-      })
-    }
+    // try {
+    //   this.setData({
+    //     'connectionStatus.success': false,
+    //     'connectionStatus.message': '测试中...'
+    //   })
+    //   
+    //   const result = await envDebug.testCurrentEnv()
+    //   
+    //   this.setData({
+    //     connectionStatus: {
+    //       success: result.success,
+    //       message: result.success ? '连接正常' : result.error.errMsg
+    //     }
+    //   })
+    //   
+    //   wx.showToast({
+    //     title: result.success ? '连接成功' : '连接失败',
+    //     icon: result.success ? 'success' : 'error'
+    //   })
+    // } catch (error) {
+    //   console.error('测试连接失败:', error)
+    //   this.setData({
+    //     connectionStatus: {
+    //       success: false,
+    //       message: '测试失败'
+    //     }
+    //   })
+    // }
   },
 
   switchToLocal() {
-    envDebug.switchToLocal()
-    this.updateEnvInfo()
+    // envDebug.switchToLocal()
+    // this.updateEnvInfo()
     wx.showToast({
       title: '已切换到本地环境',
       icon: 'success'
@@ -725,9 +725,8 @@ Page({
   },
 
   switchToTest() {
-    envDebug.switchToTest()
-    this.updateEnvInfo()
-    this.updateEnvInfo()
+    // envDebug.switchToTest()
+    // this.updateEnvInfo()
     wx.showToast({
       title: '已切换到测试环境',
       icon: 'success'
@@ -735,61 +734,61 @@ Page({
   },
 
   async compareEnvs() {
-    try {
-      wx.showLoading({ title: '对比中...' })
-      await envDebug.compareAllEnvs()
-      wx.hideLoading()
-      wx.showToast({
-        title: '对比完成，查看控制台',
-        icon: 'none'
-      })
-    } catch (error) {
-      wx.hideLoading()
-      console.error('环境对比失败:', error)
-    }
+    // try {
+    //   wx.showLoading({ title: '对比中...' })
+    //   await envDebug.compareAllEnvs()
+    //   wx.hideLoading()
+    //   wx.showToast({
+    //     title: '对比完成，查看控制台',
+    //     icon: 'none'
+    //   })
+    // } catch (error) {
+    //   wx.hideLoading()
+    //   console.error('环境对比失败:', error)
+    // }
   },
 
   async compareApis() {
-    try {
-      wx.showLoading({ title: '对比接口中...' })
-      const result = await apiDebug.compareApis()
-      wx.hideLoading()
-      
-      if (result.auth.success && !result.register.success) {
-        wx.showToast({
-          title: 'Auth成功，Register失败',
-          icon: 'none',
-          duration: 3000
-        })
-      } else if (result.auth.success && result.register.success) {
-        wx.showToast({
-          title: '两个接口都成功',
-          icon: 'success'
-        })
-      } else {
-        wx.showToast({
-          title: '两个接口都失败',
-          icon: 'error'
-        })
-      }
-    } catch (error) {
-      wx.hideLoading()
-      console.error('接口对比失败:', error)
-    }
+    // try {
+    //   wx.showLoading({ title: '对比接口中...' })
+    //   const result = await apiDebug.compareApis()
+    //   wx.hideLoading()
+    //   
+    //   if (result.auth.success && !result.register.success) {
+    //     wx.showToast({
+    //     title: 'Auth成功，Register失败',
+    //     icon: 'none',
+    //     duration: 3000
+    //   })
+    //   } else if (result.auth.success && result.register.success) {
+    //     wx.showToast({
+    //     title: '两个接口都成功',
+    //     icon: 'success'
+    //   })
+    //   } else {
+    //     wx.showToast({
+    //     title: '两个接口都失败',
+    //     icon: 'error'
+    //   })
+    //   }
+    // } catch (error) {
+    //   wx.hideLoading()
+    //   console.error('接口对比失败:', error)
+    // }
   },
 
   async testDataFormats() {
-    try {
-      wx.showLoading({ title: '测试数据格式...' })
-      await apiDebug.testDataFormats()
-      wx.hideLoading()
-      wx.showToast({
-        title: '测试完成，查看控制台',
-        icon: 'none'
-      })
-    } catch (error) {
-      wx.hideLoading()
-      console.error('数据格式测试失败:', error)
-    }
+    // try {
+    //   wx.showLoading({ title: '测试数据格式...' })
+    //   await apiDebug.testDataFormats()
+    //   wx.hideLoading()
+    //   wx.showToast({
+    //     title: '测试完成，查看控制台',
+    //     icon: 'none'
+    //   })
+    // } catch (error) {
+    //   wx.hideLoading()
+    //   console.error('数据格式测试失败:', error)
+    // }
   }
 }) 
