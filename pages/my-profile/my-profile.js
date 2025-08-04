@@ -82,7 +82,6 @@ Page({
       profileId: user.id,
       updateTime: this.formatTime(user.updatedAt || user.createdAt),
       status: user.status || 'active',
-      phone: user.phone ? this.maskPhone(user.phone) : '',
       address: user.address || '未知',
       archives: user.archives || 0,
       photos: user.photos || 0,
@@ -113,11 +112,7 @@ Page({
     }
   },
 
-  // 手机号脱敏
-  maskPhone(phone) {
-    if (!phone || phone.length < 7) return phone
-    return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
-  },
+
 
   // 计算统计数据
   calculateStats() {
@@ -228,8 +223,7 @@ Page({
             gender: userData.gender || '',
             age: userData.age || '',
             address: userData.address || '',
-            relationship: this.getRelationshipFromUser(userData),
-            phone: userData.phone || ''
+            relationship: this.getRelationshipFromUser(userData)
           },
           showEditPopup: true
         });
@@ -435,8 +429,7 @@ Page({
         realName: editingProfile.name, // 同时保留realName作为真实姓名
         age: parseInt(editingProfile.age),
         gender: editingProfile.gender,
-        address: editingProfile.address,
-        phone: editingProfile.phone
+        address: editingProfile.address
       }
 
       console.log('更新用户数据:', updateData)
