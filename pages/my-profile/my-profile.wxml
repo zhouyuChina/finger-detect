@@ -1,6 +1,11 @@
 <!--my-profile.wxml-->
 <view class="container">
 
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
 
   <!-- 搜索栏 -->
   <view class="search-section">
@@ -44,6 +49,7 @@
           <view class="profile-meta">
             <text class="meta-item">档案ID: {{item.profileId}}</text>
             <text class="meta-item">更新时间: {{item.updateTime}}</text>
+            <text class="meta-item">档案: {{item.archives}} | 照片: {{item.photos}} | 报告: {{item.reports}}</text>
           </view>
         </view>
         
@@ -77,7 +83,7 @@
 
   <!-- 空状态 -->
   <t-empty 
-    wx:if="{{filteredProfiles.length === 0}}"
+    wx:if="{{!loading && filteredProfiles.length === 0}}"
     description="暂无档案记录"
     icon="user-avatar"
   >

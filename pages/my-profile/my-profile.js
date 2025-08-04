@@ -1,4 +1,7 @@
 // my-profile.js
+const api = require('../../utils/api.js')
+const common = require('../../utils/common.js')
+
 Page({
   data: {
     searchValue: '',
@@ -6,8 +9,9 @@ Page({
     activeProfiles: 0,
     recentUpdates: 0,
     showEditPopup: false,
+    loading: false,
     editingProfile: {
-      id: 0,
+      id: '',
       name: '',
       gender: '',
       age: '',
@@ -17,72 +21,102 @@ Page({
     },
     genderOptions: ['男', '女'],
     relationshipOptions: ['本人', '配偶', '子女', '父母', '其他'],
-    profiles: [
-      {
-        id: 1,
-        name: '谢芳',
-        gender: '女',
-        age: 28,
-        relationship: '本人',
-        avatar: '/images/default-avatar.png',
-        profileId: 'PF001',
-        updateTime: '2024-01-15',
-        status: 'active',
-        phone: '159****3314',
-        address: '北京市朝阳区'
-      },
-      {
-        id: 2,
-        name: '张明',
-        gender: '男',
-        age: 32,
-        relationship: '配偶',
-        avatar: '/images/default-avatar.png',
-        profileId: 'PF002',
-        updateTime: '2024-01-10',
-        status: 'active',
-        phone: '138****5678',
-        address: '北京市朝阳区'
-      },
-      {
-        id: 3,
-        name: '张小宝',
-        gender: '男',
-        age: 5,
-        relationship: '子女',
-        avatar: '/images/default-avatar.png',
-        profileId: 'PF003',
-        updateTime: '2024-01-08',
-        status: 'active',
-        phone: '',
-        address: '北京市朝阳区'
-      },
-      {
-        id: 4,
-        name: '李阿姨',
-        gender: '女',
-        age: 58,
-        relationship: '父母',
-        avatar: '/images/default-avatar.png',
-        profileId: 'PF004',
-        updateTime: '2024-01-05',
-        status: 'inactive',
-        phone: '186****1234',
-        address: '上海市浦东新区'
-      }
-    ],
+    profiles: [],
     filteredProfiles: []
   },
 
   onLoad() {
-    this.calculateStats();
-    this.filterProfiles();
+    this.loadUserProfiles();
   },
 
   onShow() {
     // 页面显示时刷新数据
-    this.calculateStats();
-    this.filterProfiles();
+    this.loadUserProfiles();
+  },
+
+  // 加载用户档案数据
+  async loadUserProfiles() {
+    try {
+      this.setData({ loading: true })
+      
+      const response = await api.user.getUsers()
+      console.log('获取用户档案响应:', response)
+      
+      if (response.success && response.data && response.data.subUsers) {
+        const profiles = this.formatProfiles(response.data.subUsers)
+        this.setData({ profiles })
+        
+        // 计算统计数据
+        this.calculateStats()
+        // 过滤数据
+        this.filterProfiles()
+        
+        console.log('用户档案加载成功:', profiles)
+      } else {
+        console.warn('获取用户档案失败:', response)
+        common.showError(response.message || '获取用户档案失败')
+        this.setData({ profiles: [] })
+      }
+    } catch (error) {
+      console.error('加载用户档案失败:', error)
+      common.showError('加载用户档案失败')
+      this.setData({ profiles: [] })
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  // 格式化用户档案数据
+  formatProfiles(subUsers) {
+    if (!Array.isArray(subUsers)) {
+      return []
+    }
+    
+    return subUsers.map(user => ({
+      id: user.id,
+      name: user.realName || user.username || '未知用户',
+      gender: user.gender || '未知',
+      age: user.age || '未知',
+      relationship: this.getRelationshipFromUser(user),
+      avatar: '/images/default-avatar.png',
+      profileId: user.id,
+      updateTime: this.formatTime(user.updatedAt || user.createdAt),
+      status: user.status || 'active',
+      phone: user.phone ? this.maskPhone(user.phone) : '',
+      address: user.address || '未知',
+      archives: user.archives || 0,
+      photos: user.photos || 0,
+      reports: user.reports || 0,
+      originalData: user
+    }))
+  },
+
+  // 根据用户信息推断关系
+  getRelationshipFromUser(user) {
+    // 这里可以根据用户信息推断关系，暂时返回默认值
+    return '本人'
+  },
+
+  // 格式化时间
+  formatTime(timeStr) {
+    if (!timeStr) return ''
+    
+    try {
+      const date = new Date(timeStr)
+      return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      })
+    } catch (error) {
+      return timeStr
+    }
+  },
+
+  // 手机号脱敏
+  maskPhone(phone) {
+    if (!phone || phone.length < 7) return phone
+    return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
   },
 
   // 计算统计数据
@@ -153,7 +187,7 @@ Page({
     
     wx.showModal({
       title: '档案详情',
-      content: `姓名：${profile.name}\n性别：${profile.gender}\n年龄：${profile.age}岁\n关系：${profile.relationship}\n档案ID：${profile.profileId}\n状态：${profile.status === 'active' ? '活跃' : '非活跃'}`,
+      content: `姓名：${profile.name}\n性别：${profile.gender}\n年龄：${profile.age}岁\n关系：${profile.relationship}\n档案ID：${profile.profileId}\n状态：${profile.status === 'active' ? '活跃' : '非活跃'}\n档案数量：${profile.archives}\n照片数量：${profile.photos}\n报告数量：${profile.reports}`,
       showCancel: false,
       confirmText: '确定'
     });
