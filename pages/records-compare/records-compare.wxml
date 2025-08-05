@@ -38,7 +38,6 @@
               hover
               bindtap="onRecordClick"
               data-id="{{item.id}}"
-              right-icon="chevron-right"
             >
               <view slot="description" class="cell-description">
                 <text class="update-time">{{item.updateTime}}</text>
