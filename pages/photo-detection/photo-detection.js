@@ -200,13 +200,30 @@ Page({
     })
 
     try {
-      // 准备检测数据
+      // 验证必填参数
       const profile = this.data.profile
+      if (!profile) {
+        throw new Error('档案信息缺失')
+      }
+      
+      if (!profile.subUserId) {
+        throw new Error('子用户ID缺失')
+      }
+      
+      if (!profile.id) {
+        throw new Error('档案ID缺失')
+      }
+      
+      if (!this.data.photoPath) {
+        throw new Error('图片路径缺失')
+      }
+
+      // 准备检测数据
       const detectionData = {
-        subUserId: profile.subUserId, // 使用subUserId
-        archiveId: profile.id,
+        subUserId: profile.subUserId, // 子用户ID（必填）
+        archiveId: profile.id, // 档案ID（必填）
         detectionType: this.getDetectionType(profile.name), // 获取检测类型
-        imageUrl: this.data.photoPath // 照片路径
+        imageUrl: this.data.photoPath // 图片URL（必填）
       }
 
       console.log('保存检测数据:', detectionData)
@@ -250,7 +267,7 @@ Page({
       wx.hideLoading()
       console.error('保存失败:', error)
       wx.showToast({
-        title: '保存失败，请重试',
+        title: error.message || '保存失败，请重试',
         icon: 'none'
       })
     }
@@ -263,13 +280,30 @@ Page({
     })
 
     try {
-      // 准备检测数据
+      // 验证必填参数
       const profile = this.data.profile
+      if (!profile) {
+        throw new Error('档案信息缺失')
+      }
+      
+      if (!profile.subUserId) {
+        throw new Error('子用户ID缺失')
+      }
+      
+      if (!profile.id) {
+        throw new Error('档案ID缺失')
+      }
+      
+      if (!this.data.photoPath) {
+        throw new Error('图片路径缺失')
+      }
+
+      // 准备检测数据
       const detectionData = {
-        subUserId: profile.subUserId, // 使用subUserId
-        archiveId: profile.id,
-        detectionType: this.getDetectionType(profile.name),
-        imageUrl: this.data.photoPath // 这里应该上传图片后获取URL
+        subUserId: profile.subUserId, // 子用户ID（必填）
+        archiveId: profile.id, // 档案ID（必填）
+        detectionType: this.getDetectionType(profile.name), // 检测类型
+        imageUrl: this.data.photoPath // 图片URL（必填）
       }
 
       console.log('开始检测，数据:', detectionData)
@@ -319,7 +353,7 @@ Page({
       wx.hideLoading()
       console.error('检测失败:', error)
       wx.showToast({
-        title: '检测失败，请重试',
+        title: error.message || '检测失败，请重试',
         icon: 'none'
       })
     }
