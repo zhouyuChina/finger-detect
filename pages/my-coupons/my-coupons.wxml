@@ -13,27 +13,7 @@
     </view>
   </view>
 
-  <!-- 兑换码输入区域 -->
-  <view class="redeem-section">
-    <view class="redeem-input-container">
-      <input 
-        class="redeem-input" 
-        placeholder="请输入兑换码" 
-        value="{{redeemCode}}"
-        bindinput="onRedeemInput"
-      />
-      <view class="redeem-btn" >
-        <t-button 
-          theme="light" 
-          size="small"
-          bindtap="redeemCoupon"
-        >
-        兑换
-      </t-button>
-      </view>
-      
-    </view>
-  </view>
+
 
   <!-- 优惠券列表 -->
   <view class="coupons-list">
@@ -44,46 +24,42 @@
       bindtap="onCouponClick"
       data-id="{{item.id}}"
     >
-      <!-- 优惠券图片 -->
-      <view class="coupon-image">
-        <image 
-          class="coupon-img" 
-          src="{{item.image || '/images/banner1.png'}}" 
-          mode="aspectFill"
-        />
-      </view>
-
       <!-- 优惠券信息 -->
       <view class="coupon-info">
-        <view class="coupon-value">¥ {{item.value}}</view>
-        <view class="coupon-condition">{{item.condition}}</view>
-        <view class="coupon-description">{{item.description}}</view>
-      </view>
-
-      <!-- 操作按钮 -->
-      <view class="coupon-action">
-        <t-button 
-          wx:if="{{item.status === 'unused'}}"
-          class="claim-btn" 
-          theme="primary" 
-          size="small"
-          bindtap="claimCoupon"
-          data-id="{{item.id}}"
-          catchtap="claimCoupon"
-        >
-          <view class="btn-content">立即领取
+        <view class="coupon-header">
+          <view class="coupon-name">{{item.coupon.name}}</view>
+          <view class="coupon-status {{item.status}}">{{item.status === 'unused' ? '未使用' : item.status === 'used' ? '已使用' : '已过期'}}</view>
+        </view>
+        
+        <view class="coupon-value">{{item.coupon.displayValue}}</view>
+        <view class="coupon-condition">{{item.coupon.displayCondition}}</view>
+        <view class="coupon-description">{{item.coupon.displayDescription}}</view>
+        
+        <view class="coupon-footer">
+          <view class="coupon-expire">有效期至：{{item.coupon.endTime}}</view>
+          <view class="coupon-remaining" wx:if="{{item.status === 'unused'}}">
+            {{item.coupon.remainingTimeText}}
           </view>
-        </t-button>
-        <view wx:else class="status-overlay">
-          <text class="status-text">{{item.statusText}}</text>
         </view>
       </view>
 
-      <!-- 已领取状态遮罩 -->
-      <view wx:if="{{item.status === 'claimed'}}" class="claimed-overlay">
-        <text class="claimed-text">已领</text>
+      <!-- 状态显示 -->
+      <view class="coupon-action">
+        <view class="status-overlay">
+          <text class="status-text">{{item.status === 'unused' ? '未使用' : item.status === 'used' ? '已使用' : '已过期'}}</text>
+        </view>
       </view>
     </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{loading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..."></t-loading>
+  </view>
+
+  <!-- 没有更多数据 -->
+  <view class="no-more" wx:if="{{!hasMore && filteredCoupons.length > 0}}">
+    <text>没有更多数据了</text>
   </view>
 
   <!-- 空状态 -->

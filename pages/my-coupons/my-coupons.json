@@ -1,8 +1,10 @@
 {
   "navigationBarTitleText": "我的优惠券",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f5f5",
   "usingComponents": {
     "t-button": "../../miniprogram_npm/button/button",
     "t-empty": "../../miniprogram_npm/empty/empty",
-    "t-icon": "../../miniprogram_npm/icon/icon"
+    "t-loading": "../../miniprogram_npm/loading/loading"
   }
 } 

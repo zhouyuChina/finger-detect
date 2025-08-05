@@ -14,6 +14,7 @@
     "pages/record-gallery/record-gallery",
     "pages/my-profile/my-profile",
     "pages/my-coupons/my-coupons",
+    "pages/feedback/feedback",
     "pages/system-messages/system-messages",
     "pages/records-compare/records-compare"
   ],

@@ -19,10 +19,7 @@ Page({
       totalDetections: 0,
       unreadMessages: 0
     },
-    showFeedbackPopup: false,
-    feedbackType: 'bug',
-    feedbackContent: '',
-    contactInfo: '',
+
     loading: false // 加载状态
   },
 
@@ -160,100 +157,10 @@ Page({
   },
 
   // 留言反馈
-  onEditProfile() {
-    this.setData({
-      showFeedbackPopup: true
+  onFeedback() {
+    wx.navigateTo({
+      url: '/pages/feedback/feedback'
     });
-  },
-
-  // 反馈弹窗状态变化
-  onFeedbackPopupChange(e) {
-    this.setData({
-      showFeedbackPopup: e.detail.visible
-    });
-  },
-
-  // 关闭反馈弹窗
-  closeFeedbackPopup() {
-    this.setData({
-      showFeedbackPopup: false,
-      feedbackType: 'bug',
-      feedbackContent: '',
-      contactInfo: ''
-    });
-  },
-
-  // 选择反馈类型
-  selectType(e) {
-    const type = e.currentTarget.dataset.type;
-    this.setData({
-      feedbackType: type
-    });
-  },
-
-  // 反馈内容输入
-  onContentInput(e) {
-    this.setData({
-      feedbackContent: e.detail.value
-    });
-  },
-
-  // 联系方式输入
-  onContactInput(e) {
-    this.setData({
-      contactInfo: e.detail.value
-    });
-  },
-
-  // 提交反馈
-  async submitFeedback() {
-    const { feedbackType, feedbackContent, contactInfo } = this.data;
-    
-    if (!feedbackContent.trim()) {
-      wx.showToast({
-        title: '请输入反馈内容',
-        icon: 'error'
-      });
-      return;
-    }
-
-    // 显示提交中状态
-    wx.showLoading({
-      title: '提交中...'
-    });
-
-    try {
-      // TODO: 调用反馈提交API
-      // const response = await api.feedback.submit({
-      //   type: feedbackType,
-      //   content: feedbackContent,
-      //   contact: contactInfo
-      // })
-
-      // 模拟提交反馈
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // 重置表单
-      this.setData({
-        showFeedbackPopup: false,
-        feedbackType: 'bug',
-        feedbackContent: '',
-        contactInfo: ''
-      });
-
-      wx.showToast({
-        title: '反馈提交成功',
-        icon: 'success'
-      });
-    } catch (error) {
-      console.error('提交反馈失败:', error)
-      wx.showToast({
-        title: '提交失败，请重试',
-        icon: 'error'
-      });
-    } finally {
-      wx.hideLoading();
-    }
   },
 
   // 查看检测记录

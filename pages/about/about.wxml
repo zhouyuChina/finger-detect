@@ -1,14 +1,20 @@
 <!--about.wxml-->
 <view class="container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+
   <!-- 主要内容 -->
-  <view class="content">
+  <view class="content" wx:else>
     <!-- Logo区域 -->
     <view class="logo-section">
-      <view class="logo-placeholder">
+      <view class="logo-placeholder" wx:if="{{!aboutInfo.logo}}">
         <text class="logo-text">🏥</text>
       </view>
-      <text class="platform-name">{{platformName}}</text>
-      <text class="version-text">版本 {{version}}</text>
+      <image wx:else class="logo-image" src="{{aboutInfo.logo}}" mode="aspectFit" />
+      <text class="platform-name">{{aboutInfo.name}}</text>
+      <text class="version-text">版本 {{aboutInfo.version}}</text>
     </view>
 
     <!-- 介绍文案 -->
@@ -16,7 +22,7 @@
       <t-cell-group>
         <t-cell title="平台介绍" hover>
           <view slot="description" class="description-text">
-            我们致力于为用户提供专业、便捷的健康检测服务。通过先进的AI技术，为用户提供准确、快速的健康分析报告。
+            {{aboutInfo.description}}
           </view>
         </t-cell>
         
@@ -47,18 +53,42 @@
     <view class="contact-section">
       <t-cell-group>
         <t-cell 
+          wx:if="{{aboutInfo.phone}}"
           title="客服电话" 
-          description="400-123-4567"
+          description="{{aboutInfo.phone}}"
           hover
           bindtap="onCallService"
           right-icon="chevron-right"
         />
         <t-cell 
+          wx:if="{{aboutInfo.website}}"
           title="官方网站" 
-          description="www.healthdetect.com"
+          description="{{aboutInfo.website}}"
           hover
           bindtap="onVisitWebsite"
           right-icon="chevron-right"
+        />
+        <t-cell 
+          wx:if="{{aboutInfo.email}}"
+          title="联系邮箱" 
+          description="{{aboutInfo.email}}"
+          hover
+          bindtap="onCopyEmail"
+          right-icon="chevron-right"
+        />
+        <t-cell 
+          wx:if="{{aboutInfo.wechat}}"
+          title="微信公众号" 
+          description="{{aboutInfo.wechat}}"
+          hover
+          bindtap="onCopyWechat"
+          right-icon="chevron-right"
+        />
+        <t-cell 
+          wx:if="{{aboutInfo.address}}"
+          title="公司地址" 
+          description="{{aboutInfo.address}}"
+          hover
         />
         <t-cell 
           title="意见反馈" 
@@ -73,8 +103,8 @@
     <!-- 版本信息 -->
     <view class="version-section">
       <t-cell-group>
-        <t-cell title="当前版本" description="{{version}}" />
-        <t-cell title="更新日期" description="{{updateDate}}" />
+        <t-cell title="当前版本" description="{{aboutInfo.version}}" />
+        <t-cell wx:if="{{aboutInfo.copyright}}" title="版权信息" description="{{aboutInfo.copyright}}" />
       </t-cell-group>
     </view>
 

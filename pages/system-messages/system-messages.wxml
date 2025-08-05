@@ -4,14 +4,9 @@
   <view class="page-header">
     <text class="page-title">系统消息</text>
     <view class="header-actions">
-      <t-button 
-        theme="light" 
-        size="small"
-        bindtap="markAllAsRead"
-        disabled="{{!hasUnreadMessages}}"
-      >
-        一键已读
-      </t-button>
+      <view wx:if="{{unreadCount > 0}}" class="unread-badge">
+        <t-badge count="{{unreadCount}}" theme="danger" />
+      </view>
     </view>
   </view>
 
@@ -26,37 +21,49 @@
         hover
       >
         <view slot="left-icon" class="message-icon">
-          <view class="icon-container {{item.type}}">
+          <view class="icon-container">
             <t-icon 
-              name="{{item.icon}}" 
+              name="{{getMessageIcon(item.type)}}" 
               size="48rpx" 
-              color="{{item.type === 'unread' ? '#e34d59' : '#999'}}"
+              color="#666"
             />
           </view>
-          <view wx:if="{{item.type === 'unread'}}" class="unread-dot"></view>
         </view>
         
         <view slot="title" class="message-title">
-          <text class="title-text {{item.type === 'unread' ? 'unread' : ''}}">{{item.title}}</text>
-          <view wx:if="{{item.isImportant}}" class="important-tag">
-            <t-tag theme="danger" size="small">重要</t-tag>
+          <text class="title-text">{{item.title}}</text>
+          <view class="message-type-tag">
+            <t-tag theme="light" size="small">{{getMessageTypeText(item.type)}}</t-tag>
           </view>
         </view>
         
         <view slot="description" class="message-preview">
-          <text class="preview-text">{{item.preview}}</text>
+          <text class="preview-text">{{item.content}}</text>
         </view>
         
         <view slot="note" class="message-meta">
-          <text class="time-text">{{item.time}}</text>
+          <text class="time-text">{{formatTime(item.publishedAt)}}</text>
+          <view class="read-count">
+            <text class="count-text">{{item.readCount}}/{{item.totalCount}}</text>
+          </view>
         </view>
       </t-cell>
     </t-cell-group>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{loading}}" class="loading-more">
+      <t-loading theme="circular" size="40rpx" text="加载中..." />
+    </view>
+
+    <!-- 没有更多数据 -->
+    <view wx:if="{{!hasMore && messages.length > 0}}" class="no-more">
+      <text class="no-more-text">没有更多消息了</text>
+    </view>
   </view>
 
   <!-- 空状态 -->
   <t-empty 
-    wx:if="{{messages.length === 0}}"
+    wx:if="{{messages.length === 0 && !loading}}"
     description="暂无系统消息"
     icon="notification"
   >
@@ -82,8 +89,8 @@
       <view class="popup-header">
         <view class="popup-title-section">
           <text class="popup-title">{{currentMessage.title}}</text>
-          <view wx:if="{{currentMessage.isImportant}}" class="important-tag">
-            <t-tag theme="danger" size="small">重要</t-tag>
+          <view class="message-type-tag">
+            <t-tag theme="light" size="small">{{getMessageTypeText(currentMessage.type)}}</t-tag>
           </view>
         </view>
         <text class="popup-close" bindtap="closeDetailPopup">×</text>
@@ -92,26 +99,11 @@
       <!-- 消息内容 -->
       <view class="popup-content">
         <view class="message-info">
-          <text class="message-time">{{currentMessage.time}}</text>
-          <text class="message-type">{{currentMessage.typeText}}</text>
+          <text class="message-time">{{formatTime(currentMessage.publishedAt)}}</text>
         </view>
         
         <view class="message-body">
           <text class="message-content">{{currentMessage.content}}</text>
-        </view>
-        
-        <view wx:if="{{currentMessage.actions && currentMessage.actions.length > 0}}" class="message-actions">
-          <t-button 
-            wx:for="{{currentMessage.actions}}" 
-            wx:key="index"
-            wx:for-item="action"
-            theme="{{action.theme || 'primary'}}" 
-            size="small"
-            bindtap="onActionClick"
-            data-action="{{action}}"
-          >
-            {{action.text}}
-          </t-button>
         </view>
       </view>
 
@@ -123,14 +115,6 @@
           bindtap="closeDetailPopup"
         >
           关闭
-        </t-button>
-        <t-button 
-          wx:if="{{currentMessage.type === 'unread'}}"
-          theme="primary" 
-          size="small"
-          bindtap="markAsRead"
-        >
-          标记已读
         </t-button>
       </view>
     </view>

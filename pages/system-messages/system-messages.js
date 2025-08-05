@@ -1,225 +1,243 @@
 // system-messages.js
+const api = require('../../utils/api.js')
+
 Page({
   data: {
-    messages: [
-      {
-        id: 1,
-        type: 'unread',
-        icon: 'notification',
-        title: '优惠券功能上线通知',
-        preview: '优惠券功能正式上线，现在可以使用优惠券享受各种服务...',
-        content: '好消息！我们的优惠券功能正式上线了。现在您可以使用优惠券享受各种服务，包括检测费用减免、会员特权等。新用户还可以获得专属优惠券，快来体验吧！',
-        time: '2024-01-15 10:30',
-        isImportant: true,
-        typeText: '系统通知',
-        actions: [
-          {
-            action: 'goToCoupons',
-            text: '查看优惠券',
-            theme: 'primary'
-          }
-        ]
-      },
-      {
-        id: 2,
-        type: 'unread',
-        icon: 'notification',
-        title: '检测完成通知',
-        preview: '恭喜您完成健康检测，获得专属优惠券...',
-        content: '恭喜您完成健康检测！根据我们的活动规则，您获得了专属优惠券。优惠券可用于下次检测费用减免、会员特权等服务。继续使用我们的服务，获得更多专属优惠！',
-        time: '2024-01-14 16:45',
-        isImportant: false,
-        typeText: '检测通知',
-        actions: [
-          {
-            action: 'goToCoupons',
-            text: '查看优惠券',
-            theme: 'primary'
-          }
-        ]
-      },
-      {
-        id: 3,
-        title: '检测报告已生成',
-        preview: '您的最新健康检测报告已生成完成，请及时查看...',
-        content: '您的健康检测报告已生成完成，检测结果显示各项指标正常。建议您定期进行健康检测，保持良好的生活习惯。如需详细解读报告内容，请联系我们的专业医生。',
-        time: '2024-01-13 16:45',
-        type: 'read',
-        typeText: '检测报告',
-        icon: 'file',
-        isImportant: false,
-        actions: [
-          {
-            text: '查看报告',
-            theme: 'primary',
-            action: 'viewReport'
-          }
-        ]
-      },
-      {
-        id: 4,
-        title: '积分到账通知',
-        preview: '恭喜您完成健康检测，获得50积分奖励...',
-        content: '恭喜您完成健康检测！根据我们的积分规则，您获得了50积分奖励。积分可用于兑换优惠券、会员特权等服务。继续使用我们的服务，获得更多积分奖励！',
-        time: '2024-01-12 09:20',
-        type: 'read',
-        typeText: '积分通知',
-        icon: 'gift',
-        isImportant: false
-      },
-      {
-        id: 5,
-        title: '账号安全提醒',
-        preview: '检测到您的账号在新设备登录，如非本人操作请及时修改密码...',
-        content: '我们检测到您的账号在2024-01-11 15:30在新设备上登录。登录地点：北京市朝阳区。如非本人操作，请立即修改密码并联系客服。为了账号安全，建议您定期更换密码。',
-        time: '2024-01-11 15:35',
-        type: 'read',
-        typeText: '安全提醒',
-        icon: 'shield',
-        isImportant: true,
-        actions: [
-          {
-            text: '修改密码',
-            theme: 'danger',
-            action: 'changePassword'
-          }
-        ]
-      }
-    ],
+    messages: [],
+    loading: false,
+    hasMore: true,
+    page: 1,
+    limit: 10,
     showDetailPopup: false,
     currentMessage: {},
-    hasUnreadMessages: false
+    unreadCount: 0,
+    refreshing: false
   },
 
   onLoad() {
-    this.calculateUnreadCount();
+    this.loadMessages(true)
+    this.loadUnreadCount()
   },
 
   onShow() {
-    // 页面显示时刷新数据
-    this.calculateUnreadCount();
+    // 页面显示时刷新未读数量
+    this.loadUnreadCount()
   },
 
-  // 计算未读消息数量
-  calculateUnreadCount() {
-    const unreadCount = this.data.messages.filter(msg => msg.type === 'unread').length;
-    this.setData({
-      hasUnreadMessages: unreadCount > 0
-    });
+  // 下拉刷新
+  onPullDownRefresh() {
+    this.setData({ refreshing: true })
+    this.loadMessages(true).then(() => {
+      wx.stopPullDownRefresh()
+      this.setData({ refreshing: false })
+    }).catch(() => {
+      wx.stopPullDownRefresh()
+      this.setData({ refreshing: false })
+    })
   },
 
-  // 点击消息
-  onMessageClick(e) {
-    const id = e.currentTarget.dataset.id;
-    const message = this.data.messages.find(msg => msg.id === id);
-    
-    if (!message) return;
-
-    this.setData({
-      currentMessage: message,
-      showDetailPopup: true
-    });
-
-    // 如果是未读消息，自动标记为已读
-    if (message.type === 'unread') {
-      this.markMessageAsRead(id);
+  // 上拉加载更多
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loading) {
+      this.loadMessages(false)
     }
   },
 
-  // 标记单条消息为已读
-  markMessageAsRead(messageId) {
-    const messages = this.data.messages.map(msg => {
-      if (msg.id === messageId) {
-        return { ...msg, type: 'read' };
-      }
-      return msg;
-    });
+  // 加载系统消息列表
+  async loadMessages(refresh = false) {
+    if (this.data.loading) return
 
-    this.setData({ messages });
-    this.calculateUnreadCount();
+    this.setData({ loading: true })
+
+    try {
+      const page = refresh ? 1 : this.data.page
+      const params = {
+        page: page,
+        limit: this.data.limit,
+        status: 'published'
+      }
+
+      const res = await api.systemMessages.getList(params)
+      
+      if (res.success && res.data) {
+        const newMessages = res.data.messages || []
+        const messages = refresh ? newMessages : [...this.data.messages, ...newMessages]
+        
+        this.setData({
+          messages: messages,
+          page: page + 1,
+          hasMore: newMessages.length === this.data.limit
+        })
+      } else {
+        wx.showToast({
+          title: res.message || '获取消息失败',
+          icon: 'none'
+        })
+      }
+    } catch (error) {
+      console.error('加载系统消息失败:', error)
+      wx.showToast({
+        title: '网络错误，请稍后重试',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ loading: false })
+    }
   },
 
-  // 标记当前消息为已读
-  markAsRead() {
-    const { currentMessage } = this.data;
-    this.markMessageAsRead(currentMessage.id);
+  // 加载未读消息数量
+  async loadUnreadCount() {
+    try {
+      const res = await api.systemMessages.getUnreadCount()
+      if (res.success && res.data) {
+        this.setData({
+          unreadCount: res.data.unreadCount || 0
+        })
+      }
+    } catch (error) {
+      console.error('获取未读数量失败:', error)
+    }
+  },
+
+  // 点击消息
+  async onMessageClick(e) {
+    const id = e.currentTarget.dataset.id
+    const message = this.data.messages.find(msg => msg.id === id)
     
-    // 更新当前消息状态
-    this.setData({
-      'currentMessage.type': 'read'
-    });
+    if (!message) return
 
-    wx.showToast({
-      title: '已标记为已读',
-      icon: 'success'
-    });
-  },
+    // 显示加载状态
+    wx.showLoading({ title: '加载中...' })
 
-  // 一键已读
-  markAllAsRead() {
-    wx.showModal({
-      title: '确认操作',
-      content: '确定要将所有未读消息标记为已读吗？',
-      success: (res) => {
-        if (res.confirm) {
-          const messages = this.data.messages.map(msg => {
-            if (msg.type === 'unread') {
-              return { ...msg, type: 'read' };
-            }
-            return msg;
-          });
-
-          this.setData({ messages });
-          this.calculateUnreadCount();
-
-          wx.showToast({
-            title: '已全部标记为已读',
-            icon: 'success'
-          });
-        }
+    try {
+      // 获取消息详情
+      const res = await api.systemMessages.getDetail(id)
+      
+      if (res.success && res.data) {
+        this.setData({
+          currentMessage: res.data,
+          showDetailPopup: true
+        })
+      } else {
+        wx.showToast({
+          title: res.message || '获取消息详情失败',
+          icon: 'none'
+        })
       }
-    });
+    } catch (error) {
+      console.error('获取消息详情失败:', error)
+      wx.showToast({
+        title: '网络错误，请稍后重试',
+        icon: 'none'
+      })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   // 弹窗状态变化
   onDetailPopupChange(e) {
     this.setData({
       showDetailPopup: e.detail.visible
-    });
+    })
   },
 
   // 关闭详情弹窗
   closeDetailPopup() {
     this.setData({
       showDetailPopup: false
-    });
+    })
   },
 
   // 处理消息中的操作按钮
   onActionClick(e) {
-    const action = e.currentTarget.dataset.action;
+    const action = e.currentTarget.dataset.action
     
     switch (action.action) {
       case 'goToCoupons':
         wx.navigateTo({
           url: '/pages/my-coupons/my-coupons'
-        });
-        break;
+        })
+        break
+      case 'viewReport':
+        wx.navigateTo({
+          url: '/pages/detection-result/detection-result'
+        })
+        break
+      case 'changePassword':
+        wx.showToast({
+          title: '功能开发中',
+          icon: 'none'
+        })
+        break
       default:
         wx.showToast({
           title: '功能暂未开放',
           icon: 'none'
-        });
+        })
     }
 
     // 关闭弹窗
-    this.closeDetailPopup();
+    this.closeDetailPopup()
+  },
+
+  // 获取消息类型文本
+  getMessageTypeText(type) {
+    const typeMap = {
+      'system_notice': '系统通知',
+      'activity_announcement': '活动公告',
+      'feature_update': '功能更新',
+      'maintenance_notice': '维护通知',
+      'security_alert': '安全提醒'
+    }
+    return typeMap[type] || '系统消息'
+  },
+
+  // 获取消息图标
+  getMessageIcon(type) {
+    const iconMap = {
+      'system_notice': 'notification',
+      'activity_announcement': 'gift',
+      'feature_update': 'setting',
+      'maintenance_notice': 'wrench',
+      'security_alert': 'shield'
+    }
+    return iconMap[type] || 'notification'
+  },
+
+  // 格式化时间
+  formatTime(timeStr) {
+    if (!timeStr) return ''
+    
+    const date = new Date(timeStr)
+    const now = new Date()
+    const diff = now - date
+    
+    // 小于1分钟
+    if (diff < 60 * 1000) {
+      return '刚刚'
+    }
+    // 小于1小时
+    if (diff < 60 * 60 * 1000) {
+      return Math.floor(diff / (60 * 1000)) + '分钟前'
+    }
+    // 小于24小时
+    if (diff < 24 * 60 * 60 * 1000) {
+      return Math.floor(diff / (60 * 60 * 1000)) + '小时前'
+    }
+    // 小于30天
+    if (diff < 30 * 24 * 60 * 60 * 1000) {
+      return Math.floor(diff / (24 * 60 * 60 * 1000)) + '天前'
+    }
+    
+    // 超过30天显示具体日期
+    return date.toLocaleDateString('zh-CN')
   },
 
   // 跳转到首页
   goToHome() {
     wx.switchTab({
       url: '/pages/index/index'
-    });
+    })
   }
-}); 
+}) 

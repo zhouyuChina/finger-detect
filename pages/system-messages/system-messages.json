@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "系统消息",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
   "usingComponents": {
     "t-cell": "../../miniprogram_npm/cell/cell",
     "t-cell-group": "../../miniprogram_npm/cell-group/cell-group",
@@ -7,6 +9,8 @@
     "t-empty": "../../miniprogram_npm/empty/empty",
     "t-icon": "../../miniprogram_npm/icon/icon",
     "t-tag": "../../miniprogram_npm/tag/tag",
-    "t-popup": "../../miniprogram_npm/popup/popup"
+    "t-popup": "../../miniprogram_npm/popup/popup",
+    "t-badge": "../../miniprogram_npm/badge/badge",
+    "t-loading": "../../miniprogram_npm/loading/loading"
   }
 } 

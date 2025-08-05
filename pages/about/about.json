@@ -1,3 +1,10 @@
 {
-  "navigationBarTitleText": "关于我们"
+  "navigationBarTitleText": "关于我们",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "t-cell": "../../miniprogram_npm/cell/cell",
+    "t-cell-group": "../../miniprogram_npm/cell-group/cell-group",
+    "t-loading": "../../miniprogram_npm/loading/loading"
+  }
 } 

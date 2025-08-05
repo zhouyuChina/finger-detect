@@ -23,7 +23,7 @@
     </view>
     <t-button 
       theme="primary"
-      bindtap="onEditProfile"
+      bindtap="onFeedback"
       size="extra-small"
     >
       留言反馈
@@ -100,93 +100,5 @@
     </t-cell>
   </view>
 
-  <!-- 留言反馈弹窗 -->
-  <t-popup 
-    visible="{{showFeedbackPopup}}" 
-    placement="center" 
-    bind:visible-change="onFeedbackPopupChange"
-    close-on-overlay-click="{{false}}"
-  >
-    <view class="feedback-popup">
-      <!-- 弹窗头部 -->
-      <view class="popup-header">
-        <text class="popup-title">留言反馈</text>
-        <text class="popup-close" bindtap="closeFeedbackPopup">×</text>
-      </view>
 
-      <!-- 反馈表单 -->
-      <view class="feedback-form">
-        <!-- 反馈类型 -->
-        <view class="feedback-type">
-          <text class="section-title">反馈类型</text>
-          <view class="type-options">
-            <view 
-              class="type-option {{feedbackType === 'bug' ? 'active' : ''}}"
-              bindtap="selectType"
-              data-type="bug"
-            >
-              <text class="type-text">问题反馈</text>
-            </view>
-            <view 
-              class="type-option {{feedbackType === 'suggestion' ? 'active' : ''}}"
-              bindtap="selectType"
-              data-type="suggestion"
-            >
-              <text class="type-text">功能建议</text>
-            </view>
-            <view 
-              class="type-option {{feedbackType === 'other' ? 'active' : ''}}"
-              bindtap="selectType"
-              data-type="other"
-            >
-              <text class="type-text">其他</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 反馈内容 -->
-        <view class="feedback-content">
-          <text class="section-title">反馈内容</text>
-          <textarea 
-            class="feedback-textarea"
-            placeholder="请详细描述您的问题或建议..."
-            value="{{feedbackContent}}"
-            bindinput="onContentInput"
-            maxlength="500"
-          />
-          <text class="char-count">{{feedbackContent.length}}/500</text>
-        </view>
-
-        <!-- 联系方式 -->
-        <view class="contact-info">
-          <text class="section-title">联系方式（选填）</text>
-          <input 
-            class="contact-input"
-            placeholder="请输入您的手机号或邮箱"
-            value="{{contactInfo}}"
-            bindinput="onContactInput"
-          />
-        </view>
-      </view>
-
-      <!-- 操作按钮 -->
-      <view class="popup-actions">
-        <t-button 
-          theme="light" 
-          size="samll"
-          bindtap="closeFeedbackPopup"
-        >
-          取消
-        </t-button>
-        <t-button 
-          theme="primary" 
-          size="samll"
-          bindtap="submitFeedback"
-          disabled="{{!feedbackContent.trim()}}"
-        >
-          提交反馈
-        </t-button>
-      </view>
-    </view>
-  </t-popup>
 </view> 
