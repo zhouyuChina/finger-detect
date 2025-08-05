@@ -258,6 +258,12 @@ Page({
         }, 1500)
       } else {
         console.warn('检测保存接口返回错误:', response)
+        console.error('错误详情:', {
+          success: response.success,
+          code: response.code,
+          message: response.message,
+          data: response.data
+        })
         wx.showToast({
           title: response.message || '保存失败',
           icon: 'none'
@@ -265,9 +271,21 @@ Page({
       }
     } catch (error) {
       wx.hideLoading()
-      console.error('保存失败:', error)
+      console.error('保存失败，详细错误信息:', error)
+      console.error('错误类型:', typeof error)
+      console.error('错误消息:', error.message)
+      console.error('错误堆栈:', error.stack)
+      
+      // 根据错误类型显示不同的提示
+      let errorMessage = '保存失败，请重试'
+      if (error.message) {
+        errorMessage = error.message
+      } else if (error.code) {
+        errorMessage = `错误码: ${error.code}`
+      }
+      
       wx.showToast({
-        title: error.message || '保存失败，请重试',
+        title: errorMessage,
         icon: 'none'
       })
     }
@@ -344,6 +362,12 @@ Page({
         }, 1500)
       } else {
         console.warn('检测接口返回错误:', response)
+        console.error('错误详情:', {
+          success: response.success,
+          code: response.code,
+          message: response.message,
+          data: response.data
+        })
         wx.showToast({
           title: response.message || '检测失败',
           icon: 'none'
@@ -351,9 +375,21 @@ Page({
       }
     } catch (error) {
       wx.hideLoading()
-      console.error('检测失败:', error)
+      console.error('检测失败，详细错误信息:', error)
+      console.error('错误类型:', typeof error)
+      console.error('错误消息:', error.message)
+      console.error('错误堆栈:', error.stack)
+      
+      // 根据错误类型显示不同的提示
+      let errorMessage = '检测失败，请重试'
+      if (error.message) {
+        errorMessage = error.message
+      } else if (error.code) {
+        errorMessage = `错误码: ${error.code}`
+      }
+      
       wx.showToast({
-        title: error.message || '检测失败，请重试',
+        title: errorMessage,
         icon: 'none'
       })
     }
