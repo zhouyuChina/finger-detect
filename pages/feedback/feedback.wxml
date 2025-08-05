@@ -1,0 +1,216 @@
+<!--feedback.wxml-->
+<view class="container">
+  <!-- Tab标签页 -->
+  <t-tabs 
+    value="{{activeTab}}" 
+    bind:change="onTabChange"
+    class="feedback-tabs"
+  >
+    <t-tab-panel value="message" label="给系统留言">
+      <!-- 留言板块 -->
+      <view class="message-section">
+        <!-- 留言表单 -->
+        <view class="message-form">
+          <view class="form-header">
+            <text class="form-title">发表留言</text>
+          </view>
+          
+          <view class="form-content">
+            <view class="input-group">
+              <text class="input-label">留言标题</text>
+              <input 
+                class="message-title-input"
+                placeholder="请输入留言标题"
+                value="{{messageTitle}}"
+                bindinput="onMessageTitleInput"
+                maxlength="50"
+              />
+            </view>
+            
+            <view class="input-group">
+              <text class="input-label">留言内容</text>
+              <textarea 
+                class="message-content-textarea"
+                placeholder="请输入留言内容..."
+                value="{{messageContent}}"
+                bindinput="onMessageContentInput"
+                maxlength="500"
+              />
+              <text class="char-count">{{messageContent.length}}/500</text>
+            </view>
+            
+            <view class="form-actions">
+              <t-button 
+                theme="primary" 
+                size="medium"
+                bindtap="submitMessage"
+              >
+                提交留言
+              </t-button>
+            </view>
+          </view>
+        </view>
+
+
+
+
+      </view>
+    </t-tab-panel>
+
+    <t-tab-panel value="feedback" label="系统回复">
+      <!-- 反馈板块 -->
+      <view class="feedback-section">
+
+        <!-- 加载状态 -->
+        <view class="loading-state" wx:if="{{feedbackLoading && feedbacks.length === 0}}">
+          <t-loading theme="circular" size="40rpx" text="加载中..." />
+        </view>
+
+        <!-- 反馈列表 -->
+        <view class="feedback-list" wx:if="{{!feedbackLoading && feedbacks.length > 0}}">
+          <view 
+            class="feedback-item" 
+            wx:for="{{feedbacks}}" 
+            wx:key="id" 
+            bindtap="onFeedbackClick" 
+            data-id="{{item.id}}"
+          >
+            <view class="feedback-header">
+              <view class="feedback-type">
+                <t-icon name="{{getFeedbackTypeIcon(item.type)}}" size="32rpx" />
+                <text class="type-text">{{getFeedbackTypeText(item.type)}}</text>
+              </view>
+              <view class="feedback-time">{{formatTime(item.createdAt)}}</view>
+            </view>
+            
+            <view class="feedback-title" wx:if="{{item.title}}">
+              <text class="title-text">{{item.title}}</text>
+            </view>
+            
+            <view class="feedback-content">
+              <text class="content-text">{{item.content}}</text>
+            </view>
+            
+            <view class="feedback-images" wx:if="{{item.images && item.images.length > 0}}">
+              <image 
+                wx:for="{{item.images}}" 
+                wx:for-item="img" 
+                wx:key="*this"
+                src="{{img}}" 
+                mode="aspectFill" 
+                class="feedback-image"
+                bindtap="onPreviewFeedbackImage"
+                data-src="{{img}}"
+              />
+            </view>
+            
+            <view class="feedback-status" wx:if="{{item.status}}">
+              <t-tag 
+                theme="{{item.status === 'pending' ? 'warning' : item.status === 'processing' ? 'primary' : item.status === 'completed' ? 'success' : 'danger'}}" 
+                size="small"
+              >
+                {{item.statusText || (item.status === 'pending' ? '待处理' : item.status === 'processing' ? '处理中' : item.status === 'completed' ? '已完成' : item.status === 'rejected' ? '已拒绝' : '未知状态')}}
+              </t-tag>
+            </view>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <t-empty 
+          wx:if="{{!feedbackLoading && feedbacks.length === 0}}"
+          description="暂无系统回复"
+          icon="help-circle"
+        />
+
+        <!-- 加载更多 -->
+        <view class="load-more" wx:if="{{feedbackLoading && feedbacks.length > 0}}">
+          <t-loading theme="circular" size="40rpx" text="加载中..." />
+        </view>
+
+        <!-- 没有更多 -->
+        <view class="no-more" wx:if="{{!feedbackHasMore && feedbacks.length > 0}}">
+          <text class="no-more-text">没有更多了</text>
+        </view>
+      </view>
+    </t-tab-panel>
+  </t-tabs>
+
+  <!-- 反馈详情弹窗 -->
+  <t-popup 
+    visible="{{showDetailPopup}}" 
+    placement="center" 
+    bind:visible-change="onDetailPopupChange"
+    close-on-overlay-click="{{true}}"
+  >
+    <view class="detail-popup">
+      <!-- 弹窗头部 -->
+      <view class="popup-header">
+        <view class="popup-title-section">
+          <text class="popup-title">回复详情</text>
+          <view class="feedback-type-tag">
+            <t-tag theme="light" size="small">{{getFeedbackTypeText(currentFeedback.type)}}</t-tag>
+          </view>
+        </view>
+        <text class="popup-close" bindtap="closeDetailPopup">×</text>
+      </view>
+
+      <!-- 反馈内容 -->
+      <view class="popup-content">
+        <view class="feedback-info">
+          <text class="feedback-time">{{formatTime(currentFeedback.createdAt)}}</text>
+        </view>
+        
+        <view class="feedback-title" wx:if="{{currentFeedback.title}}">
+          <text class="title-text">{{currentFeedback.title}}</text>
+        </view>
+        
+        <view class="feedback-body">
+          <text class="feedback-content">{{currentFeedback.content}}</text>
+        </view>
+        
+        <view class="feedback-images" wx:if="{{currentFeedback.images && currentFeedback.images.length > 0}}">
+          <image 
+            wx:for="{{currentFeedback.images}}" 
+            wx:for-item="img" 
+            wx:key="*this"
+            src="{{img}}" 
+            mode="aspectFill" 
+            class="feedback-image"
+            bindtap="onPreviewFeedbackImage"
+            data-src="{{img}}"
+          />
+        </view>
+        
+        <view class="feedback-reply" wx:if="{{currentFeedback.reply}}">
+          <view class="reply-header">
+            <text class="reply-title">官方回复</text>
+            <text class="reply-time">{{formatTime(currentFeedback.repliedAt)}}</text>
+          </view>
+          <text class="reply-content">{{currentFeedback.reply}}</text>
+        </view>
+        
+        <view class="feedback-status" wx:if="{{currentFeedback.status}}">
+          <t-tag 
+            theme="{{currentFeedback.status === 'pending' ? 'warning' : currentFeedback.status === 'processing' ? 'primary' : currentFeedback.status === 'completed' ? 'success' : 'danger'}}" 
+            size="medium"
+          >
+            {{currentFeedback.statusText || (currentFeedback.status === 'pending' ? '待处理' : currentFeedback.status === 'processing' ? '处理中' : currentFeedback.status === 'completed' ? '已完成' : currentFeedback.status === 'rejected' ? '已拒绝' : '未知状态')}}
+          </t-tag>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="popup-actions">
+        <t-button 
+          theme="light" 
+          size="medium"
+          bindtap="closeDetailPopup"
+        >
+          关闭
+        </t-button>
+      </view>
+    </view>
+  </t-popup>
+
+
+</view> 

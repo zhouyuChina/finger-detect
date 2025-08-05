@@ -15,7 +15,7 @@ const ENV_CONFIG = {
 }
 
 // 当前使用的环境 - 修改这里来切换环境
-const CURRENT_ENV = 'TEST' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
+const CURRENT_ENV = 'LOCAL' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
 
 const baseUrl = ENV_CONFIG[CURRENT_ENV].baseUrl
 
@@ -81,6 +81,7 @@ const config = {
     message: {
       list: '/miniprogram/news',
       detail: '/miniprogram/news', // 新闻详情接口
+      submit: '/miniprogram/messages', // 提交留言
       markRead: '/message/mark-read',
       markAllRead: '/miniprogram/news/read-all', // 一键已读
       delete: '/message/delete',
@@ -89,12 +90,21 @@ const config = {
       markArticleRead: '/miniprogram/news/read' // 标记单个已读
     },
 
+    // 系统消息相关
+    systemMessages: {
+      list: '/miniprogram/system-messages', // 获取系统消息列表
+      detail: '/miniprogram/system-messages', // 获取系统消息详情
+      unreadCount: '/miniprogram/system-messages/unread-count' // 获取未读系统消息数量
+    },
+
+    // 关于我们相关
+    about: {
+      info: '/miniprogram/about' // 获取关于我们信息
+    },
+
     // 优惠券相关
     coupon: {
-      list: '/coupon/list',
-      use: '/coupon/use',
-      receive: '/coupon/receive',
-      myCoupons: '/coupon/my-coupons'
+      list: '/miniprogram/coupons' // 获取当前用户拥有的优惠券信息
     },
 
     // 系统相关
@@ -125,6 +135,13 @@ const config = {
       delete: '/record/delete',
       detail: '/record/detail',
       compare: '/record/compare'
+    },
+
+    // 反馈相关
+    feedback: {
+      list: '/miniprogram/feedback', // 获取反馈列表
+      submit: '/miniprogram/feedback', // 提交反馈
+      detail: '/miniprogram/feedback' // 获取反馈详情
     }
   },
 

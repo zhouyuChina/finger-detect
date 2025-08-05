@@ -143,6 +143,11 @@ const messageApi = {
     return request.get(`${config.api.message.detail}/${id}`)
   },
 
+  // 提交留言
+  submit(data) {
+    return request.post(config.api.message.submit, data)
+  },
+
   // 标记消息为已读
   markRead(id) {
     return request.put(`${config.api.message.markRead}/${id}`)
@@ -186,24 +191,9 @@ const messageApi = {
 
 // 优惠券相关API
 const couponApi = {
-  // 获取优惠券列表
-  getList(params = {}) {
+  // 获取当前用户拥有的优惠券信息
+  getUserCoupons(params = {}) {
     return request.get(config.api.coupon.list, params)
-  },
-
-  // 使用优惠券
-  use(id) {
-    return request.post(`${config.api.coupon.use}/${id}`)
-  },
-
-  // 领取优惠券
-  receive(id) {
-    return request.post(`${config.api.coupon.receive}/${id}`)
-  },
-
-  // 获取我的优惠券
-  getMyCoupons(params = {}) {
-    return request.get(config.api.coupon.myCoupons, params)
   }
 }
 
@@ -227,6 +217,32 @@ const systemApi = {
   // 健康检查
   health() {
     return request.get(config.api.system.health)
+  }
+}
+
+// 系统消息相关API
+const systemMessagesApi = {
+  // 获取系统消息列表
+  getList(params = {}) {
+    return request.get(config.api.systemMessages.list, params)
+  },
+
+  // 获取系统消息详情
+  getDetail(id) {
+    return request.get(`${config.api.systemMessages.detail}/${id}`)
+  },
+
+  // 获取未读系统消息数量
+  getUnreadCount() {
+    return request.get(config.api.systemMessages.unreadCount)
+  }
+}
+
+// 关于我们相关API
+const aboutApi = {
+  // 获取关于我们信息
+  getInfo() {
+    return request.get(config.api.about.info)
   }
 }
 
@@ -315,12 +331,38 @@ const recordApi = {
   }
 }
 
+// 反馈相关API
+const feedbackApi = {
+  // 获取反馈列表
+  getList(params = {}) {
+    return request.get(config.api.feedback.list, params)
+  },
+
+  // 提交反馈
+  submit(data) {
+    return request.post(config.api.feedback.submit, data)
+  },
+
+  // 获取反馈详情
+  getDetail(id) {
+    return request.get(`${config.api.feedback.detail}/${id}`)
+  },
+
+  // 获取反馈详情（使用查询参数）
+  getDetailByQuery(id) {
+    return request.get(config.api.feedback.detail, { id })
+  }
+}
+
 module.exports = {
   user: userApi,
   detection: detectionApi,
   message: messageApi,
   coupon: couponApi,
   system: systemApi,
+  systemMessages: systemMessagesApi,
+  about: aboutApi,
   profile: profileApi,
-  record: recordApi
+  record: recordApi,
+  feedback: feedbackApi
 } 

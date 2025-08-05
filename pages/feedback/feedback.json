@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "留言反馈",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f5f5",
+  "usingComponents": {
+    "t-tabs": "../../miniprogram_npm/tabs/tabs",
+    "t-tab-panel": "../../miniprogram_npm/tab-panel/tab-panel",
+    "t-button": "../../miniprogram_npm/button/button",
+    "t-loading": "../../miniprogram_npm/loading/loading",
+    "t-empty": "../../miniprogram_npm/empty/empty",
+    "t-popup": "../../miniprogram_npm/popup/popup",
+    "t-icon": "../../miniprogram_npm/icon/icon",
+    "t-tag": "../../miniprogram_npm/tag/tag"
+  }
+} 
