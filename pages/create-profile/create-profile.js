@@ -187,8 +187,27 @@ Page({
       console.log('当前用户信息:', userInfo)
       
       // 设置当前用户为选中状态
+      const currentUser = {
+        id: 'myself', // 使用特殊ID标识当前用户
+        nickname: userInfo.nickname || userInfo.realName || '我',
+        username: userInfo.username || userInfo.nickname,
+        age: userInfo.age || 0,
+        address: userInfo.address || '未知地址',
+        phone: userInfo.phone || '',
+        email: userInfo.email || '',
+        gender: userInfo.gender || '0',
+        archives: userInfo.archives || 0,
+        photos: userInfo.photos || 0,
+        reports: userInfo.reports || 0,
+        remark: '当前用户',
+        status: 'active',
+        createdAt: userInfo.createdAt,
+        updatedAt: userInfo.updatedAt,
+        isCurrentUser: true // 标记为当前用户
+      }
+      
       this.setData({ 
-        selectedUser: userInfo,
+        selectedUser: currentUser,
         isEditingMyself: true,
         currentStep: 1 // 从第一步开始
       })
@@ -235,9 +254,35 @@ Page({
         // 格式化用户数据
         const formattedSubUsers = this.formatSubUsers(subUsers)
         
+        // 将当前用户（微信用户）也添加到用户列表中
+        let allUsers = []
+        if (wechatUser) {
+          const currentUser = {
+            id: 'myself', // 使用特殊ID标识当前用户
+            nickname: wechatUser.nickname || wechatUser.realName || '我',
+            username: wechatUser.username || wechatUser.nickname,
+            age: wechatUser.age || 0,
+            address: wechatUser.address || '未知地址',
+            phone: wechatUser.phone || '',
+            email: wechatUser.email || '',
+            gender: wechatUser.gender || '0',
+            archives: wechatUser.archives || 0,
+            photos: wechatUser.photos || 0,
+            reports: wechatUser.reports || 0,
+            remark: '当前用户',
+            status: 'active',
+            createdAt: wechatUser.createdAt,
+            updatedAt: wechatUser.updatedAt,
+            isCurrentUser: true // 标记为当前用户
+          }
+          allUsers = [currentUser, ...formattedSubUsers]
+        } else {
+          allUsers = formattedSubUsers
+        }
+        
         this.setData({ 
           wechatUser,
-          subUsers: formattedSubUsers,
+          subUsers: allUsers, // 使用包含当前用户的完整列表
           currentSubUser
         })
         
@@ -1024,9 +1069,30 @@ Page({
             // 更新当前用户信息
             const updatedUserInfo = { ...storage.getUserInfo(), ...updateData }
             
+            // 创建当前用户对象
+            const currentUser = {
+              id: 'myself', // 使用特殊ID标识当前用户
+              nickname: updatedUserInfo.nickname || updatedUserInfo.realName || '我',
+              username: updatedUserInfo.username || updatedUserInfo.nickname,
+              age: updatedUserInfo.age || 0,
+              address: updatedUserInfo.address || '未知地址',
+              phone: updatedUserInfo.phone || '',
+              email: updatedUserInfo.email || '',
+              gender: updatedUserInfo.gender || '0',
+              archives: updatedUserInfo.archives || 0,
+              photos: updatedUserInfo.photos || 0,
+              reports: updatedUserInfo.reports || 0,
+              remark: '当前用户',
+              status: 'active',
+              createdAt: updatedUserInfo.createdAt,
+              updatedAt: updatedUserInfo.updatedAt,
+              isCurrentUser: true // 标记为当前用户
+            }
+            
             // 设置当前用户为选中状态，进入正常流程
             this.setData({
-              selectedUser: { id: 'myself', ...updatedUserInfo },
+              selectedUser: currentUser,
+              subUsers: [currentUser, ...this.data.subUsers], // 将当前用户添加到用户列表
               isEditingMyself: false, // 退出编辑模式
               currentStep: 1 // 回到第一步
             })
