@@ -24,8 +24,17 @@ Page({
     if (options.profile) {
       try {
         const profile = JSON.parse(decodeURIComponent(options.profile))
+        console.log('解析到的档案信息:', profile)
+        
+        // 检查档案是否有ID
+        if (!profile || !profile.id) {
+          console.error('档案信息缺失或缺少ID:', profile)
+          this.handleError('档案ID缺失')
+          return
+        }
+        
         this.setData({ profile })
-        console.log('获取到档案信息:', profile)
+        console.log('设置档案信息成功，档案ID:', profile.id)
         
         // 检查档案是否有报告
         this.checkProfileReports(profile.id)

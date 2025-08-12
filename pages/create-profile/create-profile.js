@@ -652,12 +652,35 @@ Page({
       
       if (response.success && response.data) {
         const newArchive = response.data
+        console.log('新创建的档案:', newArchive)
+        
+        // 检查档案是否有ID
+        if (!newArchive.id) {
+          console.error('新创建的档案缺少ID:', newArchive)
+          wx.showToast({
+            title: '档案创建失败：缺少档案ID',
+            icon: 'none'
+          });
+          return;
+        }
         
         // 重新加载档案列表
         await this.loadUserProfiles(selectedUser.id)
         
         // 设置新创建的档案为选中状态
         const formattedArchive = this.formatArchives([newArchive])[0]
+        console.log('格式化后的档案:', formattedArchive)
+        
+        // 再次检查格式化后的档案是否有ID
+        if (!formattedArchive.id) {
+          console.error('格式化后的档案缺少ID:', formattedArchive)
+          wx.showToast({
+            title: '档案格式化失败：缺少档案ID',
+            icon: 'none'
+          });
+          return;
+        }
+        
         this.setData({
           selectedProfile: formattedArchive,
           showDetailPartPopup: false
