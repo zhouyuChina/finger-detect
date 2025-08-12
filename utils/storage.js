@@ -217,16 +217,17 @@ class Storage {
       return false
     }
 
+    console.log('检查用户信息完整性，userInfo:', userInfo)
+
     // 检查性别（0-未知，1-男，2-女）
-    const hasGender = userInfo.gender !== undefined && userInfo.gender !== null && userInfo.gender !== '' && userInfo.gender !== '0'
+    const hasGender = userInfo.gender !== undefined && userInfo.gender !== null && userInfo.gender !== '' && userInfo.gender !== 0 && userInfo.gender !== '0'
     
     // 检查年龄（通过出生年份计算）
     const hasAge = userInfo.birthYear !== undefined && userInfo.birthYear !== null && userInfo.birthYear !== ''
     
-    // 检查地址（省市区）
+    // 检查地址（省市）
     const hasAddress = userInfo.province !== undefined && userInfo.province !== null && userInfo.province !== '' &&
-                      userInfo.city !== undefined && userInfo.city !== null && userInfo.city !== '' &&
-                      userInfo.district !== undefined && userInfo.district !== null && userInfo.district !== ''
+                      userInfo.city !== undefined && userInfo.city !== null && userInfo.city !== ''
 
     console.log('用户信息完整性检查:', {
       hasGender,
@@ -235,8 +236,7 @@ class Storage {
       gender: userInfo.gender,
       birthYear: userInfo.birthYear,
       province: userInfo.province,
-      city: userInfo.city,
-      district: userInfo.district
+      city: userInfo.city
     })
 
     return hasGender && hasAge && hasAddress
@@ -246,13 +246,13 @@ class Storage {
   getMissingUserInfoFields() {
     const userInfo = this.getUserInfo()
     if (!userInfo) {
-      return ['gender', 'birthYear', 'province', 'city', 'district']
+      return ['gender', 'birthYear', 'province', 'city']
     }
 
     const missingFields = []
 
     // 检查性别（0-未知，1-男，2-女）
-    if (!userInfo.gender || userInfo.gender === '' || userInfo.gender === '0') {
+    if (!userInfo.gender || userInfo.gender === '' || userInfo.gender === 0 || userInfo.gender === '0') {
       missingFields.push('gender')
     }
     
@@ -261,15 +261,12 @@ class Storage {
       missingFields.push('birthYear')
     }
     
-    // 检查地址
+    // 检查地址（省市）
     if (!userInfo.province || userInfo.province === '') {
       missingFields.push('province')
     }
     if (!userInfo.city || userInfo.city === '') {
       missingFields.push('city')
-    }
-    if (!userInfo.district || userInfo.district === '') {
-      missingFields.push('district')
     }
 
     return missingFields
