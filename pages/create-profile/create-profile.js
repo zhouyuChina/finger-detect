@@ -188,7 +188,7 @@ Page({
       
       // 设置当前用户为选中状态
       const currentUser = {
-        id: 'myself', // 使用特殊ID标识当前用户
+        id: userInfo.id || userInfo.subUserId, // 使用真实的用户ID
         nickname: userInfo.nickname || userInfo.realName || '我',
         username: userInfo.username || userInfo.nickname,
         age: userInfo.age || 0,
@@ -254,35 +254,41 @@ Page({
         // 格式化用户数据
         const formattedSubUsers = this.formatSubUsers(subUsers)
         
-        // 将当前用户（微信用户）也添加到用户列表中
+        // 构建完整的用户列表，避免重复添加默认用户
         let allUsers = []
-        if (wechatUser) {
-          const currentUser = {
-            id: 'myself', // 使用特殊ID标识当前用户
-            nickname: wechatUser.nickname || wechatUser.realName || '我',
-            username: wechatUser.username || wechatUser.nickname,
-            age: wechatUser.age || 0,
-            address: wechatUser.address || '未知地址',
-            phone: wechatUser.phone || '',
-            email: wechatUser.email || '',
-            gender: wechatUser.gender || '0',
-            archives: wechatUser.archives || 0,
-            photos: wechatUser.photos || 0,
-            reports: wechatUser.reports || 0,
-            remark: '当前用户',
+        
+        // 检查 subUsers 中是否已经包含默认用户
+        const hasDefaultUser = formattedSubUsers.some(user => user.id === currentSubUser?.id)
+        
+        if (currentSubUser && !hasDefaultUser) {
+          // 如果 subUsers 中没有默认用户，则添加
+          const defaultUser = {
+            id: currentSubUser.id,
+            nickname: currentSubUser.realName || currentSubUser.username || '我',
+            username: currentSubUser.username,
+            age: currentSubUser.age || 0,
+            address: currentSubUser.address || '未知地址',
+            phone: currentSubUser.phone || '',
+            email: currentSubUser.email || '',
+            gender: currentSubUser.gender || '0',
+            archives: currentSubUser.archives || 0,
+            photos: currentSubUser.photos || 0,
+            reports: currentSubUser.reports || 0,
+            remark: '默认用户',
             status: 'active',
-            createdAt: wechatUser.createdAt,
-            updatedAt: wechatUser.updatedAt,
+            createdAt: currentSubUser.createdAt,
+            updatedAt: currentSubUser.updatedAt,
             isCurrentUser: true // 标记为当前用户
           }
-          allUsers = [currentUser, ...formattedSubUsers]
+          allUsers = [defaultUser, ...formattedSubUsers]
         } else {
+          // 如果 subUsers 中已经有默认用户，直接使用
           allUsers = formattedSubUsers
         }
         
         this.setData({ 
           wechatUser,
-          subUsers: allUsers, // 使用包含当前用户的完整列表
+          subUsers: allUsers, // 使用包含默认用户的完整列表
           currentSubUser
         })
         
@@ -508,16 +514,7 @@ Page({
       console.log('当前用户信息:', currentUser)
       
       // 确定正确的subUserId
-      let subUserId
-      if (selectedUser.id === 'myself') {
-        // 如果选择的是当前用户，使用当前用户的真实ID
-        subUserId = currentUser.id || currentUser.subUserId
-        console.log('选择当前用户，使用真实ID:', subUserId)
-      } else {
-        // 如果选择的是子用户，使用子用户的ID
-        subUserId = selectedUser.id
-        console.log('选择子用户，使用子用户ID:', subUserId)
-      }
+      const subUserId = currentUser.currentSubUser.id
       
       console.log('准备调用档案接口，subUserId:', subUserId)
       const response = await api.profile.getArchives(subUserId)
@@ -580,32 +577,24 @@ Page({
     this.setData({ showBodyPartPopup: true });
   },
 
-
-
   // 为档案列表加载检测次数
   async loadDetectionCounts(profiles) {
     try {
       console.log('开始为档案加载检测次数')
       
-      const subUserId = this.data.selectedUser?.id
-      if (!subUserId) {
+      const selectedUser = this.data.selectedUser
+      if (!selectedUser || !selectedUser.id) {
         console.warn('缺少用户ID，无法获取检测次数')
         return
       }
       
       // 一次性获取所有检测记录，然后按档案名称分组统计
       try {
-        // 确定正确的subUserId
-        let subUserId
-        if (selectedUser.id === 'myself') {
-          // 如果选择的是当前用户，使用当前用户的真实ID
-          const currentUser = storage.getUserInfo()
-          subUserId = currentUser.id || currentUser.subUserId
-        } else {
-          // 如果选择的是子用户，使用子用户的ID
-          subUserId = selectedUser.id
-        }
+        // 确定正确的subUserId - 从currentSubUser中获取
+        const currentUser = storage.getUserInfo()
+        const subUserId = currentUser.currentSubUser.id
         
+        console.log('准备调用检测记录接口，subUserId:', subUserId)
         const detectionResponse = await api.detection.getList({
           subUserId: subUserId
         })
@@ -705,25 +694,41 @@ Page({
 
       // 准备档案数据
       const archiveName = `${bodyPart.name}${part.name}`
+      
+      // 获取当前用户的subUserId
+      const currentUser = storage.getUserInfo()
+      const subUserId = currentUser.currentSubUser.id
+      
       const archiveData = {
-        subUserId: selectedUser.id,
+        subUserId: subUserId,
         archiveName: archiveName,
         bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
-      };
-
-      console.log('创建档案数据:', archiveData)
+      }
+      console.log('准备创建档案，数据:', archiveData)
       
-      // 调用创建档案接口
+      // 创建档案
       const response = await api.profile.create(archiveData)
       console.log('创建档案接口响应:', response)
       
       if (response.success && response.data) {
         const newArchive = response.data
         console.log('新创建的档案:', newArchive)
+        console.log('新档案的所有字段:', Object.keys(newArchive))
         
-        // 检查档案是否有ID
-        if (!newArchive.id) {
-          console.error('新创建的档案缺少ID:', newArchive)
+        // 根据实际返回的数据结构，档案信息在 archive 字段中
+        const archiveData = newArchive.archive || newArchive
+        console.log('档案数据:', archiveData)
+        console.log('档案数据的所有字段:', Object.keys(archiveData))
+        console.log('可能的ID字段:', {
+          id: archiveData.id,
+          archiveId: archiveData.archiveId,
+          _id: archiveData._id
+        });
+        
+        // 检查档案是否有ID，尝试不同的字段名
+        const archiveId = archiveData.id || archiveData.archiveId || archiveData._id;
+        if (!archiveId) {
+          console.error('新创建的档案缺少ID:', archiveData)
           wx.showToast({
             title: '档案创建失败：缺少档案ID',
             icon: 'none'
@@ -735,11 +740,18 @@ Page({
         await this.loadUserProfiles(selectedUser.id)
         
         // 设置新创建的档案为选中状态
-        const formattedArchive = this.formatArchives([newArchive])[0]
+        const formattedArchive = this.formatArchives([archiveData])[0]
         console.log('格式化后的档案:', formattedArchive)
+        console.log('格式化档案的所有字段:', Object.keys(formattedArchive));
+        console.log('格式化档案可能的ID字段:', {
+          id: formattedArchive.id,
+          archiveId: formattedArchive.archiveId,
+          _id: formattedArchive._id
+        });
         
-        // 再次检查格式化后的档案是否有ID
-        if (!formattedArchive.id) {
+        // 再次检查格式化后的档案是否有ID，尝试不同的字段名
+        const formattedArchiveId = formattedArchive.id || formattedArchive.archiveId || formattedArchive._id;
+        if (!formattedArchiveId) {
           console.error('格式化后的档案缺少ID:', formattedArchive)
           wx.showToast({
             title: '档案格式化失败：缺少档案ID',
@@ -751,30 +763,26 @@ Page({
         this.setData({
           selectedProfile: formattedArchive,
           showDetailPartPopup: false
-        });
-
+        })
+        
+        // 显示成功提示
         wx.showToast({
           title: '档案创建成功',
           icon: 'success'
         });
-
-        // 创建档案后直接跳转到拍照页面
-        setTimeout(() => {
-          wx.navigateTo({
-            url: `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(formattedArchive))}`
-          });
-        }, 1000);
+        
+        console.log('档案创建成功并选中:', formattedArchive)
       } else {
-        console.warn('创建档案接口返回错误:', response)
+        console.error('创建档案失败，响应:', response)
         wx.showToast({
           title: response.message || '创建档案失败',
           icon: 'none'
         });
       }
     } catch (error) {
-      console.error('创建档案失败:', error)
+      console.error('创建档案出错:', error)
       wx.showToast({
-        title: '创建档案失败，请重试',
+        title: '创建档案出错',
         icon: 'none'
       });
     }
@@ -1066,8 +1074,24 @@ Page({
         
         if (response.success && response.data) {
           // 更新本地存储的用户信息
-          const updatedUserInfo = { ...storage.getUserInfo(), ...updateData }
+          const currentUserInfo = storage.getUserInfo()
+          
+          // 更新 currentSubUser 的信息
+          if (currentUserInfo.currentSubUser) {
+            currentUserInfo.currentSubUser = {
+              ...currentUserInfo.currentSubUser,
+              ...updateData
+            }
+          }
+          
+          // 同时更新根级别的用户信息
+          const updatedUserInfo = { 
+            ...currentUserInfo, 
+            ...updateData 
+          }
+          
           storage.setUserInfo(updatedUserInfo)
+          console.log('更新后的用户信息:', updatedUserInfo)
           
           // 关闭弹窗
           this.setData({
@@ -1076,62 +1100,12 @@ Page({
             showBirthYearPopup: false
           })
           
-          // 检查是否是完善信息模式
-          const pages = getCurrentPages()
-          const currentPage = pages[pages.length - 1]
-          const isCompleteMode = currentPage.options && currentPage.options.mode === 'complete'
+          // 重新加载用户列表以获取最新数据
+          await this.loadUsers()
           
-          if (isCompleteMode) {
-            // 完善信息模式：显示成功提示，然后进入正常流程
-            wx.showToast({
-              title: '信息完善成功',
-              icon: 'success'
-            })
-            
-            // 更新当前用户信息
-            const updatedUserInfo = { ...storage.getUserInfo(), ...updateData }
-            
-            // 创建当前用户对象
-            const currentUser = {
-              id: 'myself', // 使用特殊ID标识当前用户
-              nickname: updatedUserInfo.nickname || updatedUserInfo.realName || '我',
-              username: updatedUserInfo.username || updatedUserInfo.nickname,
-              age: updatedUserInfo.age || 0,
-              address: updatedUserInfo.address || '未知地址',
-              phone: updatedUserInfo.phone || '',
-              email: updatedUserInfo.email || '',
-              gender: updatedUserInfo.gender || '0',
-              archives: updatedUserInfo.archives || 0,
-              photos: updatedUserInfo.photos || 0,
-              reports: updatedUserInfo.reports || 0,
-              remark: '当前用户',
-              status: 'active',
-              createdAt: updatedUserInfo.createdAt,
-              updatedAt: updatedUserInfo.updatedAt,
-              isCurrentUser: true // 标记为当前用户
-            }
-            
-            // 设置当前用户为选中状态，进入正常流程
-            this.setData({
-              selectedUser: currentUser,
-              subUsers: [currentUser, ...this.data.subUsers], // 将当前用户添加到用户列表
-              isEditingMyself: false, // 退出编辑模式
-              currentStep: 1 // 回到第一步
-            })
-            
-            // 延迟显示用户选择器
-            setTimeout(() => {
-              this.setData({ showUserSelector: true })
-            }, 1500)
-          } else {
-            // 正常模式：继续原有流程
-            this.setData({
-              myselfInfo: userInfo,
-              selectedUser: { id: 'myself', ...userInfo },
-              currentStep: 2
-            });
-            this.loadUserProfiles('myself');
-          }
+          // 显示用户选择器
+          this.setData({ showUserSelector: true })
+      
         } else {
           throw new Error(response.message || '更新用户信息失败')
         }

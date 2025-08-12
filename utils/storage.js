@@ -217,27 +217,32 @@ class Storage {
       return false
     }
 
-    console.log('检查用户信息完整性，userInfo:', userInfo)
+    console.log('=== 用户信息完整性检查 ===')
+    console.log('完整的userInfo对象:', JSON.stringify(userInfo, null, 2))
+    console.log('userInfo类型:', typeof userInfo)
+    console.log('userInfo是否为对象:', typeof userInfo === 'object')
+    
+    if (userInfo.currentSubUser) {
+      console.log('currentSubUser存在:', JSON.stringify(userInfo.currentSubUser, null, 2))
+      console.log('currentSubUser.gender:', userInfo.currentSubUser.gender, '类型:', typeof userInfo.currentSubUser.gender)
+      console.log('currentSubUser.age:', userInfo.currentSubUser.age, '类型:', typeof userInfo.currentSubUser.age)
+      console.log('currentSubUser.address:', userInfo.currentSubUser.address, '类型:', typeof userInfo.currentSubUser.address)
+    } else {
+      console.log('currentSubUser不存在')
+    }
 
     // 检查性别（0-未知，1-男，2-女）
-    const hasGender = userInfo.gender !== undefined && userInfo.gender !== null && userInfo.gender !== '' && userInfo.gender !== 0 && userInfo.gender !== '0'
+    const hasGender = userInfo.currentSubUser && userInfo.currentSubUser.gender !== undefined && userInfo.currentSubUser.gender !== null && userInfo.currentSubUser.gender !== '' && userInfo.currentSubUser.gender !== 0 && userInfo.currentSubUser.gender !== '0'
     
     // 检查年龄（通过出生年份计算）
-    const hasAge = userInfo.birthYear !== undefined && userInfo.birthYear !== null && userInfo.birthYear !== ''
+    const hasAge = userInfo.currentSubUser && userInfo.currentSubUser.age !== undefined && userInfo.currentSubUser.age !== null && userInfo.currentSubUser.age !== '' && userInfo.currentSubUser.age !== 0 && userInfo.currentSubUser.age !== '0'
     
     // 检查地址（省市）
-    const hasAddress = userInfo.province !== undefined && userInfo.province !== null && userInfo.province !== '' &&
-                      userInfo.city !== undefined && userInfo.city !== null && userInfo.city !== ''
+    const hasAddress = userInfo.currentSubUser && userInfo.currentSubUser.address !== undefined && userInfo.currentSubUser.address !== null && userInfo.currentSubUser.address !== '' && userInfo.currentSubUser.address !== 0 && userInfo.currentSubUser.address !== '0'
 
-    console.log('用户信息完整性检查:', {
-      hasGender,
-      hasAge,
-      hasAddress,
-      gender: userInfo.gender,
-      birthYear: userInfo.birthYear,
-      province: userInfo.province,
-      city: userInfo.city
-    })
+    console.log('检查结果:', { hasGender, hasAge, hasAddress })
+    console.log('最终结果:', hasGender && hasAge && hasAddress)
+    console.log('=== 检查结束 ===')
 
     return hasGender && hasAge && hasAddress
   }
