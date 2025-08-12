@@ -212,12 +212,34 @@ class Storage {
     const userInfo = this.getUserInfo()
     const subUsers = this.getSubUsers()
     
-    // 如果有子用户，说明用户信息已经完整
+    // 如果有子用户，检查默认用户（当前用户）的信息是否完整
     if (subUsers && subUsers.length > 0) {
-      console.log('检测到子用户，认为用户信息完整，子用户数量:', subUsers.length)
-      return true
+      // 找到默认用户（当前用户）
+      const defaultUser = subUsers.find(user => user.id === 'myself' || user.isCurrentUser)
+      if (defaultUser) {
+        // 检查默认用户的性别、年龄、地址
+        const hasGender = defaultUser.gender !== undefined && defaultUser.gender !== null && defaultUser.gender !== '' && defaultUser.gender !== '0'
+        const hasAge = defaultUser.birthYear !== undefined && defaultUser.birthYear !== null && defaultUser.birthYear !== ''
+        const hasAddress = defaultUser.province !== undefined && defaultUser.province !== null && defaultUser.province !== '' &&
+                          defaultUser.city !== undefined && defaultUser.city !== null && defaultUser.city !== '' &&
+                          defaultUser.district !== undefined && defaultUser.district !== null && defaultUser.district !== ''
+        
+        console.log('检查默认用户信息完整性:', {
+          hasGender,
+          hasAge,
+          hasAddress,
+          gender: defaultUser.gender,
+          birthYear: defaultUser.birthYear,
+          province: defaultUser.province,
+          city: defaultUser.city,
+          district: defaultUser.district
+        })
+        
+        return hasGender && hasAge && hasAddress
+      }
     }
     
+    // 如果没有子用户或找不到默认用户，检查当前用户信息
     if (!userInfo) {
       return false
     }
