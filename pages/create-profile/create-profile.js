@@ -459,8 +459,10 @@ Page({
       }
       
       // 调用档案列表接口
-      console.log('准备调用档案接口，用户ID:', selectedUser.id)
-      const response = await api.profile.getArchives(selectedUser.id)
+      const currentUser = storage.getUserInfo()
+      const subUserId = currentUser.subUserId || currentUser.id
+      console.log('准备调用档案接口，subUserId:', subUserId)
+      const response = await api.profile.getArchives(subUserId)
       console.log('档案列表接口响应:', response)
       console.log('响应状态:', response.success)
       console.log('响应数据:', response.data)
@@ -535,8 +537,10 @@ Page({
       
       // 一次性获取所有检测记录，然后按档案名称分组统计
       try {
+        const currentUser = storage.getUserInfo()
+        const subUserId = currentUser.subUserId || currentUser.id
         const detectionResponse = await api.detection.getList({
-          subUserId: this.data.selectedUser.id
+          subUserId: subUserId
         })
         
         console.log('检测记录响应:', detectionResponse)
