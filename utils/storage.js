@@ -187,8 +187,8 @@ class Storage {
 
   // 设置openId
   setOpenId(openId) {
-    // 设置7天过期时间
-    const expireTime = 7 * 24 * 60 * 60 * 1000 // 7天
+    // 设置30天过期时间（与用户信息保持一致）
+    const expireTime = 30 * 24 * 60 * 60 * 1000 // 30天
     this.set('openId', openId, expireTime)
   }
 
@@ -241,9 +241,78 @@ class Storage {
   getCurrentSubUser() {
     return this.get('currentSubUser')
   }
+
+  // 检查授权状态
+  checkAuthStatus() {
+    const userInfo = this.getUserInfo()
+    const openId = this.getOpenId()
+    
+    return {
+      isAuthorized: !!(userInfo && openId),
+      hasUserInfo: !!userInfo,
+      hasOpenId: !!openId,
+      userInfoExpired: !userInfo,
+      openIdExpired: !openId,
+      // 计算剩余有效期（天）
+      userInfoRemainingDays: userInfo ? this.getRemainingDays('userInfo') : 0,
+      openIdRemainingDays: openId ? this.getRemainingDays('openId') : 0
+    }
+  }
+
+  // 获取缓存剩余天数
+  getRemainingDays(key) {
+    try {
+      const data = wx.getStorageSync(key)
+      if (!data || !data.expireTime) {
+        return 0
+      }
+      
+      const remainingTime = data.expireTime - (Date.now() - data.timestamp)
+      return Math.max(0, Math.ceil(remainingTime / (24 * 60 * 60 * 1000)))
+    } catch (error) {
+      console.error('获取剩余天数失败:', error)
+      return 0
+    }
+  }
+
+  // 获取授权状态描述
+  getAuthStatusDescription() {
+    const status = this.checkAuthStatus()
+    
+    if (status.isAuthorized) {
+      const minDays = Math.min(status.userInfoRemainingDays, status.openIdRemainingDays)
+      if (minDays > 7) {
+        return `授权有效，剩余${minDays}天`
+      } else if (minDays > 0) {
+        return `授权即将过期，剩余${minDays}天`
+      } else {
+        return '授权已过期'
+      }
+    } else {
+      return '未授权'
+    }
+  }
+
+  // 延长授权有效期（可选功能）
+  extendAuthValidity() {
+    const userInfo = this.getUserInfo()
+    const openId = this.getOpenId()
+    
+    if (userInfo) {
+      // 重新设置用户信息，延长30天有效期
+      this.setUserInfo(userInfo)
+      console.log('用户信息有效期已延长30天')
+    }
+    
+    if (openId) {
+      // 重新设置openId，延长30天有效期
+      this.setOpenId(openId)
+      console.log('OpenId有效期已延长30天')
+    }
+  }
 }
 
 // 创建单例实例
 const storage = new Storage()
 
-module.exports = storage 
+module.exports = storage

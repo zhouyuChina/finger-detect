@@ -85,34 +85,62 @@ App({
   async autoLogin() {
     try {
       // 检查localStorage中是否有完整的用户数据
-      const token = storage.getToken()
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
       
       console.log('检查localStorage数据:', {
-        hasToken: !!token,
         hasUserInfo: !!userInfo,
-        hasOpenId: !!openId
+        hasOpenId: !!openId,
+        userInfoExpired: userInfo ? '未过期' : '已过期或不存在',
+        openIdExpired: openId ? '未过期' : '已过期或不存在'
       })
       
-      // 只有当localStorage中缺少必要数据时才触发注册
-      if (token && userInfo && openId && !token.startsWith('dev_token_')) {
+      // 优化授权检查逻辑：只要有有效的openId和用户信息就认为已登录
+      // 不再依赖token，因为新接口格式不需要token
+      if (userInfo && openId) {
         console.log('localStorage数据完整，使用现有登录状态')
         this.globalData.userInfo = userInfo
         this.globalData.isLoggedIn = true
+        
+        // 可选：静默刷新用户信息（不强制要求用户重新授权）
+        this.silentRefreshUserInfo()
       } else {
         console.log('localStorage数据不完整，开始注册流程')
         // 清除可能存在的临时数据
-        if (token && token.startsWith('dev_token_')) {
-          storage.remove('token')
-        }
-        // 确保清除所有用户相关数据
         storage.clearUserData()
         // 触发微信登录并注册
         await this.wxLoginAndRegister()
       }
     } catch (error) {
       console.error('自动登录失败:', error)
+    }
+  },
+
+  // 静默刷新用户信息（可选功能）
+  async silentRefreshUserInfo() {
+    try {
+      // 只在网络良好的情况下尝试静默刷新
+      const networkType = await new Promise((resolve) => {
+        wx.getNetworkType({
+          success: (res) => resolve(res.networkType),
+          fail: () => resolve('unknown')
+        })
+      })
+      
+      if (networkType === 'wifi' || networkType === '4g' || networkType === '5g') {
+        console.log('网络良好，尝试静默刷新用户信息')
+        // 这里可以调用后端API获取最新的用户信息
+        // 但不强制要求用户重新授权
+        // const api = require('./utils/api.js')
+        // const response = await api.user.getProfile()
+        // if (response.success) {
+        //   storage.setUserInfo(response.data)
+        //   this.globalData.userInfo = response.data
+        // }
+      }
+    } catch (error) {
+      console.log('静默刷新用户信息失败:', error)
+      // 静默刷新失败不影响正常使用
     }
   },
 

@@ -52,27 +52,49 @@ Page({
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
+    // 使用新的授权状态检查方法
+    const authStatus = storage.checkAuthStatus()
+    const authDescription = storage.getAuthStatusDescription()
+    
     console.log('index页面检查授权状态:', {
       hasUserInfo: !!userInfo,
       hasOpenId: !!openId,
+      userInfoExpired: userInfo ? '未过期' : '已过期或不存在',
+      openIdExpired: openId ? '未过期' : '已过期或不存在',
+      authStatus: authStatus,
+      authDescription: authDescription,
       userInfoValue: userInfo ? JSON.stringify(userInfo).substring(0, 50) + '...' : null,
       openIdValue: openId ? openId.substring(0, 10) + '...' : null
     })
     
-    // 如果缺少必要数据，跳转到授权页面（新接口不再需要token）
+    // 优化授权检查：只要有有效的openId和用户信息就认为已授权
+    // 缓存时间已延长到30天，用户不需要频繁重新授权
     if (!userInfo || !openId) {
       console.log('index页面缺少授权数据，跳转到授权页面')
       console.log('缺少的数据:', {
         missingUserInfo: !userInfo,
         missingOpenId: !openId
       })
-      wx.redirectTo({
-        url: '/pages/auth/auth'
+      
+      // 显示友好的提示信息
+      wx.showToast({
+        title: '需要重新授权',
+        icon: 'none',
+        duration: 1500
       })
+      
+      // 延迟跳转，让用户看到提示
+      setTimeout(() => {
+        wx.redirectTo({
+          url: '/pages/auth/auth'
+        })
+      }, 1500)
       return
     }
     
     console.log('index页面授权数据完整，初始化页面')
+    console.log('用户信息有效期：30天，当前状态：有效')
+    console.log('授权状态描述：', authDescription)
     this.initPage()
   },
 
