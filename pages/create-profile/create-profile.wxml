@@ -168,7 +168,7 @@
   >
     <view class="popup-content">
       <view class="popup-header">
-        <text class="popup-title">新增用户</text>
+        <text class="popup-title">{{popupTitle}}</text>
         <text class="popup-close" bindtap="closeNicknamePopup">✕</text>
       </view>
       
@@ -182,6 +182,27 @@
             bindinput="onNicknameInput"
             maxlength="20"
           />
+        </view>
+        <view class="form-item">
+          <text class="form-label">性别</text>
+          <view class="gender-selector">
+            <view 
+              class="gender-option {{userForm.gender === '1' ? 'active' : ''}}" 
+              bindtap="selectGender" 
+              data-gender="1"
+            >
+              <text class="gender-icon">👨</text>
+              <text class="gender-text">男</text>
+            </view>
+            <view 
+              class="gender-option {{userForm.gender === '2' ? 'active' : ''}}" 
+              bindtap="selectGender" 
+              data-gender="2"
+            >
+              <text class="gender-icon">👩</text>
+              <text class="gender-text">女</text>
+            </view>
+          </view>
         </view>
       </view>
       
@@ -200,7 +221,7 @@
   >
     <view class="popup-content">
       <view class="popup-header">
-        <text class="popup-title">新增用户</text>
+        <text class="popup-title">{{popupTitle}}</text>
         <text class="popup-close" bindtap="closeBirthYearPopup">✕</text>
       </view>
       
@@ -228,7 +249,7 @@
   >
     <view class="popup-content">
       <view class="popup-header">
-        <text class="popup-title">新增用户</text>
+        <text class="popup-title">{{popupTitle}}</text>
         <text class="popup-close" bindtap="closeAddressPopup">✕</text>
       </view>
       
@@ -256,7 +277,7 @@
       
       <view class="popup-actions">
         <button class="popup-btn cancel-btn" bindtap="prevUserStep">上一步</button>
-        <button class="popup-btn confirm-btn" bindtap="saveUserInfo">确定</button>
+        <button class="popup-btn confirm-btn" bindtap="saveUserInfo">{{isCompleteMode ? '保存' : '确定'}}</button>
       </view>
     </view>
   </t-popup>

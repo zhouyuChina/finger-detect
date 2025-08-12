@@ -207,6 +207,71 @@ class Storage {
     this.remove('currentSubUser')
   }
 
+  // 检查用户信息是否完整（性别、年龄、地址）
+  isUserInfoComplete() {
+    const userInfo = this.getUserInfo()
+    if (!userInfo) {
+      return false
+    }
+
+    // 检查性别（0-未知，1-男，2-女）
+    const hasGender = userInfo.gender !== undefined && userInfo.gender !== null && userInfo.gender !== '' && userInfo.gender !== '0'
+    
+    // 检查年龄（通过出生年份计算）
+    const hasAge = userInfo.birthYear !== undefined && userInfo.birthYear !== null && userInfo.birthYear !== ''
+    
+    // 检查地址（省市区）
+    const hasAddress = userInfo.province !== undefined && userInfo.province !== null && userInfo.province !== '' &&
+                      userInfo.city !== undefined && userInfo.city !== null && userInfo.city !== '' &&
+                      userInfo.district !== undefined && userInfo.district !== null && userInfo.district !== ''
+
+    console.log('用户信息完整性检查:', {
+      hasGender,
+      hasAge,
+      hasAddress,
+      gender: userInfo.gender,
+      birthYear: userInfo.birthYear,
+      province: userInfo.province,
+      city: userInfo.city,
+      district: userInfo.district
+    })
+
+    return hasGender && hasAge && hasAddress
+  }
+
+  // 获取缺失的用户信息字段
+  getMissingUserInfoFields() {
+    const userInfo = this.getUserInfo()
+    if (!userInfo) {
+      return ['gender', 'birthYear', 'province', 'city', 'district']
+    }
+
+    const missingFields = []
+
+    // 检查性别（0-未知，1-男，2-女）
+    if (!userInfo.gender || userInfo.gender === '' || userInfo.gender === '0') {
+      missingFields.push('gender')
+    }
+    
+    // 检查年龄（出生年份）
+    if (!userInfo.birthYear || userInfo.birthYear === '') {
+      missingFields.push('birthYear')
+    }
+    
+    // 检查地址
+    if (!userInfo.province || userInfo.province === '') {
+      missingFields.push('province')
+    }
+    if (!userInfo.city || userInfo.city === '') {
+      missingFields.push('city')
+    }
+    if (!userInfo.district || userInfo.district === '') {
+      missingFields.push('district')
+    }
+
+    return missingFields
+  }
+
   // 检查是否登录
   isLoggedIn() {
     return !!this.getToken()

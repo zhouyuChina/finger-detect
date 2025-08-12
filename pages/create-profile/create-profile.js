@@ -18,6 +18,10 @@ Page({
     error: false, // 错误状态
     errorMessage: '', // 错误信息
     
+    // 完善信息模式相关
+    isCompleteMode: false, // 是否是完善信息模式
+    popupTitle: '新增用户', // 弹窗标题
+    
     // 档案相关
     selectedProfile: null, // 当前选择的档案
     
@@ -36,6 +40,7 @@ Page({
     // 表单数据
     userForm: {
       nickname: '新用户',
+      gender: '1', // 默认男性
       birthYear: '',
       province: '',
       city: '',
@@ -125,8 +130,12 @@ Page({
     userCreateStep: 1 // 1-昵称，2-出生年份，3-地址
   },
 
-  onLoad() {
-    console.log('Create-profile页面加载')
+  onLoad(options) {
+    console.log('Create-profile页面加载，参数:', options)
+    
+    // 检查是否是完善信息模式
+    const isCompleteMode = options.mode === 'complete'
+    console.log('是否完善信息模式:', isCompleteMode)
     
     // 生成出生年份选项（1950-2020）
     const currentYear = new Date().getFullYear();
@@ -136,8 +145,21 @@ Page({
     }
     this.setData({ birthYearOptions });
     
-    // 加载用户数据
-    this.loadUsers();
+    if (isCompleteMode) {
+      // 完善信息模式：直接加载当前用户信息并进入完善流程
+      this.setData({ 
+        isCompleteMode: true,
+        popupTitle: '完善个人信息'
+      })
+      this.loadCurrentUserForCompletion()
+    } else {
+      // 正常模式：加载用户数据
+      this.setData({ 
+        isCompleteMode: false,
+        popupTitle: '新增用户'
+      })
+      this.loadUsers();
+    }
   },
 
   onShow() {
@@ -145,6 +167,56 @@ Page({
     if (this.data.selectedUser && this.data.selectedUser.username) {
       console.log('页面显示，重新加载档案')
       this.loadUserProfiles(this.data.selectedUser.id);
+    }
+  },
+
+  // 加载当前用户信息用于完善
+  async loadCurrentUserForCompletion() {
+    try {
+      this.setData({ loading: true, error: false })
+      
+      console.log('开始加载当前用户信息用于完善')
+      
+      // 获取当前用户信息
+      const userInfo = storage.getUserInfo()
+      if (!userInfo) {
+        this.handleError('未找到用户信息，请重新登录')
+        return
+      }
+      
+      console.log('当前用户信息:', userInfo)
+      
+      // 设置当前用户为选中状态
+      this.setData({ 
+        selectedUser: userInfo,
+        isEditingMyself: true,
+        currentStep: 1 // 从第一步开始
+      })
+      
+      // 预填充表单数据
+      const userForm = {
+        nickname: userInfo.nickname || userInfo.realName || '新用户',
+        gender: userInfo.gender || '1',
+        birthYear: userInfo.birthYear || '',
+        province: userInfo.province || '',
+        city: userInfo.city || '',
+        district: userInfo.district || ''
+      }
+      
+      this.setData({ userForm })
+      
+      console.log('用户信息完善模式初始化完成')
+      
+      // 在完善信息模式下，直接显示信息编辑弹窗
+      setTimeout(() => {
+        this.showUserInfoEditPopup()
+      }, 500)
+      
+    } catch (error) {
+      console.error('加载当前用户信息失败:', error)
+      this.handleError('加载用户信息失败')
+    } finally {
+      this.setData({ loading: false })
     }
   },
 
@@ -678,6 +750,14 @@ Page({
     });
   },
 
+  // 性别选择
+  selectGender(e) {
+    const gender = e.currentTarget.dataset.gender;
+    this.setData({
+      'userForm.gender': gender
+    });
+  },
+
   // 出生年份选择
   showBirthYearSelector() {
     this.setData({ showBirthYearSelector: true });
@@ -852,9 +932,9 @@ Page({
 
   // 保存用户信息
   async saveUserInfo() {
-    const { nickname, birthYear, province, city, district } = this.data.userForm;
+    const { nickname, gender, birthYear, province, city, district } = this.data.userForm;
     
-    if (!nickname || !birthYear || !province || !city || !district) {
+    if (!nickname || !gender || !birthYear || !province || !city || !district) {
       wx.showToast({
         title: '请填写完整信息',
         icon: 'none'
@@ -868,18 +948,74 @@ Page({
     
     // 组合完整地址
     const address = `${province}${city}${district}`;
-    const userInfo = { nickname, birthYear, age, address, province, city, district };
+    const userInfo = { nickname, gender, birthYear, age, address, province, city, district };
 
     if (this.data.isEditingMyself) {
       // 保存本人信息
-      wx.setStorageSync('myselfInfo', userInfo);
-      this.setData({
-        myselfInfo: userInfo,
-        selectedUser: { id: 'myself', ...userInfo },
-        showAddressPopup: false,
-        currentStep: 2
-      });
-      this.loadUserProfiles('myself');
+      try {
+        // 更新用户信息到服务器
+        const updateData = {
+          nickname: nickname,
+          realName: nickname,
+          gender: gender,
+          birthYear: birthYear,
+          age: age,
+          address: address,
+          province: province,
+          city: city,
+          district: district
+        }
+        
+        console.log('更新用户信息:', updateData)
+        const response = await api.user.updateProfile(updateData)
+        console.log('更新用户信息响应:', response)
+        
+        if (response.success && response.data) {
+          // 更新本地存储的用户信息
+          const updatedUserInfo = { ...storage.getUserInfo(), ...updateData }
+          storage.setUserInfo(updatedUserInfo)
+          
+          // 关闭弹窗
+          this.setData({
+            showAddressPopup: false,
+            showNicknamePopup: false,
+            showBirthYearPopup: false
+          })
+          
+          // 检查是否是完善信息模式
+          const pages = getCurrentPages()
+          const currentPage = pages[pages.length - 1]
+          const isCompleteMode = currentPage.options && currentPage.options.mode === 'complete'
+          
+          if (isCompleteMode) {
+            // 完善信息模式：显示成功提示并返回上一页
+            wx.showToast({
+              title: '信息完善成功',
+              icon: 'success'
+            })
+            
+            setTimeout(() => {
+              wx.navigateBack()
+            }, 1500)
+          } else {
+            // 正常模式：继续原有流程
+            this.setData({
+              myselfInfo: userInfo,
+              selectedUser: { id: 'myself', ...userInfo },
+              currentStep: 2
+            });
+            this.loadUserProfiles('myself');
+          }
+        } else {
+          throw new Error(response.message || '更新用户信息失败')
+        }
+      } catch (error) {
+        console.error('更新用户信息失败:', error)
+        wx.showToast({
+          title: '更新信息失败，请重试',
+          icon: 'none'
+        })
+      }
     } else {
       // 创建新用户
       try {
@@ -945,6 +1081,15 @@ Page({
 
   closeDetailPartPopup() {
     this.setData({ showDetailPartPopup: false });
+  },
+
+  // 显示用户信息编辑弹窗（完善信息模式使用）
+  showUserInfoEditPopup() {
+    console.log('显示用户信息编辑弹窗')
+    this.setData({ 
+      showNicknamePopup: true,
+      userCreateStep: 1
+    })
   },
 
   // 步骤控制
