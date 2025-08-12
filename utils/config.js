@@ -1,7 +1,7 @@
 // 环境配置 - 可以在这里切换环境
 const ENV_CONFIG = {
   LOCAL: {
-    baseUrl: 'localhost:3001',
+    baseUrl: 'localhost:4000',
     name: '本地环境'
   },
   TEST: {

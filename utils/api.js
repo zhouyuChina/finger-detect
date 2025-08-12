@@ -130,6 +130,13 @@ const detectionApi = {
 const messageApi = {
   // 获取消息列表
   getList(params = {}) {
+    // 如果请求置顶信息，添加相应的参数
+    if (params.isTop) {
+      params.types = params.types || []
+      if (!params.types.includes('置顶')) {
+        params.types.push('置顶')
+      }
+    }
     return request.get(config.api.message.list, params)
   },
 

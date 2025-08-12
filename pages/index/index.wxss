@@ -98,6 +98,7 @@ page {
   padding: 30rpx;
   /* margin: 0 20rpx 30rpx 20rpx; */
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  width: calc(100vw - 60rpx);
 }
 
 .section-header {
@@ -171,6 +172,7 @@ page {
 .message-cover {
   position: relative;
   margin-right: 20rpx;
+  margin-left: 20rpx;
   flex-shrink: 0;
   width: 120rpx;
   height: 80rpx;
@@ -242,16 +244,31 @@ page {
   align-items: flex-start;
 }
 
+.title-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
 .message-title {
   font-size: 30rpx;
   font-weight: 600;
   color: #333;
   flex: 1;
-  margin-right: 16rpx;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+}
+
+.top-icon {
+  margin-left: 8rpx;
+  flex-shrink: 0;
+}
+
+.top-icon-text {
+  font-size: 24rpx;
 }
 
 .message-time {

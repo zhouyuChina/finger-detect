@@ -324,8 +324,8 @@ Page({
   // 加载消息列表
   async loadMessages() {
     try {
-      // 从服务器获取消息数据
-      const response = await api.message.getList({ limit: 10 })
+      // 从服务器获取消息数据，只获取置顶信息
+      const response = await api.message.getList({ limit: 50, isTop: true })
       console.log('消息响应:', response.code, response.message)
       
       let messages = []
@@ -343,10 +343,19 @@ Page({
         return
       }
 
+      // 过滤出置顶信息，如果没有置顶信息则显示前5条重要信息
+      let topMessages = messages.filter(msg => msg.isTop)
+      if (topMessages.length === 0) {
+        topMessages = messages.filter(msg => msg.isImportant).slice(0, 5)
+        console.log('没有置顶信息，显示重要信息数量:', topMessages.length)
+      } else {
+        console.log('首页显示置顶信息数量:', topMessages.length)
+      }
+
       // 获取阅读状态
       try {
         // 提取文章ID列表
-        const articleIds = messages.map(msg => msg.id)
+        const articleIds = topMessages.map(msg => msg.id)
         console.log('获取阅读状态，文章ID列表:', articleIds)
         
         if (articleIds.length > 0) {
@@ -355,18 +364,23 @@ Page({
           
           if (readStatusResponse.success && readStatusResponse.data) {
             // 合并阅读状态到消息数据
-            messages = this.mergeReadStatus(messages, readStatusResponse.data)
+            const messagesWithReadStatus = this.mergeReadStatus(topMessages, readStatusResponse.data)
+            this.setData({ messages: messagesWithReadStatus })
+          } else {
+            this.setData({ messages: topMessages })
           }
+        } else {
+          this.setData({ messages: topMessages })
         }
       } catch (readError) {
         console.warn('获取阅读状态失败，使用默认状态:', readError)
         // 阅读状态获取失败不影响消息显示
+        this.setData({ messages: topMessages })
       }
 
-      this.setData({ messages })
       this.calculateUnreadCount()
       // 缓存数据
-      storage.setMessages(messages)
+      storage.setMessages(topMessages)
     } catch (error) {
       console.error('加载消息失败:', error)
       this.setData({ messages: [] })

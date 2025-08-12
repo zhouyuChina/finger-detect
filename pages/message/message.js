@@ -74,7 +74,7 @@ Page({
       return []
     }
 
-    return data.map((item, index) => {
+    const formattedData = data.map((item, index) => {
       // 处理封面图片URL，如果是相对路径则拼接完整URL
       let image = item.coverImage || item.image || item.img || ''
       if (image && !image.startsWith('http')) {
@@ -88,13 +88,37 @@ Page({
       const publishedAt = item.publishedAt || item.createdAt || item.createTime || new Date().toISOString()
       const time = common.formatTime(new Date(publishedAt), 'YYYY-MM-DD')
 
+      // 处理标签和类型
+      const tags = item.tags || []
+      const types = item.types || []
+      const isTop = types.includes('置顶') || item.isTop
+      const isImportant = types.includes('重要') || item.isImportant
+
       return {
         id: item.id || index + 1,
         title: item.title || `消息 ${index + 1}`,
         image: image,
         views: item.readCount || 0,
-        time: time
+        time: time,
+        summary: item.summary || item.content || item.desc || '',
+        author: item.author || '系统',
+        category: item.category || '资讯',
+        tags: tags,
+        types: types,
+        isTop: isTop,
+        isImportant: isImportant,
+        isRead: item.isRead || false,
+        publishedAt: publishedAt
       }
+    })
+
+    // 排序：置顶 > 重要 > 发布时间倒序
+    return formattedData.sort((a, b) => {
+      if (a.isTop && !b.isTop) return -1
+      if (!a.isTop && b.isTop) return 1
+      if (a.isImportant && !b.isImportant) return -1
+      if (!a.isImportant && b.isImportant) return 1
+      return new Date(b.publishedAt) - new Date(a.publishedAt)
     })
   },
 

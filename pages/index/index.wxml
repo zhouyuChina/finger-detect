@@ -60,7 +60,7 @@
   <!-- 消息列表 -->
   <view class="message-section" wx:if="{{messages.length > 0}}">
     <view class="section-header">
-      <text class="section-title">健康资讯</text>
+      <text class="section-title">置顶资讯</text>
       <view class="header-actions">
         <text class="unread-count" wx:if="{{unreadCount > 0}}">{{unreadCount}}条未读</text>
         <text class="view-all" bindtap="onViewAll">查看全部</text>
@@ -82,6 +82,8 @@
             src="{{item.coverImage}}" 
             mode="aspectFill"
           />
+          <!-- 未读红点 -->
+          <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
         </view>
         
         <!-- 消息图标（无封面图片时显示） -->
@@ -89,12 +91,19 @@
           <view class="icon-bg {{item.category === '技术资讯' ? 'tech' : item.category === '健康提醒' ? 'health' : 'news'}}">
             <text class="icon-text">{{item.category === '技术资讯' ? '技' : item.category === '健康提醒' ? '健' : '资'}}</text>
           </view>
+          <!-- 未读红点 -->
           <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
         </view>
         
         <view class="message-content">
           <view class="message-header">
-            <text class="message-title">{{item.title}}</text>
+            <view class="title-container">
+              <text class="message-title">{{item.title}}</text>
+              <!-- 置顶图标 -->
+              <view class="top-icon" wx:if="{{item.isTop}}">
+                <text class="top-icon-text">📌</text>
+              </view>
+            </view>
             <text class="message-time">{{item.publishTime}}</text>
           </view>
           <text class="message-summary">{{item.summary}}</text>
