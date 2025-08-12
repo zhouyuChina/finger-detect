@@ -210,6 +210,14 @@ class Storage {
   // 检查用户信息是否完整（性别、年龄、地址）
   isUserInfoComplete() {
     const userInfo = this.getUserInfo()
+    const subUsers = this.getSubUsers()
+    
+    // 如果有子用户，说明用户信息已经完整
+    if (subUsers && subUsers.length > 0) {
+      console.log('检测到子用户，认为用户信息完整，子用户数量:', subUsers.length)
+      return true
+    }
+    
     if (!userInfo) {
       return false
     }
