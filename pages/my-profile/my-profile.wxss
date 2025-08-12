@@ -259,8 +259,10 @@
 
 /* 编辑弹窗样式 */
 .edit-popup {
-  width: 600rpx;
-  max-height: 80vh;
+  width: 90vw; /* 修改为90vw，占屏幕宽度的90% */
+  max-width: 90vw; /* 确保最大宽度不超过90vw */
+  max-height: 80vh; /* 修改为80vh，占屏幕高度的80% */
+  min-height: 60vh; /* 添加最小高度，确保至少占60% */
   background-color: #fff;
   border-radius: 16rpx;
   overflow: hidden;
@@ -300,8 +302,9 @@
 }
 
 .edit-form {
-  max-height: 60vh;
+  max-height: 60vh; /* 修改为60vh，给表单更多空间 */
   overflow-y: auto;
+  flex: 1; /* 让表单区域占据剩余空间 */
 }
 
 .popup-actions {

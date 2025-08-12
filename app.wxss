@@ -8,3 +8,49 @@
   padding: 200rpx 0;
   box-sizing: border-box;
 } 
+
+/* 全局弹窗样式覆盖 - 确保所有模态框占整体面积的一半以上 */
+.t-popup--bottom {
+  max-height: 70vh !important;
+  min-height: 60vh !important;
+}
+
+.t-popup--center {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+  min-height: 60vh !important;
+}
+
+.t-popup--top {
+  max-height: 70vh !important;
+  min-height: 60vh !important;
+}
+
+.t-popup--left {
+  width: 80vw !important;
+  max-width: 80vw !important;
+}
+
+.t-popup--right {
+  width: 80vw !important;
+  max-width: 80vw !important;
+}
+
+/* 对话框样式覆盖 */
+.t-dialog {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+  min-height: 60vh !important;
+}
+
+/* 确保弹窗内容区域有足够空间 */
+.t-popup__content {
+  min-height: 60vh !important;
+}
+
+.t-dialog__content {
+  min-height: 50vh !important;
+  max-height: 70vh !important;
+} 

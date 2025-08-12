@@ -173,7 +173,8 @@ page {
   background-color: #ffffff;
   border-radius: 20rpx 20rpx 0 0;
   padding: 0;
-  max-height: 80vh;
+  max-height: 70vh; /* 修改为70vh */
+  min-height: 60vh; /* 添加最小高度 */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -209,8 +210,9 @@ page {
 
 .selector-options {
   padding: 0;
-  max-height: 40vh;
+  max-height: 50vh; /* 增加选项区域的高度 */
   overflow-y: auto;
+  flex: 1; /* 让选项区域占据剩余空间 */
 }
 
 .selector-option {
@@ -479,7 +481,8 @@ page {
   background-color: #ffffff;
   border-radius: 20rpx 20rpx 0 0;
   padding: 0;
-  max-height: 80vh;
+  max-height: 70vh; /* 修改为70vh */
+  min-height: 60vh; /* 添加最小高度 */
   overflow: hidden;
 }
 
@@ -689,7 +692,8 @@ page {
   width: 100%;
   background-color: #ffffff;
   border-radius: 20rpx 20rpx 0 0;
-  max-height: 80vh;
+  max-height: 70vh; /* 修改为70vh，占屏幕高度的70% */
+  min-height: 60vh; /* 添加最小高度，确保至少占60% */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -703,4 +707,17 @@ page {
   to {
     transform: translateY(0);
   }
+} 
+
+/* 覆盖TDesign弹窗样式，使其占更大面积 */
+.t-popup--bottom {
+  max-height: 70vh !important;
+  min-height: 60vh !important;
+}
+
+.t-popup--center {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+  min-height: 60vh !important;
 } 

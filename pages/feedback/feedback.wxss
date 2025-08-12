@@ -317,8 +317,10 @@
 
 /* 反馈详情弹窗样式 */
 .detail-popup {
-  width: 600rpx;
-  max-height: 90vh;
+  width: 90vw; /* 修改为90vw，占屏幕宽度的90% */
+  max-width: 90vw; /* 确保最大宽度不超过90vw */
+  max-height: 85vh; /* 修改为85vh，占屏幕高度的85% */
+  min-height: 60vh; /* 添加最小高度，确保至少占60% */
   background-color: #fff;
   border-radius: 16rpx;
   overflow: hidden;
@@ -370,8 +372,9 @@
 
 .popup-content {
   padding: 40rpx;
-  max-height: 70vh;
+  max-height: 65vh; /* 修改为65vh，给内容更多空间 */
   overflow-y: auto;
+  flex: 1; /* 让内容区域占据剩余空间 */
 }
 
 .feedback-info {
