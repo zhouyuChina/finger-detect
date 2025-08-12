@@ -506,8 +506,19 @@ Page({
       // 调用档案列表接口
       const currentUser = storage.getUserInfo()
       console.log('当前用户信息:', currentUser)
-      // 应该使用 selectedUser.id 作为 subUserId
-      const subUserId = selectedUser.id
+      
+      // 确定正确的subUserId
+      let subUserId
+      if (selectedUser.id === 'myself') {
+        // 如果选择的是当前用户，使用当前用户的真实ID
+        subUserId = currentUser.id || currentUser.subUserId
+        console.log('选择当前用户，使用真实ID:', subUserId)
+      } else {
+        // 如果选择的是子用户，使用子用户的ID
+        subUserId = selectedUser.id
+        console.log('选择子用户，使用子用户ID:', subUserId)
+      }
+      
       console.log('准备调用档案接口，subUserId:', subUserId)
       const response = await api.profile.getArchives(subUserId)
       console.log('档案列表接口响应:', response)
@@ -584,8 +595,19 @@ Page({
       
       // 一次性获取所有检测记录，然后按档案名称分组统计
       try {
+        // 确定正确的subUserId
+        let subUserId
+        if (selectedUser.id === 'myself') {
+          // 如果选择的是当前用户，使用当前用户的真实ID
+          const currentUser = storage.getUserInfo()
+          subUserId = currentUser.id || currentUser.subUserId
+        } else {
+          // 如果选择的是子用户，使用子用户的ID
+          subUserId = selectedUser.id
+        }
+        
         const detectionResponse = await api.detection.getList({
-          subUserId: selectedUser.id
+          subUserId: subUserId
         })
         
         console.log('检测记录响应:', detectionResponse)
