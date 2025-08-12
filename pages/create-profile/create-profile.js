@@ -1015,14 +1015,25 @@ Page({
           const isCompleteMode = currentPage.options && currentPage.options.mode === 'complete'
           
           if (isCompleteMode) {
-            // 完善信息模式：显示成功提示并返回上一页
+            // 完善信息模式：显示成功提示，然后进入正常流程
             wx.showToast({
               title: '信息完善成功',
               icon: 'success'
             })
             
+            // 更新当前用户信息
+            const updatedUserInfo = { ...storage.getUserInfo(), ...updateData }
+            
+            // 设置当前用户为选中状态，进入正常流程
+            this.setData({
+              selectedUser: { id: 'myself', ...updatedUserInfo },
+              isEditingMyself: false, // 退出编辑模式
+              currentStep: 1 // 回到第一步
+            })
+            
+            // 延迟显示用户选择器
             setTimeout(() => {
-              wx.navigateBack()
+              this.setData({ showUserSelector: true })
             }, 1500)
           } else {
             // 正常模式：继续原有流程
