@@ -52,7 +52,7 @@ const config = {
       login: '/auth/login',
       register: '/miniprogram/register', // 小程序用户注册
       profile: '/miniprogram/profile',
-      updateProfile: '/miniprogram/profile',
+      updateProfile: '/miniprogram/profile/update',
       syncProfile: '/miniprogram/profile/sync', // 同步用户完整信息
       logout: '/auth/logout',
       refreshToken: '/auth/refresh',
