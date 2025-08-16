@@ -1045,6 +1045,8 @@ Page({
         const userData = {
           username: nickname,
           realName: nickname,
+          gender: gender,
+          birthYear: birthYear,
           age: age,
           address: address,
           province: province,
