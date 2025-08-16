@@ -48,7 +48,7 @@
                   theme="{{item.type === 'mine' ? 'primary' : 'default'}}" 
                   size="small"
                 >
-                  {{item.type === 'mine' ? '我的' : '其他'}}
+                  {{item.type === 'mine' ? '我的' : (item.username || '其他')}}
                 </t-tag>
               </view>
             </t-cell>
@@ -121,7 +121,7 @@
                 <text class="record-count">检测次数：{{item.recordCount}}</text>
               </view>
               <view slot="note" class="record-meta">
-                <t-tag theme="default" size="small">其他</t-tag>
+                <t-tag theme="default" size="small">{{item.username || '其他'}}</t-tag>
               </view>
             </t-cell>
           </view>
