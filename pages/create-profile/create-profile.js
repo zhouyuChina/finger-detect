@@ -221,41 +221,9 @@ Page({
         // 格式化用户数据
         const formattedSubUsers = this.formatSubUsers(subUsers)
         
-        // 构建完整的用户列表，避免重复添加默认用户
-        let allUsers = []
-        
-        // 检查 subUsers 中是否已经包含默认用户
-        const hasDefaultUser = formattedSubUsers.some(user => user.id === currentSubUser?.id)
-        
-        if (currentSubUser && !hasDefaultUser) {
-          // 如果 subUsers 中没有默认用户，则添加
-          const defaultUser = {
-            id: currentSubUser.id,
-            nickname: currentSubUser.realName || currentSubUser.username || '我',
-            username: currentSubUser.username,
-            age: currentSubUser.age || 0,
-            address: currentSubUser.address || '未知地址',
-            phone: currentSubUser.phone || '',
-            email: currentSubUser.email || '',
-            gender: currentSubUser.gender || '0',
-            archives: currentSubUser.archives || 0,
-            photos: currentSubUser.photos || 0,
-            reports: currentSubUser.reports || 0,
-            remark: '默认用户',
-            status: 'active',
-            createdAt: currentSubUser.createdAt,
-            updatedAt: currentSubUser.updatedAt,
-            isCurrentUser: true // 标记为当前用户
-          }
-          allUsers = [defaultUser, ...formattedSubUsers]
-        } else {
-          // 如果 subUsers 中已经有默认用户，直接使用
-          allUsers = formattedSubUsers
-        }
-        
         this.setData({ 
           wechatUser,
-          subUsers: allUsers, // 使用包含默认用户的完整列表
+          subUsers: formattedSubUsers, // 使用包含默认用户的完整列表
           currentSubUser
         })
         
@@ -468,6 +436,7 @@ Page({
       // 获取用户信息
       const selectedUser = this.data.selectedUser;
       console.log('当前选中的用户:', selectedUser)
+
       if (!selectedUser || !selectedUser.id) {
         console.warn('用户信息不完整，无法获取档案')
         console.warn('selectedUser:', selectedUser)
@@ -1089,10 +1058,30 @@ Page({
         const response = await api.user.createSubUser(userData)
         console.log('创建子用户接口响应:', response)
         
-        if (response.success && response.data) {
-          const newUser = response.data.user || response.data
-          
-          // 重新加载用户列表以获取最新数据
+                  if (response.success && response.data) {
+            const newUser = response.data.user || response.data
+
+            // 更新缓存中的用户信息
+            // 1. 获取当前用户信息
+            const currentUserInfo = storage.getUserInfo() || {};
+            
+            // 2. 更新 currentSubUser 为新创建的用户
+            storage.setCurrentSubUser(newUser);
+            
+            // 3. 更新 userInfo，保持原有结构，更新 currentSubUser
+            const updatedUserInfo = {
+              ...currentUserInfo,
+              currentSubUser: newUser
+            };
+            storage.setUserInfo(updatedUserInfo);
+            
+            // 4. 更新 subUsers 列表，添加新用户
+            const existingSubUsers = storage.getSubUsers() || [];
+            const updatedSubUsers = [...existingSubUsers, newUser];
+            storage.setSubUsers(updatedSubUsers);
+  
+            
+            // 重新加载用户列表以获取最新数据
           await this.loadUsers()
           
           // 设置新创建的用户为选中状态
