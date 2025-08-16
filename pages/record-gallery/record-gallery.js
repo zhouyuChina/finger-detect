@@ -14,6 +14,10 @@ Page({
     detections: [],
     loading: false,
     
+    // 首次检测图片
+    firstDetectionImage: '',
+    firstDetectionDate: '',
+    
     // 图片浏览
     currentIndex: 0,
     scrollLeft: 0,
@@ -79,9 +83,16 @@ Page({
         console.log('格式化后的检测记录:', formattedDetections)
         console.log('格式化后数组长度:', formattedDetections.length)
         
+        // 设置首次检测图片数据
+        const firstDetection = formattedDetections.length > 0 ? formattedDetections[0] : null
+        const firstDetectionImage = firstDetection ? firstDetection.imagePath : ''
+        const firstDetectionDate = firstDetection ? firstDetection.uploadTime : ''
+        
         this.setData({
           archive: report || {},
           detections: formattedDetections,
+          firstDetectionImage: firstDetectionImage,
+          firstDetectionDate: firstDetectionDate,
           pagination: pagination || this.data.pagination
         })
         
@@ -276,5 +287,27 @@ Page({
       title: `${archiveName} - 检测历史`,
       imageUrl: detections.length > 0 ? detections[0].imagePath : ''
     }
+  },
+
+  // 首次检测图片点击
+  onFirstDetectionTap() {
+    const { firstDetectionImage, detections } = this.data
+    if (!firstDetectionImage || detections.length === 0) return
+    
+    // 预览首次检测图片
+    wx.previewImage({
+      current: firstDetectionImage,
+      urls: [firstDetectionImage]
+    })
+  },
+
+  // 首次检测图片加载成功
+  onFirstDetectionLoad(e) {
+    console.log('首次检测图片加载成功:', e.detail)
+  },
+
+  // 首次检测图片加载失败
+  onFirstDetectionError(e) {
+    console.error('首次检测图片加载失败:', e.detail)
   }
 }) 

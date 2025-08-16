@@ -38,14 +38,6 @@
   font-weight: 500;
 }
 
-/* 大图片展示区域 */
-.main-image-section {
-  flex: 1;
-  position: absolute;
-  top: 182rpx;
-  width: 100vw;
-}
-
 /* 档案信息 */
 .archive-info {
   background-color: rgba(0, 0, 0, 0.8);
@@ -74,6 +66,79 @@
   font-size: 24rpx;
   color: #fff;
   flex: 1;
+}
+
+/* 首次检测图片区域 */
+.first-detection-section {
+  background-color: #111;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #333;
+  margin-top: 0;
+  width: 100vw;
+  height: 30vh;
+}
+
+.first-detection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* margin-bottom: 15rpx; */
+  margin: 0 20rpx 10rpx;
+}
+
+.first-detection-title {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.first-detection-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.first-detection-image-container {
+  position: relative;
+  width: 100%;
+  height: 28vh;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.first-detection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.first-detection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background: linear-gradient(135deg, rgba(0, 122, 255, 0.8), rgba(0, 122, 255, 0.4)); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.first-detection-label {
+  font-size: 24rpx;
+  color: #fff;
+  font-weight: 500;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+/* 大图片展示区域 */
+.main-image-section {
+  flex: 1;
+  /* position: absolute; */
+  /* top: 350rpx; */
+  width: 100vw;
 }
 
 /* 加载状态 */
@@ -140,7 +205,7 @@
 
 .main-swiper {
   width: 100vw;
-  height: 64vh;
+  height: 34vh;
 }
 
 .main-image-container {
@@ -192,7 +257,7 @@
 /* 左右切换按钮 */
 .navigation-buttons {
   position: absolute;
-  top: 50%;
+  top: 58%;
   left: 0;
   right: 0;
   display: flex;
@@ -255,6 +320,7 @@
   background-color: #111;
   padding: 20rpx;
   border-top: 1rpx solid #333;
+  width: 100vw;
 }
 
 .thumbnail-list {
@@ -333,11 +399,12 @@
 .action-section {
   position: absolute;
   bottom: 38rpx;
-  background-color: #111;
+  /* background-color: #111; */
   padding: 30rpx 20rpx;
   display: flex;
   gap: 20rpx;
-  border-top: 1rpx solid #333;
+  /* width: 100vw; */
+  /* border-top: 1rpx solid #333; */
 }
 
 .action-btn {
