@@ -131,7 +131,7 @@ Page({
 
   onShow() {
     // 页面显示时，如果已经选择了用户，重新加载档案
-    if (this.data.selectedUser && this.data.selectedUser.username) {
+    if (this.data.selectedUser && this.data.selectedUser.username && this.data.selectedUser.id) {
       console.log('页面显示，重新加载档案')
       this.loadUserProfiles(this.data.selectedUser.id);
     }
@@ -410,7 +410,7 @@ Page({
 
   // 确认用户选择
   confirmUserSelection() {
-    if (this.data.selectedUser) {
+    if (this.data.selectedUser && this.data.selectedUser.id) {
       this.setData({ 
         showUserSelector: false,
         currentStep: 2
@@ -1090,7 +1090,7 @@ Page({
         console.log('创建子用户接口响应:', response)
         
         if (response.success && response.data) {
-          const newUser = response.data.user
+          const newUser = response.data.user || response.data
           
           // 重新加载用户列表以获取最新数据
           await this.loadUsers()
@@ -1101,7 +1101,13 @@ Page({
             showAddressPopup: false,
             currentStep: 2
           });
-          this.loadUserProfiles(newUser.id);
+          
+          // 安全地访问用户ID
+          if (newUser && newUser.id) {
+            this.loadUserProfiles(newUser.id);
+          } else {
+            console.warn('新创建的用户缺少ID，跳过加载档案')
+          }
           
           wx.showToast({
             title: '用户创建成功',
