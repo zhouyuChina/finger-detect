@@ -100,37 +100,94 @@
       
       <t-tab-panel label="其他档案" value="others">
         <view class="tab-content">
-          <!-- 加载状态 -->
-          <view class="loading-container" wx:if="{{loading}}">
-            <text class="loading-text">加载中...</text>
+          <!-- 用户列表视图 -->
+          <view wx:if="{{showUserList}}">
+            <!-- 加载状态 -->
+            <view class="loading-container" wx:if="{{loading}}">
+              <text class="loading-text">加载中...</text>
+            </view>
+            
+            <!-- 用户列表 -->
+            <view class="user-list" wx:if="{{subUsers.length > 0 && !loading}}">
+              <view class="user-list-header">
+                <text class="user-list-title">选择用户查看档案</text>
+                <text class="user-list-desc">共 {{subUsers.length}} 个用户</text>
+              </view>
+              
+              <view class="user-list-content">
+                <t-cell 
+                  wx:for="{{subUsers}}" 
+                  wx:key="id"
+                  title="{{item.username || item.name || '未知用户'}}"
+                  image="{{item.avatarUrl || '/images/profile-avatar.png'}}"
+                  hover
+                  bindtap="onUserSelect"
+                  data-userid="{{item.id}}"
+                  data-username="{{item.username || item.name || '未知用户'}}"
+                  right-icon="chevron-right"
+                >
+                  <view slot="description" class="cell-description">
+                    <text class="user-archive-count">档案数：{{item.archiveCount || 0}}</text>
+                  </view>
+                </t-cell>
+              </view>
+            </view>
+            
+            <!-- 空状态 -->
+            <t-empty 
+              wx:if="{{subUsers.length === 0 && !loading}}"
+              description="暂无其他用户"
+            />
           </view>
           
-          <view class="record-list" wx:if="{{otherRecords.length > 0 && !loading}}">
-            <t-cell 
-              wx:for="{{otherRecords}}" 
-              wx:key="id"
-              title="{{item.name}}"
-              image="{{item.avatar}}"
-              hover
-              bindtap="onRecordClick"
-              data-id="{{item.id}}"
-              right-icon="chevron-right"
-            >
-              <view slot="description" class="cell-description">
-                <text class="update-time">{{item.updateTime}}</text>
-                <text class="record-count">检测次数：{{item.recordCount}}</text>
-              </view>
-              <view slot="note" class="record-meta">
-                <t-tag theme="default" size="small">{{item.username || '其他'}}</t-tag>
-              </view>
-            </t-cell>
+          <!-- 用户档案视图 -->
+          <view wx:if="{{!showUserList}}">
+            <!-- 返回按钮 -->
+            <view class="back-section">
+              <t-button 
+                theme="light" 
+                size="small" 
+                bindtap="onBackToUserList"
+                icon="arrow-left"
+              >
+                返回用户列表
+              </t-button>
+              <text class="current-user">{{selectedUserName}} 的档案</text>
+            </view>
+            
+            <!-- 加载状态 -->
+            <view class="loading-container" wx:if="{{userArchivesLoading}}">
+              <text class="loading-text">加载中...</text>
+            </view>
+            
+            <!-- 用户档案列表 -->
+            <view class="record-list" wx:if="{{userArchives.length > 0 && !userArchivesLoading}}">
+              <t-cell 
+                wx:for="{{userArchives}}" 
+                wx:key="id"
+                title="{{item.name}}"
+                image="{{item.avatar}}"
+                hover
+                bindtap="onRecordClick"
+                data-id="{{item.id}}"
+                right-icon="chevron-right"
+              >
+                <view slot="description" class="cell-description">
+                  <text class="update-time">{{item.updateTime}}</text>
+                  <text class="record-count">检测次数：{{item.recordCount}}</text>
+                </view>
+                <view slot="note" class="record-meta">
+                  <t-tag theme="default" size="small">{{selectedUserName}}</t-tag>
+                </view>
+              </t-cell>
+            </view>
+            
+            <!-- 空状态 -->
+            <t-empty 
+              wx:if="{{userArchives.length === 0 && !userArchivesLoading}}"
+              description="该用户暂无档案"
+            />
           </view>
-          
-          <!-- 空状态 -->
-          <t-empty 
-            wx:if="{{otherRecords.length === 0 && !loading}}"
-            description="暂无其他档案"
-          />
         </view>
       </t-tab-panel>
     </t-tabs>

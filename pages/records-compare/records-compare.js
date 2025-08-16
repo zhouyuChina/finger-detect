@@ -27,7 +27,15 @@ Page({
     // 筛选后的数据
     filteredRecords: [],
     myRecords: [],
-    otherRecords: []
+    otherRecords: [],
+    
+    // 其他档案用户选择相关
+    selectedUserId: '', // 当前选中的用户ID
+    selectedUserName: '', // 当前选中的用户名
+    userArchives: [], // 选中用户的档案列表
+    showUserList: true, // 是否显示用户列表（true显示用户列表，false显示用户档案）
+    userListLoading: false, // 用户列表加载状态
+    userArchivesLoading: false // 用户档案加载状态
   },
 
   onLoad() {
@@ -75,10 +83,19 @@ Page({
         const formattedOwnArchives = this.formatArchives(ownArchives, 'mine', ownSubUserId)
         const formattedOtherArchives = this.formatArchives(otherArchives, 'others', ownSubUserId)
         
+        // 计算每个用户的档案数量（排除本人档案）
+        const userArchiveCounts = this.calculateUserArchiveCounts(formattedOtherArchives, ownSubUserId)
+        
+        // 为subUsers添加档案数量信息（排除本人）
+        const subUsersWithCounts = (subUsers || []).filter(user => user.id !== ownSubUserId).map(user => ({
+          ...user,
+          archiveCount: userArchiveCounts[user.id] || 0
+        }))
+        
         this.setData({
           ownArchives: formattedOwnArchives,
           otherArchives: formattedOtherArchives,
-          subUsers: subUsers || [],
+          subUsers: subUsersWithCounts,
           totalOwn: totalOwn || 0,
           totalOthers: totalOthers || 0,
           totalAll: totalAll || 0
@@ -117,6 +134,18 @@ Page({
       createdAt: this.formatTime(archive.createdAt),
       originalData: archive
     }))
+  },
+
+  // 计算每个用户的档案数量（排除本人档案）
+  calculateUserArchiveCounts(archives, ownSubUserId) {
+    const counts = {}
+    archives.forEach(archive => {
+      const userId = archive.subUserId || archive.userId
+      if (userId && userId !== ownSubUserId) {
+        counts[userId] = (counts[userId] || 0) + 1
+      }
+    })
+    return counts
   },
 
   // 格式化时间
@@ -182,7 +211,12 @@ Page({
   onTabChange(e) {
     const value = e.detail.value
     this.setData({
-      activeTab: value
+      activeTab: value,
+      // 切换到其他档案时，重置用户选择状态
+      selectedUserId: '',
+      selectedUserName: '',
+      userArchives: [],
+      showUserList: true
     })
     this.filterRecords()
   },
@@ -214,6 +248,57 @@ Page({
     })
   },
 
+  // 用户选择
+  onUserSelect(e) {
+    const { userid, username } = e.currentTarget.dataset
+    this.setData({
+      selectedUserId: userid,
+      selectedUserName: username,
+      showUserList: false,
+      userArchives: []
+    })
+    this.loadUserArchives(userid)
+  },
+
+  // 返回用户列表
+  onBackToUserList() {
+    this.setData({
+      selectedUserId: '',
+      selectedUserName: '',
+      userArchives: [],
+      showUserList: true
+    })
+  },
+
+  // 加载指定用户的档案
+  async loadUserArchives(userId) {
+    try {
+      this.setData({ userArchivesLoading: true })
+      
+      const params = {
+        page: 1,
+        limit: 50
+      }
+      
+      const response = await api.profile.getArchives(userId, params)
+      
+      if (response.success && response.data) {
+        const formattedArchives = this.formatArchives(response.data.archives || response.data.list || [], 'others', userId)
+        this.setData({
+          userArchives: formattedArchives
+        })
+      } else {
+        console.warn('获取用户档案失败:', response)
+        common.showError(response.message || '获取用户档案失败')
+      }
+    } catch (error) {
+      console.error('加载用户档案失败:', error)
+      common.showError('加载用户档案失败')
+    } finally {
+      this.setData({ userArchivesLoading: false })
+    }
+  },
+
   // 下拉刷新
   onPullDownRefresh() {
     this.loadArchives().then(() => {
@@ -233,7 +318,7 @@ Page({
   // 档案项点击 - 查看历史记录
   onRecordClick(e) {
     const { id } = e.currentTarget.dataset
-    const allRecords = [...this.data.ownArchives, ...this.data.otherArchives]
+    const allRecords = [...this.data.ownArchives, ...this.data.otherArchives, ...this.data.userArchives]
     const record = allRecords.find(item => item.id === id)
     
     if (record) {
