@@ -69,9 +69,10 @@
 
   <!-- 操作按钮 -->
   <view class="action-buttons">
-    <button class="btn btn-save" bindtap="saveToProfile">
+    <!-- 暂时隐藏保存按钮，后端会自动处理灰指甲的数据库存储 -->
+    <!-- <button class="btn btn-save" bindtap="saveToProfile">
       {{detection.isFirstReport ? '保存报告' : '保存记录'}}
-    </button>
+    </button> -->
     <button class="btn btn-home" bindtap="backToHome">返回首页</button>
   </view>
 </view> 
