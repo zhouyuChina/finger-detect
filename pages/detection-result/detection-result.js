@@ -32,15 +32,35 @@ Page({
       try {
         const detection = JSON.parse(decodeURIComponent(options.detection))
         const thirdPartyResult = JSON.parse(decodeURIComponent(options.thirdPartyResult))
+        const finalResult = options.finalResult ? decodeURIComponent(options.finalResult) : null
         
-        console.log('解析检测结果:', { detection, thirdPartyResult })
+        console.log('解析检测结果:', { detection, thirdPartyResult, finalResult })
+        
+        // 根据检测结果生成描述和建议
+        let description = ''
+        let suggestions = ''
+        
+        if (finalResult === 'onychomycosis') {
+          description = '检测结果显示存在灰指甲症状'
+          suggestions = '建议及时就医治疗，保持指甲清洁干燥，避免共用个人用品'
+        } else if (finalResult === 'Normal') {
+          description = '检测结果显示指甲状态正常'
+          suggestions = '建议继续保持良好的卫生习惯'
+        } else if (finalResult === 'UNKNOWN') {
+          description = '未能识别指甲状态'
+          suggestions = '未识别'
+        } else {
+          description = '检测完成'
+          suggestions = '请查看详细结果'
+        }
         
         // 更新检测结果数据
         this.setData({
           detection,
           thirdPartyResult,
-          'detectionResult.description': thirdPartyResult.description,
-          'detectionResult.suggestions': thirdPartyResult.suggestion,
+          finalResult,
+          'detectionResult.description': description,
+          'detectionResult.suggestions': suggestions,
           loading: false
         })
         

@@ -130,7 +130,49 @@ page {
   object-fit: contain;
 }
 
-/* 第二部分：描述内容 */
+/* 第二部分：检测结果状态 */
+.result-status-section {
+  width: 100%;
+}
+
+.status-content {
+  background-color: #ffffff;
+  border-radius: 8rpx;
+  padding: 20rpx;
+}
+
+.status-item {
+  display: inline-block;
+  padding: 10rpx 20rpx;
+  border-radius: 6rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.status-item.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1rpx solid #ffeaa7;
+}
+
+.status-item.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1rpx solid #c3e6cb;
+}
+
+.status-item.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1rpx solid #bee5eb;
+}
+
+.status-text {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+/* 第三部分：描述内容 */
 .description-section {
   width: 100%;
 }

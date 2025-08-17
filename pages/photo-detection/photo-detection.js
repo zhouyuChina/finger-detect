@@ -227,12 +227,15 @@ Page({
         throw new Error('图片路径缺失')
       }
 
+      // 将图片转换为base64
+      const base64Image = await this.convertImageToBase64(this.data.photoPath)
+      
       // 准备检测数据
       const detectionData = {
         subUserId: profile.subUserId, // 子用户ID（必填）
         archiveId: profile.id, // 档案ID（必填）
         detectionType: this.getDetectionType(profile.name), // 获取检测类型
-        imageUrl: this.data.photoPath // 图片URL（必填）
+        base64Image: base64Image // base64图片数据（必填）
       }
 
       console.log('保存检测数据:', detectionData)
@@ -243,7 +246,28 @@ Page({
       
       wx.hideLoading()
       
-      if (response.success || response.code === 200) {
+      if (response.success && response.data) {
+        const { detection, thirdPartyResult, isFirstReport, shouldSaveToDatabase } = response.data
+        
+        // 处理检测结果
+        const finalResult = thirdPartyResult.final_result
+        console.log('最终检测结果:', finalResult)
+        
+        // 根据检测结果进行不同处理
+        if (finalResult === 'blurred') {
+          // 图片模糊，提示重新拍照
+          wx.showModal({
+            title: '图片模糊',
+            content: '检测到图片模糊，请重新拍照',
+            showCancel: false,
+            success: () => {
+              // 返回拍照页面
+              wx.navigateBack()
+            }
+          })
+          return
+        }
+        
         wx.showToast({
           title: '保存成功',
           icon: 'success'
@@ -325,12 +349,15 @@ Page({
         throw new Error('图片路径缺失')
       }
 
+      // 将图片转换为base64
+      const base64Image = await this.convertImageToBase64(this.data.photoPath)
+      
       // 准备检测数据
       const detectionData = {
         subUserId: profile.subUserId, // 子用户ID（必填）
         archiveId: profile.id, // 档案ID（必填）
         detectionType: this.getDetectionType(profile.name), // 检测类型
-        imageUrl: this.data.photoPath // 图片URL（必填）
+        base64Image: base64Image // base64图片数据（必填）
       }
 
       console.log('开始检测，数据:', detectionData)
@@ -342,18 +369,35 @@ Page({
       wx.hideLoading()
       
       if (response.success && response.data) {
-        const { detection, thirdPartyResult } = response.data
+        const { detection, thirdPartyResult, isFirstReport, shouldSaveToDatabase } = response.data
         
-        // 前端自行判断是否为第一次报告
-        const isFirstReport = this.data.profile.photoCount === 0
+        console.log('检测完成，是否为第一次报告:', isFirstReport)
+        console.log('是否需要保存到数据库:', shouldSaveToDatabase)
+        
+        // 处理检测结果
+        const finalResult = thirdPartyResult.final_result
+        console.log('最终检测结果:', finalResult)
+        
+        // 根据检测结果进行不同处理
+        if (finalResult === 'blurred') {
+          // 图片模糊，提示重新拍照
+          wx.showModal({
+            title: '图片模糊',
+            content: '检测到图片模糊，请重新拍照',
+            showCancel: false,
+            success: () => {
+              // 返回拍照页面
+              wx.navigateBack()
+            }
+          })
+          return
+        }
         
         // 为检测结果添加 isFirstReport 字段
         const detectionWithReportFlag = {
           ...detection,
           isFirstReport: isFirstReport
         }
-        
-        console.log('检测完成，是否为第一次报告:', isFirstReport)
         
         wx.showToast({
           title: '检测完成',
@@ -366,7 +410,7 @@ Page({
         // 跳转到检测结果页面
         setTimeout(() => {
           wx.navigateTo({
-            url: `/pages/detection-result/detection-result?detection=${encodeURIComponent(JSON.stringify(detectionWithReportFlag))}&thirdPartyResult=${encodeURIComponent(JSON.stringify(thirdPartyResult))}&imagePath=${encodeURIComponent(this.data.photoPath)}`
+            url: `/pages/detection-result/detection-result?detection=${encodeURIComponent(JSON.stringify(detectionWithReportFlag))}&thirdPartyResult=${encodeURIComponent(JSON.stringify(thirdPartyResult))}&imagePath=${encodeURIComponent(this.data.photoPath)}&finalResult=${encodeURIComponent(finalResult)}`
           })
         }, 1500)
       } else {
@@ -402,6 +446,33 @@ Page({
         icon: 'none'
       })
     }
+  },
+
+  // 将图片转换为base64
+  async convertImageToBase64(imagePath) {
+    return new Promise((resolve, reject) => {
+      wx.getFileSystemManager().readFile({
+        filePath: imagePath,
+        encoding: 'base64',
+        success: (res) => {
+          // 根据文件扩展名确定MIME类型
+          const extension = imagePath.split('.').pop().toLowerCase()
+          let mimeType = 'image/jpeg' // 默认
+          if (extension === 'png') {
+            mimeType = 'image/png'
+          } else if (extension === 'jpg' || extension === 'jpeg') {
+            mimeType = 'image/jpeg'
+          }
+          
+          const base64Data = `data:${mimeType};base64,${res.data}`
+          resolve(base64Data)
+        },
+        fail: (error) => {
+          console.error('转换图片为base64失败:', error)
+          reject(error)
+        }
+      })
+    })
   },
 
   // 获取检测类型

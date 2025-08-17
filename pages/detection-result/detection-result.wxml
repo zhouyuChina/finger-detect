@@ -35,7 +35,19 @@
         </view>
       </view>
 
-      <!-- 第二部分：描述内容 -->
+      <!-- 第二部分：检测结果状态 -->
+      <view class="result-status-section" wx:if="{{finalResult}}">
+        <view class="section-title">检测结果:</view>
+        <view class="status-content">
+          <view class="status-item {{finalResult === 'onychomycosis' ? 'warning' : finalResult === 'Normal' ? 'success' : 'info'}}">
+            <text class="status-text">
+              {{finalResult === 'onychomycosis' ? '灰指甲' : finalResult === 'Normal' ? '正常' : finalResult === 'UNKNOWN' ? '未识别' : finalResult}}
+            </text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 第三部分：描述内容 -->
       <view class="description-section">
         <view class="section-title">
           {{detection.isFirstReport ? '检测报告' : '治疗记录'}}:
