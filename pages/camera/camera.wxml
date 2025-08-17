@@ -1,0 +1,51 @@
+<!--camera.wxml-->
+<view class="container">
+  <!-- 相机预览区域 -->
+  <view class="camera-container" wx:if="{{showCamera}}">
+    <camera 
+      device-position="{{devicePosition}}" 
+      flash="off" 
+      class="camera"
+      binderror="onCameraError"
+    >
+      <!-- 手指引导框 -->
+      <view class="finger-guide">
+        <view class="finger-outline"></view>
+        <text class="guide-text">将手指放在框内</text>
+      </view>
+      
+      <!-- 顶部操作栏 -->
+      <view class="top-bar">
+        <view class="back-btn" bindtap="goBack">
+          <text class="back-icon">←</text>
+        </view>
+        <view class="title">拍照检测</view>
+        <view class="switch-btn" bindtap="switchCamera">
+          <text class="switch-icon">🔄</text>
+        </view>
+      </view>
+      
+      <!-- 底部操作栏 -->
+      <view class="bottom-bar">
+        <view class="photo-btn" bindtap="takePhoto">
+          <view class="photo-btn-inner"></view>
+        </view>
+      </view>
+    </camera>
+  </view>
+
+  <!-- 照片预览区域 -->
+  <view class="preview-container" wx:if="{{!showCamera}}">
+    <image 
+      class="preview-image" 
+      src="{{photoPath}}" 
+      mode="aspectFit"
+    ></image>
+    
+    <!-- 预览操作栏 -->
+    <view class="preview-actions">
+      <button class="action-btn retake-btn" bindtap="retakePhoto">重新拍照</button>
+      <button class="action-btn confirm-btn" bindtap="confirmPhoto">使用照片</button>
+    </view>
+  </view>
+</view>

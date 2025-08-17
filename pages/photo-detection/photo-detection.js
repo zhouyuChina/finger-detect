@@ -66,20 +66,16 @@ Page({
 
   // 拍照
   takePhoto() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      sourceType: ['camera'],
-      camera: 'back',
-      success: (res) => {
-        this.setData({
-          photoTaken: true,
-          photoPath: res.tempFiles[0].tempFilePath
-        })
+    // 跳转到自定义相机页面
+    wx.navigateTo({
+      url: `/pages/camera/camera?profile=${encodeURIComponent(JSON.stringify(this.data.profile))}`,
+      success: () => {
+        console.log('跳转到相机页面成功')
       },
-      fail: (err) => {
+      fail: (error) => {
+        console.error('跳转到相机页面失败:', error)
         wx.showToast({
-          title: '拍照失败',
+          title: '相机启动失败',
           icon: 'none'
         })
       }

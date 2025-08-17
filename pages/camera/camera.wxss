@@ -1,0 +1,199 @@
+/* camera.wxss */
+page {
+  background-color: #000;
+}
+
+.container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* 相机容器 */
+.camera-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.camera {
+  width: 100%;
+  height: 100%;
+}
+
+/* 手指引导框 */
+.finger-guide {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.finger-outline {
+  width: 300rpx;
+  height: 500rpx;
+  border: 3rpx dashed #4CAF50;
+  border-radius: 100rpx 100rpx 60rpx 60rpx;
+  position: relative;
+  margin-bottom: 20rpx;
+  background: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 20rpx rgba(76, 175, 80, 0.3);
+}
+
+/* 添加手指的指甲部分 */
+/* .finger-outline::before {
+  content: '';
+  position: absolute;
+  top: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 20rpx;
+  border: 3rpx dashed #4CAF50;
+  border-bottom: none;
+  border-radius: 40rpx 40rpx 0 0;
+  background: rgba(76, 175, 80, 0.1);
+} */
+
+.guide-text {
+  font-size: 28rpx;
+  color: #4CAF50;
+  font-weight: 600;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 12rpx 24rpx 11rpx;
+  border-radius: 25rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+  border: 2rpx solid #4CAF50;
+}
+
+/* 顶部操作栏 */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40rpx;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+  z-index: 20;
+}
+
+.back-btn {
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-icon {
+  font-size: 40rpx;
+  color: #fff;
+}
+
+.title {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.switch-btn {
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.switch-icon {
+  font-size: 36rpx;
+  color: #fff;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  z-index: 20;
+}
+
+.photo-btn {
+  width: 120rpx;
+  height: 120rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid #fff;
+  margin-bottom: 100rpx;
+}
+
+.photo-btn-inner {
+  width: 100rpx;
+  height: 100rpx;
+  background: #fff;
+  border-radius: 50%;
+}
+
+/* 预览容器 */
+.preview-container {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-image {
+  flex: 1;
+  width: 100%;
+  background: #000;
+}
+
+.preview-actions {
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 40rpx;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.action-btn {
+  width: 300rpx !important;
+  height: 70rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  color: #fff;
+}
+
+.retake-btn {
+  background: #666;
+}
+
+.confirm-btn {
+  background: #4CAF50;
+}
