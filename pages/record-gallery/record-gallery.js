@@ -120,11 +120,22 @@ Page({
       return []
     }
     
+    // 获取静态资源基础URL
+    const config = require('../../utils/config.js')
+    const staticUrl = config.getCurrentConfig().staticUrl
+    
     return detections.map(detection => {
       const confidence = detection.confidence || 0
+      
+      // 处理图片URL，如果是相对路径则拼接服务器地址
+      let imagePath = detection.imageUrl || ''
+      if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('data:')) {
+        imagePath = staticUrl + imagePath
+      }
+      
       return {
         id: detection.id,
-        imagePath: detection.imageUrl,
+        imagePath: imagePath,
         uploadTime: this.formatTime(detection.detectionTime || detection.createdAt),
         status: detection.result || 'normal',
         confidence: confidence,
