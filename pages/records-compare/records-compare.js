@@ -257,6 +257,20 @@ Page({
       showUserList: false,
       userArchives: []
     })
+    
+    // 更新 currentSubUser 缓存
+    const user = { id: userid, nickname: username };
+    storage.setCurrentSubUser(user);
+    console.log('已更新 currentSubUser 缓存:', user);
+    
+    // 同时更新全局用户信息中的 currentSubUser
+    const currentUserInfo = storage.getUserInfo();
+    if (currentUserInfo) {
+      currentUserInfo.currentSubUser = user;
+      storage.setUserInfo(currentUserInfo);
+      console.log('已更新全局用户信息中的 currentSubUser');
+    }
+    
     this.loadUserArchives(userid)
   },
 
