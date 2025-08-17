@@ -429,15 +429,221 @@
         <text class="popup-close" bindtap="closeDetailPartPopup">✕</text>
       </view>
       
-      <view class="detail-part-grid">
-        <view 
-          class="detail-part-item" 
-          wx:for="{{detailParts}}" 
-          wx:key="value"
-          bindtap="selectDetailPart"
-          data-part="{{item}}"
-        >
-          <text class="part-name">{{item.name}}</text>
+      <!-- 手指选择 -->
+      <view class="detail-part-container" wx:if="{{selectedBodyPart.value === 'leftHand' || selectedBodyPart.value === 'rightHand'}}">
+        <view class="hand-image-container">
+          <view class="hand-emoji {{selectedBodyPart.value === 'leftHand' ? 'left-hand' : 'right-hand'}}">
+            {{selectedBodyPart.value === 'leftHand' ? '🤚' : '🤚'}}
+          </view>
+          <!-- 手指点击区域 -->
+          <view class="finger-areas">
+            <view 
+              class="finger-area {{selectedBodyPart.value === 'leftHand' ? 'left-thumb-area' : 'right-thumb-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[0]}}"
+              data-index="0"
+            ></view>
+            <view 
+              class="finger-area {{selectedBodyPart.value === 'leftHand' ? 'left-index-area' : 'right-index-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[1]}}"
+              data-index="1"
+            ></view>
+            <view 
+              class="finger-area {{selectedBodyPart.value === 'leftHand' ? 'left-middle-area' : 'right-middle-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[2]}}"
+              data-index="2"
+            ></view>
+            <view 
+              class="finger-area {{selectedBodyPart.value === 'leftHand' ? 'left-ring-area' : 'right-ring-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[3]}}"
+              data-index="3"
+            ></view>
+            <view 
+              class="finger-area {{selectedBodyPart.value === 'leftHand' ? 'left-little-area' : 'right-little-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[4]}}"
+              data-index="4"
+            ></view>
+          </view>
+        </view>
+        <!-- 右手手指标签 -->
+        <view class="finger-labels" wx:if="{{selectedBodyPart.value === 'rightHand'}}">
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[0]}}"
+            data-index="0"
+          >大拇指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[1]}}"
+            data-index="1"
+          >食指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[2]}}"
+            data-index="2"
+          >中指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[3]}}"
+            data-index="3"
+          >无名指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[4]}}"
+            data-index="4"
+          >小指</text>
+        </view>
+        
+        <!-- 左手手指标签 -->
+        <view class="finger-labels" wx:if="{{selectedBodyPart.value === 'leftHand'}}">
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[4]}}"
+            data-index="4"
+          >小指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[3]}}"
+            data-index="3"
+          >无名指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[2]}}"
+            data-index="2"
+          >中指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[1]}}"
+            data-index="1"
+          >食指</text>
+          <text 
+            class="finger-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[0]}}"
+            data-index="0"
+          >大拇指</text>
+        </view>
+      </view>
+      
+      <!-- 脚趾选择 -->
+      <view class="detail-part-container" wx:if="{{selectedBodyPart.value === 'leftFoot' || selectedBodyPart.value === 'rightFoot'}}">
+        <view class="foot-image-container">
+          <view class="foot-emoji {{selectedBodyPart.value === 'leftFoot' ? 'left-foot' : 'right-foot'}}">
+            {{selectedBodyPart.value === 'leftFoot' ? '🦶' : '🦶'}}
+          </view>
+          <!-- 脚趾点击区域 -->
+          <view class="toe-areas">
+            <view 
+              class="toe-area {{selectedBodyPart.value === 'leftFoot' ? 'left-big-toe-area' : 'right-big-toe-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[0]}}"
+              data-index="0"
+            ></view>
+            <view 
+              class="toe-area {{selectedBodyPart.value === 'leftFoot' ? 'left-second-toe-area' : 'right-second-toe-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[1]}}"
+              data-index="1"
+            ></view>
+            <view 
+              class="toe-area {{selectedBodyPart.value === 'leftFoot' ? 'left-third-toe-area' : 'right-third-toe-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[2]}}"
+              data-index="2"
+            ></view>
+            <view 
+              class="toe-area {{selectedBodyPart.value === 'leftFoot' ? 'left-fourth-toe-area' : 'right-fourth-toe-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[3]}}"
+              data-index="3"
+            ></view>
+            <view 
+              class="toe-area {{selectedBodyPart.value === 'leftFoot' ? 'left-little-toe-area' : 'right-little-toe-area'}}" 
+              bindtap="selectDetailPart" 
+              data-part="{{detailParts[4]}}"
+              data-index="4"
+            ></view>
+          </view>
+        </view>
+        <!-- 右脚脚趾标签 -->
+        <view class="toe-labels" wx:if="{{selectedBodyPart.value === 'rightFoot'}}">
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[0]}}"
+            data-index="0"
+          >大脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[1]}}"
+            data-index="1"
+          >第二脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[2]}}"
+            data-index="2"
+          >第三脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[3]}}"
+            data-index="3"
+          >第四脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[4]}}"
+            data-index="4"
+          >小脚趾</text>
+        </view>
+        
+        <!-- 左脚脚趾标签 -->
+        <view class="toe-labels" wx:if="{{selectedBodyPart.value === 'leftFoot'}}">
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[4]}}"
+            data-index="4"
+          >小脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[3]}}"
+            data-index="3"
+          >第四脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[2]}}"
+            data-index="2"
+          >第三脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[1]}}"
+            data-index="1"
+          >第二脚趾</text>
+          <text 
+            class="toe-label" 
+            bindtap="selectDetailPart" 
+            data-part="{{detailParts[0]}}"
+            data-index="0"
+          >大脚趾</text>
         </view>
       </view>
     </view>
