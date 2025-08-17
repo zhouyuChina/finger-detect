@@ -76,9 +76,13 @@
         
         <view class="btn-group" wx:if="{{photoTaken}}">
           <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button>
-          <!-- 暂时隐藏保存记录按钮，后端会自动处理灰指甲的数据库存储 -->
+          <!-- 首次检测：开始检测 -->
           <button class="btn btn-detect" bindtap="startDetection" wx:if="{{!hasReports}}">
             开始检测
+          </button>
+          <!-- 治疗记录：保存记录（不是保存报告） -->
+          <button class="btn btn-detect" bindtap="startDetection" wx:if="{{hasReports}}">
+            保存记录
           </button>
         </view>
       </view>
