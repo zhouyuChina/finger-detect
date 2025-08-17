@@ -43,7 +43,7 @@ Page({
         if (finalResult === 'onychomycosis') {
           description = '检测结果显示存在灰指甲症状'
           suggestions = '建议及时就医治疗，保持指甲清洁干燥，避免共用个人用品'
-        } else if (finalResult === 'Normal') {
+        } else if (finalResult === 'Normal' || finalResult === 'normal') {
           description = '检测结果显示指甲状态正常'
           suggestions = '建议继续保持良好的卫生习惯'
         } else if (finalResult === 'UNKNOWN') {

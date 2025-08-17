@@ -13,17 +13,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 30rpx;
-  position: absolute;
-  top: 74rpx;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+  margin-top: 74rpx;
 }
 
 .nav-left,
 .nav-right {
   display: flex;
   align-items: center;
+  width: 0rpx;
 }
 
 .nav-icon {
@@ -36,6 +33,8 @@
   font-size: 32rpx;
   color: #fff;
   font-weight: 500;
+  width: 80vw;
+  text-align: center;
 }
 
 /* 档案信息 */

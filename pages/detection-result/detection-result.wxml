@@ -39,9 +39,9 @@
       <view class="result-status-section" wx:if="{{finalResult}}">
         <view class="section-title">检测结果:</view>
         <view class="status-content">
-          <view class="status-item {{finalResult === 'onychomycosis' ? 'warning' : finalResult === 'Normal' ? 'success' : 'info'}}">
+          <view class="status-item {{finalResult === 'onychomycosis' ? 'warning' : (finalResult === 'Normal' || finalResult === 'normal') ? 'success' : 'info'}}">
             <text class="status-text" wx:if="{{finalResult === 'onychomycosis'}}">灰指甲</text>
-            <text class="status-text" wx:elif="{{finalResult === 'Normal'}}">正常</text>
+            <text class="status-text" wx:elif="{{finalResult === 'Normal' || finalResult === 'normal'}}">正常</text>
             <text class="status-text" wx:elif="{{finalResult === 'UNKNOWN'}}">未识别</text>
             <text class="status-text" wx:else>{{finalResult}}</text>
           </view>

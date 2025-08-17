@@ -7,7 +7,7 @@
     </view>
     <view class="nav-title">{{archiveName}} - 检测历史</view>
     <view class="nav-right">
-      <text class="nav-icon" bindtap="onShare">📤</text>
+      <!-- <text class="nav-icon" bindtap="onShare">📤</text> -->
     </view>
   </view>
 

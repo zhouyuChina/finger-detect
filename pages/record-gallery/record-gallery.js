@@ -83,14 +83,34 @@ Page({
         console.log('格式化后的检测记录:', formattedDetections)
         console.log('格式化后数组长度:', formattedDetections.length)
         
-        // 设置首次检测图片数据
-        const firstDetection = formattedDetections.length > 0 ? formattedDetections[0] : null
+        // 设置首次检测图片数据（按时间排序，获取最早的检测记录）
+        const sortedDetections = formattedDetections.sort((a, b) => {
+          const timeA = new Date(a.originalData.createdAt || a.originalData.detectionTime || a.uploadTime)
+          const timeB = new Date(b.originalData.createdAt || b.originalData.detectionTime || b.uploadTime)
+          return timeA - timeB  // 升序排列，最早的在前
+        })
+        
+        console.log('排序后的检测记录时间:', sortedDetections.map(item => ({
+          id: item.id,
+          createdAt: item.originalData.createdAt,
+          detectionTime: item.originalData.detectionTime,
+          uploadTime: item.uploadTime
+        })))
+        
+        const firstDetection = sortedDetections.length > 0 ? sortedDetections[0] : null
         const firstDetectionImage = firstDetection ? firstDetection.imagePath : ''
         const firstDetectionDate = firstDetection ? firstDetection.uploadTime : ''
         
+        console.log('首次检测记录:', firstDetection ? {
+          id: firstDetection.id,
+          imagePath: firstDetection.imagePath,
+          uploadTime: firstDetection.uploadTime,
+          createdAt: firstDetection.originalData.createdAt
+        } : null)
+        
         this.setData({
           archive: report || {},
-          detections: formattedDetections,
+          detections: sortedDetections,  // 使用排序后的检测记录
           firstDetectionImage: firstDetectionImage,
           firstDetectionDate: firstDetectionDate,
           pagination: pagination || this.data.pagination
