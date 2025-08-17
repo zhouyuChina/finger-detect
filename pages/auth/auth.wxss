@@ -110,7 +110,7 @@
 
 .auth-btn {
   width: 100%;
-  height: 88rpx;
+  height: 74rpx;
   border-radius: 44rpx;
   font-size: 32rpx;
   font-weight: bold;
