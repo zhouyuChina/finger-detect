@@ -12,7 +12,8 @@
       class="step-item {{currentStep >= 2 ? 'active' : ''}}" 
     >
       <view class="step-icon">📷</view>
-      <text class="step-title">{{hasReports ? '拍照记录' : '拍照检测'}}</text>
+      <text class="step-title" wx:if="{{hasReports}}">拍照记录</text>
+      <text class="step-title" wx:else>拍照检测</text>
     </view>
     <view 
       class="step-item {{currentStep >= 3 ? 'active' : ''}}" 
@@ -40,7 +41,8 @@
     <!-- 正常状态 -->
     <view class="photo-section" wx:else>
       <view class="photo-title">
-        {{hasReports ? '请拍照记录治疗进展' : '请开始拍照检测'}}
+        <text wx:if="{{hasReports}}">请拍照记录治疗进展</text>
+        <text wx:else>请开始拍照检测</text>
       </view>
       
       <!-- 档案信息显示 -->
