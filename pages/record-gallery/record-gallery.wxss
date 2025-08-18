@@ -33,7 +33,7 @@
   font-size: 32rpx;
   color: #fff;
   font-weight: 500;
-  width: 80vw;
+  width: 90vw;
   text-align: center;
 }
 
@@ -237,7 +237,7 @@
   font-size: 28rpx;
   color: #fff;
   font-weight: 500;
-  margin-bottom: 8rpx;
+  /* margin-bottom: 8rpx; */
 }
 
 .image-status {

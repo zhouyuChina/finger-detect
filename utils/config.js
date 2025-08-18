@@ -203,6 +203,7 @@ const config = {
   // 错误码配置
   errorCodes: {
     SUCCESS: 200,
+    CREATED: 201,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,

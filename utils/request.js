@@ -166,24 +166,33 @@ class Request {
   // 处理响应
   handleResponse(response, resolve, reject) {
     const { statusCode, data } = response
+    
+    console.log('handleResponse - 状态码:', statusCode)
+    console.log('handleResponse - 响应数据:', data)
+    console.log('handleResponse - data.success:', data.success)
+    console.log('handleResponse - data.code:', data.code)
 
-    if (statusCode === 200) {
+    if (statusCode === 200 || statusCode === 201) {
       // 支持开发模式测试接口格式：{success: true, data: {...}, message: "xxx"}
       if (data.success === true) {
         console.log('检测到开发模式成功响应')
         resolve(data)
       } else if (data.code === config.errorCodes.SUCCESS) {
         // 标准格式：{code: 200, data: {...}, message: "xxx"}
+        console.log('检测到标准格式成功响应')
         resolve(data)
       } else if (data.code === config.errorCodes.UNAUTHORIZED) {
         // token过期，尝试刷新
+        console.log('检测到token过期')
         this.handleTokenExpired(resolve, reject)
       } else {
+        console.log('检测到业务错误:', data.code, data.message)
         const errorMsg = data.message || config.errorMessages[data.code] || config.errorMessages.default
         this.showError(errorMsg)
         reject(data)
       }
     } else {
+      console.log('检测到HTTP错误:', statusCode)
       const errorMsg = config.errorMessages[statusCode] || config.errorMessages.default
       this.showError(errorMsg)
       reject({

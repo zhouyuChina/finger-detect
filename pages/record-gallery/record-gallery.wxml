@@ -76,7 +76,7 @@
           />
           <view class="image-info">
             <text class="image-date">{{item.uploadTime}}</text>
-            <text class="image-status">状态：{{item.status}}</text>
+            <!-- <text class="image-status">状态：{{item.status}}</text> -->
             <!-- <text class="image-confidence" wx:if="{{item.confidence > 0}}">置信度：{{item.confidencePercent}}%</text> -->
           </view>
         </view>
@@ -127,7 +127,7 @@
             <text class="overlay-icon">✓</text>
           </view>
           <view class="thumbnail-status" wx:if="{{item.status !== 'normal'}}">
-            <text class="status-text">{{item.status}}</text>
+            <!-- <text class="status-text">{{item.status}}</text> -->
           </view>
         </view>
       </view>
