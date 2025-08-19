@@ -619,120 +619,141 @@ Page({
     const part = e.currentTarget.dataset.part;
     const bodyPart = this.data.selectedBodyPart;
     
-    try {
-      // 获取用户信息
-      const selectedUser = this.data.selectedUser;
-      console.log('创建档案时的用户信息:', selectedUser)
-      
-      if (!selectedUser) {
-        console.error('用户信息不存在')
-        wx.showToast({
-          title: '用户信息不存在，请重新选择用户',
-          icon: 'none'
-        });
-        return;
-      }
-      
-      if (!selectedUser.id) {
-        console.error('用户信息不完整，缺少用户ID:', selectedUser)
-        wx.showToast({
-          title: '用户信息不完整，请重新选择用户',
-          icon: 'none'
-        });
-        return;
-      }
-
-      // 准备档案数据
-      const archiveName = `${bodyPart.name}${part.name}`
-      
-      // 获取当前用户的subUserId
-      const currentUser = storage.getUserInfo()
-      const subUserId = currentUser.currentSubUser.id
-      
-      const archiveData = {
-        subUserId: subUserId,
-        archiveName: archiveName,
-        bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
-      }
-      console.log('准备创建档案，数据:', archiveData)
-      
-      // 创建档案
-      const response = await api.profile.create(archiveData)
-      console.log('创建档案接口响应:', response)
-      
-      if (response.success && response.data) {
-        const newArchive = response.data
-        console.log('新创建的档案:', newArchive)
-        console.log('新档案的所有字段:', Object.keys(newArchive))
-        
-        // 根据实际返回的数据结构，档案信息在 archive 字段中
-        const archiveData = newArchive.archive || newArchive
-        console.log('档案数据:', archiveData)
-        console.log('档案数据的所有字段:', Object.keys(archiveData))
-        console.log('可能的ID字段:', {
-          id: archiveData.id,
-          archiveId: archiveData.archiveId,
-          _id: archiveData._id
-        });
-        
-        // 检查档案是否有ID，尝试不同的字段名
-        const archiveId = archiveData.id || archiveData.archiveId || archiveData._id;
-        if (!archiveId) {
-          console.error('新创建的档案缺少ID:', archiveData)
-          wx.showToast({
-            title: '档案创建失败：缺少档案ID',
-            icon: 'none'
-          });
-          return;
-        }
-        
-        // 重新加载档案列表
-        await this.loadUserProfiles(selectedUser.id)
-        
-        // 设置新创建的档案为选中状态
-        const formattedArchive = this.formatArchives([archiveData])[0]
-        console.log('格式化后的档案:', formattedArchive)
-        console.log('格式化档案的所有字段:', Object.keys(formattedArchive));
-        console.log('格式化档案可能的ID字段:', {
-          id: formattedArchive.id,
-          archiveId: formattedArchive.archiveId,
-          _id: formattedArchive._id
-        });
-        
-        // 再次检查格式化后的档案是否有ID，尝试不同的字段名
-        const formattedArchiveId = formattedArchive.id || formattedArchive.archiveId || formattedArchive._id;
-        if (!formattedArchiveId) {
-          console.error('格式化后的档案缺少ID:', formattedArchive)
-          wx.showToast({
-            title: '档案格式化失败：缺少档案ID',
-            icon: 'none'
-          });
-          return;
-        }
-        
-        this.setData({
-          selectedProfile: formattedArchive,
-          showDetailPartPopup: false
-        })
-        
-        // 显示成功提示
-        wx.showToast({
-          title: '档案创建成功',
-          icon: 'success'
-        });
-        
-        console.log('档案创建成功并选中:', formattedArchive)
-      } else {
-        console.error('创建档案失败，响应:', response)
-        wx.showToast({
-          title: response.message || '创建档案失败',
-          icon: 'none'
-        });
-      }
-    } catch (error) {
-      console.error('创建档案出错:', error)
+    // 获取用户信息
+    const selectedUser = this.data.selectedUser;
+    console.log('创建档案时的用户信息:', selectedUser)
+    
+    if (!selectedUser) {
+      console.error('用户信息不存在')
       wx.showToast({
-        title: '创建档案出错',
+        title: '用户信息不存在，请重新选择用户',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (!selectedUser.id) {
+      console.error('用户信息不完整，缺少用户ID:', selectedUser)
+      wx.showToast({
+        title: '用户信息不完整，请重新选择用户',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 准备档案数据
+    const archiveName = `${bodyPart.name}${part.name}`
+    
+    // 获取当前用户的subUserId
+    const currentUser = storage.getUserInfo()
+    const subUserId = currentUser.currentSubUser.id
+    
+    const archiveData = {
+      subUserId: subUserId,
+      archiveName: archiveName,
+      bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
+    }
+    console.log('准备创建档案，数据:', archiveData)
+    
+    // 创建档案
+    let response
+    try {
+      response = await api.profile.create(archiveData)
+      console.log('创建档案接口响应:', response)
+    } catch (error) {
+      console.error('创建档案API调用失败:', error)
+      // 处理API调用失败的情况
+      let errorMessage = '创建档案失败'
+      
+      if (error.message) {
+        // 如果错误对象有message字段，直接使用
+        errorMessage = error.message
+      } else if (error.code) {
+        // 根据错误码判断
+        if (error.code === 409) {
+          errorMessage = '档案名称已存在'
+        } else if (error.code === 400) {
+          errorMessage = '请求参数错误'
+        } else {
+          errorMessage = error.message || '创建档案失败'
+        }
+      }
+      
+      wx.showToast({
+        title: errorMessage,
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (response && response.success && response.data) {
+      const newArchive = response.data
+      console.log('新创建的档案:', newArchive)
+      console.log('新档案的所有字段:', Object.keys(newArchive))
+      
+      // 根据实际返回的数据结构，档案信息在 archive 字段中
+      const archiveData = newArchive.archive || newArchive
+      console.log('档案数据:', archiveData)
+      console.log('档案数据的所有字段:', Object.keys(archiveData))
+      console.log('可能的ID字段:', {
+        id: archiveData.id,
+        archiveId: archiveData.archiveId,
+        _id: archiveData._id
+      });
+      
+      // 检查档案是否有ID，尝试不同的字段名
+      const archiveId = archiveData.id || archiveData.archiveId || archiveData._id;
+      if (!archiveId) {
+        console.error('新创建的档案缺少ID:', archiveData)
+        wx.showToast({
+          title: '档案创建失败：缺少档案ID',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      // 重新加载档案列表
+      await this.loadUserProfiles(selectedUser.id)
+      
+      // 设置新创建的档案为选中状态
+      const formattedArchive = this.formatArchives([archiveData])[0]
+      console.log('格式化后的档案:', formattedArchive)
+      console.log('格式化档案的所有字段:', Object.keys(formattedArchive));
+      console.log('格式化档案可能的ID字段:', {
+        id: formattedArchive.id,
+        archiveId: formattedArchive.archiveId,
+        _id: formattedArchive._id
+      });
+      
+      // 再次检查格式化后的档案是否有ID，尝试不同的字段名
+      const formattedArchiveId = formattedArchive.id || formattedArchive.archiveId || formattedArchive._id;
+      if (!formattedArchiveId) {
+        console.error('格式化后的档案缺少ID:', formattedArchive)
+        wx.showToast({
+          title: '档案格式化失败：缺少档案ID',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      this.setData({
+        selectedProfile: formattedArchive,
+        showDetailPartPopup: false
+      })
+      
+      // 显示成功提示
+      wx.showToast({
+        title: '档案创建成功',
+        icon: 'success'
+      });
+      
+      console.log('档案创建成功并选中:', formattedArchive)
+    } else if (response) {
+      console.error('创建档案失败，响应:', response)
+      // 使用服务器返回的错误消息
+      const errorMessage = response.message || '创建档案失败'
+      wx.showToast({
+        title: errorMessage,
         icon: 'none'
       });
     }
