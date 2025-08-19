@@ -772,6 +772,16 @@ Page({
         });
         return;
       }
+      
+      // 验证性别
+      if (!userForm.gender) {
+        wx.showToast({
+          title: '请选择性别',
+          icon: 'none'
+        });
+        return;
+      }
+      
       // 进入第二步
       this.setData({
         userCreateStep: 2,

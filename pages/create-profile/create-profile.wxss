@@ -534,6 +534,18 @@ page {
   font-weight: 500;
 }
 
+.required {
+  color: #ff4757;
+  font-weight: bold;
+}
+
+.form-tip {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
 .form-input {
   flex: 1;
   font-size: 32rpx;
