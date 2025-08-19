@@ -48,16 +48,13 @@ Page({
         id: options.archiveId,
         name: decodeURIComponent(options.archiveName),
         subUserId: options.subUserId,
-        photoCount: 1 // 从record-gallery跳转说明已有检测记录
+        photoCount: 0 // 初始化为0，需要重新获取真实数据
       }
       this.setData({ profile })
       console.log('从record-gallery获取到档案信息:', profile)
       
-      // 从record-gallery跳转说明已有检测记录，直接设置为有报告状态
-      this.setData({ 
-        hasReports: true,
-        loading: false
-      })
+      // 需要重新检查档案的真实检测数量
+      this.checkProfileReports(profile.id)
     } else {
       console.warn('未传递档案信息')
       this.handleError('档案信息缺失')
@@ -106,12 +103,34 @@ Page({
         return
       }
       
-      // 根据档案的 photoCount 判断是否有报告
-      const hasReports = profile.photoCount > 0
+      // 获取档案的真实检测数量
+      const response = await api.profile.getArchiveDetections({
+        subUserId: profile.subUserId,
+        archiveId: profile.id,
+        page: 1,
+        limit: 1 // 只需要检查是否有记录，不需要获取所有数据
+      })
+      
+      console.log('档案检测记录查询结果:', response)
+      
+      let hasReports = false
+      let actualPhotoCount = 0
+      
+      if (response.success && response.data && response.data.images) {
+        actualPhotoCount = response.data.images.length
+        hasReports = actualPhotoCount > 0
+        
+        // 更新档案的photoCount
+        const updatedProfile = {
+          ...profile,
+          photoCount: actualPhotoCount
+        }
+        this.setData({ profile: updatedProfile })
+      }
       
       console.log('档案报告检查结果:', { 
         hasReports, 
-        photoCount: profile.photoCount,
+        actualPhotoCount,
         archiveName: profile.name 
       })
       
