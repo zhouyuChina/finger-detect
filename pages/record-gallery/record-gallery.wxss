@@ -14,13 +14,15 @@
   justify-content: space-between;
   padding: 20rpx 30rpx;
   margin-top: 74rpx;
+  width: 90vw;
 }
 
 .nav-left,
 .nav-right {
   display: flex;
   align-items: center;
-  width: 0rpx;
+  width: 80rpx;
+  justify-content: center;
 }
 
 .nav-icon {
@@ -33,7 +35,7 @@
   font-size: 32rpx;
   color: #fff;
   font-weight: 500;
-  width: 90vw;
+  flex: 1;
   text-align: center;
 }
 
