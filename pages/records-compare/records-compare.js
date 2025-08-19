@@ -1,6 +1,7 @@
 // records-compare.js
 const api = require('../../utils/api.js')
 const common = require('../../utils/common.js')
+const storage = require('../../utils/storage.js')
 
 Page({
   data: {
