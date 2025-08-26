@@ -221,15 +221,30 @@ Page({
         // 格式化用户数据
         const formattedSubUsers = this.formatSubUsers(subUsers)
         
+        // 默认选择当前账号下的默认用户（currentSubUser）
+        let selectedUser = null
+        if (currentSubUser && formattedSubUsers.length > 0) {
+          // 找到对应的默认用户
+          selectedUser = formattedSubUsers.find(user => user.id === currentSubUser.id)
+          if (selectedUser) {
+            console.log('自动选择默认用户:', selectedUser.nickname)
+          }
+        } else if (formattedSubUsers.length > 0) {
+          // 如果没有找到currentSubUser，选择第一个用户作为默认
+          selectedUser = formattedSubUsers[0]
+          console.log('未找到默认用户，选择第一个用户:', selectedUser.nickname)
+        }
+        
         this.setData({ 
           wechatUser,
           subUsers: formattedSubUsers, // 使用包含默认用户的完整列表
-          currentSubUser
+          currentSubUser,
+          selectedUser: selectedUser
         })
         
         console.log('用户数据加载成功，微信用户:', wechatUser?.nickname, '子用户数量:', formattedSubUsers.length)
         
-        // 延迟显示用户选择器，确保页面完全加载
+        // 总是显示用户选择器，让用户确认选择
         setTimeout(() => {
           this.setData({ showUserSelector: true });
         }, 500);

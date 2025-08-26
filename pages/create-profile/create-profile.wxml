@@ -116,13 +116,15 @@
       
       <scroll-view class="selector-options" scroll-y="true">
         <view 
-          class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
+          class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}} {{currentSubUser && currentSubUser.id === item.id ? 'default-user' : ''}}" 
           wx:for="{{subUsers}}" 
           wx:key="id"
           bindtap="selectUser"
           data-user="{{item}}"
         >
-          <text class="option-text">{{item.nickname}}</text>
+          <text class="option-text">
+            {{item.nickname}}
+          </text>
           <text class="option-check" wx:if="{{selectedUser && selectedUser.id === item.id}}">✅</text>
         </view>
         <view class="selector-option add-option" bindtap="addNewUser">
@@ -144,13 +146,13 @@
       
       <scroll-view class="selector-options" scroll-y="true">
         <view 
-          class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}}" 
+          class="selector-option {{selectedUser && selectedUser.id === item.id ? 'selected' : ''}} {{currentSubUser && currentSubUser.id === item.id ? 'default-user' : ''}}" 
           wx:for="{{subUsers}}" 
           wx:key="id"
           bindtap="selectUser"
           data-user="{{item}}"
         >
-          <text class="option-text">{{item.nickname}}</text>
+          <text class="option-text"> {{item.nickname}} </text>
           <text class="option-check" wx:if="{{selectedUser && selectedUser.id === item.id}}">✅</text>
         </view>
         <view class="selector-option add-option" bindtap="addNewUser">

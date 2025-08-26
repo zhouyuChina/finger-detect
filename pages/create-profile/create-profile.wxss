@@ -216,13 +216,15 @@ page {
 }
 
 .selector-option {
-  padding: 20rpx;
+  /* padding: 20rpx; */
   text-align: center;
   border-bottom: 1rpx solid #f0f0f0;
   transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 80rpx; /* 确保选项有足够的高度 */
+  line-height: 0;
 }
 
 .selector-option:last-child {
@@ -239,6 +241,10 @@ page {
   font-weight: 500;
   flex: 1;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40rpx; /* 确保文字区域有足够高度 */
 }
 
 .option-check {
@@ -249,19 +255,44 @@ page {
   font-weight: bold;
   position: absolute;
   right: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40rpx; /* 确保复选框垂直居中 */
 }
 
 .selector-option.selected {
-  background-color: #f0f8ff;
+  background-color: #f8f9fa;
+  /* border-left: 4rpx solid #28a745; */
 }
 
 .selector-option.selected .option-text {
-  color: #4CAF50;
-  font-weight: 600;
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* 默认用户样式 */
+.selector-option.default-user {
+  position: relative;
+}
+
+.default-badge {
+  font-size: 24rpx;
+  color: #666;
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+
+/* 新增用户样式 - 更突出的高亮 */
+.add-option {
+  /* background-color: #e3f2fd; */
+  /* border: 2rpx solid #2196F3; */
+  border-radius: 8rpx;
+  /* margin: 10rpx 20rpx; */
 }
 
 .add-option .option-text {
-  color: #2B81E8;
+  font-size: 32rpx;
   flex: 1;
   text-align: center;
 }
