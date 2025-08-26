@@ -76,7 +76,7 @@
   border-bottom: 1rpx solid #333;
   margin-top: 0;
   width: 100vw;
-  height: 30vh;
+  height: 34vh;
 }
 
 .first-detection-header {
@@ -101,16 +101,16 @@
 .first-detection-image-container {
   position: relative;
   width: 100%;
-  height: 28vh;
+  height: 32vh;
   border-radius: 12rpx;
   overflow: hidden;
   background-color: #000;
 }
 
 .first-detection-image {
-  /* width: 100vw; */
-  /* height: 100%; */
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .first-detection-overlay {
@@ -206,7 +206,7 @@
 
 .main-swiper {
   width: 100vw;
-  height: 34vh;
+  height: 32vh;
 }
 
 .main-image-container {
@@ -222,6 +222,7 @@
 .main-image {
   width: 100%;
   height: 100%;
+  object-fit: contain;
 }
 
 .image-info {
@@ -316,7 +317,7 @@
 /* 小图片列表 */
 .thumbnail-section {
   position: absolute;
-  bottom: 184rpx;
+  bottom: 160rpx;
   z-index: 1000;
   background-color: #111;
   padding: 20rpx;
@@ -357,7 +358,7 @@
 .thumbnail-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .thumbnail-overlay {

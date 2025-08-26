@@ -36,7 +36,7 @@
     <view class="first-detection-image-container">
       <image 
         src="{{firstDetectionImage}}" 
-        mode="aspectFill" 
+        mode="aspectFit" 
         class="first-detection-image"
         bindtap="onFirstDetectionTap"
         binderror="onFirstDetectionError"
