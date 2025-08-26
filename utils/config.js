@@ -69,6 +69,7 @@ const config = {
     detection: {
       list: '/miniprogram/detection', // 获取检测记录列表
       create: '/miniprogram/detection-real', // 创建检测记录
+      photoRecord: '/miniprogram/photo-record', // 保存图片记录
       upload: '/detection/upload',
       result: '/detection/result',
       history: '/detection/history',

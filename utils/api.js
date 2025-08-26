@@ -100,6 +100,11 @@ const detectionApi = {
     })
   },
 
+  // 保存图片记录
+  savePhotoRecord(data) {
+    return request.post(config.api.detection.photoRecord, data)
+  },
+
   // 获取检测结果
   getResult(id) {
     return request.get(`${config.api.detection.result}/${id}`)

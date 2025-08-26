@@ -232,16 +232,26 @@ page {
 .btn-group {
   display: flex;
   gap: 20rpx;
+  flex-wrap: wrap;
 }
 
 .btn-retake {
   flex: 1;
   background-color: #f5f5f5;
   color: #666;
+  min-width: 140rpx;
 }
 
 .btn-detect {
   flex: 1;
   background-color: #4CAF50;
   color: #ffffff;
+  min-width: 140rpx;
+}
+
+.btn-save {
+  flex: 1;
+  background-color: #2196F3;
+  color: #ffffff;
+  min-width: 140rpx;
 } 

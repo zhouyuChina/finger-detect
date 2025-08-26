@@ -188,7 +188,7 @@ Page({
     }
   },
 
-  // 开始检测
+  // 开始检测（总是进行检测流程）
   async startDetection() {
     if (!this.data.photoTaken) {
       wx.showToast({
@@ -207,13 +207,89 @@ Page({
       return
     }
 
-    // 根据是否有报告决定处理逻辑
-    if (this.data.hasReports) {
-      // 已有报告：直接保存照片到恢复记录，不进行检测
-      this.saveToRecords()
-    } else {
-      // 没有报告：进行检测流程
-      this.performDetection()
+    // 直接进行检测流程
+    this.performDetection()
+  },
+
+  // 仅保存图片（新功能）
+  async savePhotoOnly() {
+    if (!this.data.photoTaken) {
+      wx.showToast({
+        title: '请先拍照',
+        icon: 'none'
+      })
+      return
+    }
+
+    const profile = this.data.profile
+    if (!profile) {
+      wx.showToast({
+        title: '档案信息缺失',
+        icon: 'none'
+      })
+      return
+    }
+
+    wx.showLoading({
+      title: '保存中...'
+    })
+
+    try {
+      // 验证必填参数
+      if (!profile.subUserId) {
+        throw new Error('子用户ID缺失')
+      }
+      
+      if (!profile.id) {
+        throw new Error('档案ID缺失')
+      }
+      
+      if (!this.data.photoPath) {
+        throw new Error('图片路径缺失')
+      }
+
+      // 将图片转换为base64
+      const base64Image = await this.convertImageToBase64(this.data.photoPath)
+      
+      // 准备保存数据
+      const saveData = {
+        subUserId: profile.subUserId, // 子用户ID（必填）
+        archiveId: profile.id, // 档案ID（必填）
+        detectionType: this.getDetectionType(profile.name), // 获取检测类型
+        base64Image: base64Image, // base64图片数据（必填）
+        remark: '仅保存图片' // 备注信息
+      }
+
+      console.log('保存图片数据:', saveData)
+      
+      // 调用新的保存图片接口
+      const response = await api.detection.savePhotoRecord(saveData)
+      console.log('保存图片接口响应:', response)
+      
+      wx.hideLoading()
+      
+      if (response.success && response.data) {
+        wx.showToast({
+          title: '图片保存成功',
+          icon: 'success'
+        })
+
+        // 延迟跳转到记录页面
+        setTimeout(() => {
+          wx.redirectTo({
+            url: `/pages/record-gallery/record-gallery?subUserId=${profile.subUserId}&archiveId=${profile.id}&archiveName=${encodeURIComponent(profile.name)}`
+          })
+        }, 1500)
+      } else {
+        throw new Error(response.message || '保存失败')
+      }
+    } catch (error) {
+      wx.hideLoading()
+      console.error('保存图片失败:', error)
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      })
     }
   },
 

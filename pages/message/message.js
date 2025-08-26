@@ -51,11 +51,14 @@ Page({
       console.log('Message页面格式化后的数据:', messageList)
       console.log('Message页面格式化后的数据长度:', messageList.length)
       
-      this.setData({ messageList })
+      // 获取阅读状态
+      const messageListWithReadStatus = await this.fetchReadStatus(messageList)
+      
+      this.setData({ messageList: messageListWithReadStatus })
       
       // 缓存数据
-      storage.setMessages(messageList)
-      console.log('Message页面加载成功，消息数量:', messageList.length)
+      storage.setMessages(messageListWithReadStatus)
+      console.log('Message页面加载成功，消息数量:', messageListWithReadStatus.length)
     } catch (error) {
       console.error('Message页面加载消息失败:', error)
       this.setData({ messageList: [] })
@@ -122,6 +125,49 @@ Page({
     })
   },
 
+  // 获取阅读状态
+  async fetchReadStatus(messageList) {
+    try {
+      // 获取所有消息ID
+      const articleIds = messageList.map(item => item.id)
+      
+      if (articleIds.length === 0) {
+        return messageList
+      }
+      
+      // 从服务器获取阅读状态
+      const response = await api.message.getReadStatus(articleIds)
+      console.log('获取阅读状态响应:', response)
+      
+      if (response.success && response.data) {
+        const readStatusMap = {}
+        
+        // 构建阅读状态映射
+        if (Array.isArray(response.data)) {
+          response.data.forEach(item => {
+            readStatusMap[item.articleId || item.id] = {
+              isRead: item.isRead || false,
+              readAt: item.readAt
+            }
+          })
+        }
+        
+        // 合并阅读状态到消息列表
+        return messageList.map(message => ({
+          ...message,
+          isRead: readStatusMap[message.id]?.isRead || message.isRead || false,
+          readAt: readStatusMap[message.id]?.readAt || message.readAt
+        }))
+      } else {
+        console.warn('获取阅读状态失败:', response)
+        return messageList
+      }
+    } catch (error) {
+      console.error('获取阅读状态失败:', error)
+      return messageList
+    }
+  },
+
   // 下拉刷新
   async onPullDownRefresh() {
     try {
@@ -146,15 +192,40 @@ Page({
 
 
   // 消息点击
-  onMessageClick(e) {
+  async onMessageClick(e) {
     const { id } = e.currentTarget.dataset
-    const message = this.data.messageList.find(item => item.id === id)
+    const messageIndex = this.data.messageList.findIndex(item => item.id === id)
+    const message = this.data.messageList[messageIndex]
     
     if (message) {
-      // 跳转到消息详情页面
-      wx.navigateTo({
-        url: `/pages/message-detail/message-detail?id=${id}`
-      })
+      try {
+        // 标记资讯为已读
+        if (!message.isRead) {
+          await api.message.markArticleRead(message.id)
+          
+          // 更新本地数据
+          const messageList = [...this.data.messageList]
+          messageList[messageIndex].isRead = true
+          messageList[messageIndex].readAt = new Date().toISOString()
+          this.setData({ messageList })
+          
+          // 更新缓存
+          storage.setMessages(messageList)
+          
+          console.log('标记资讯已读成功:', message.id)
+        }
+
+        // 跳转到消息详情页面
+        wx.navigateTo({
+          url: `/pages/message-detail/message-detail?id=${id}`
+        })
+      } catch (error) {
+        console.error('标记资讯已读失败:', error)
+        // 即使标记失败也跳转到详情页
+        wx.navigateTo({
+          url: `/pages/message-detail/message-detail?id=${id}`
+        })
+      }
     }
   },
 

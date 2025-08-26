@@ -12,8 +12,7 @@
       class="step-item {{currentStep >= 2 ? 'active' : ''}}" 
     >
       <view class="step-icon">📷</view>
-      <text class="step-title" wx:if="{{hasReports}}">拍照记录</text>
-      <text class="step-title" wx:else>拍照检测</text>
+      <text class="step-title">拍照操作</text>
     </view>
     <view 
       class="step-item {{currentStep >= 3 ? 'active' : ''}}" 
@@ -41,8 +40,7 @@
     <!-- 正常状态 -->
     <view class="photo-section" wx:else>
       <view class="photo-title">
-        <text wx:if="{{hasReports}}">请拍照记录治疗进展</text>
-        <text wx:else>请开始拍照检测</text>
+        <text>请拍照进行检测或记录</text>
       </view>
       
       <!-- 档案信息显示 -->
@@ -75,14 +73,13 @@
         >拍照</button>
         
         <view class="btn-group" wx:if="{{photoTaken}}">
-          <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button>
-          <!-- 首次检测：开始检测 -->
-          <button class="btn btn-detect" bindtap="startDetection" wx:if="{{!hasReports}}">
+          <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button> -->
+          <!-- 两个选择按钮：任何时候都显示 -->
+          <button class="btn btn-detect" bindtap="startDetection">
             开始检测
           </button>
-          <!-- 治疗记录：保存记录（不是保存报告） -->
-          <button class="btn btn-detect" bindtap="startDetection" wx:if="{{hasReports}}">
-            保存记录
+          <button class="btn btn-save" bindtap="savePhotoOnly">
+            仅保存图片
           </button>
         </view>
       </view>
