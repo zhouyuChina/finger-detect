@@ -71,9 +71,12 @@
       </t-cell>
       <t-cell 
         title="系统消息" 
-        description="查看系统消息"
         bindtap="onSystemMessages"
       >
+        <view slot="description" class="description-with-badge">
+          查看系统消息
+          <view wx:if="{{stats.unreadSystemMessages > 0}}" class="red-dot"></view>
+        </view>
         <text slot="note" class="arrow-icon">›</text>
       </t-cell>
       <t-cell 

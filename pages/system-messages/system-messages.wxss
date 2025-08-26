@@ -38,6 +38,7 @@
 /* 消息列表 */
 .messages-list {
   margin-top: 20rpx;
+  width: 100vw;
 }
 
 /* 消息图标 */
@@ -60,15 +61,11 @@
   background-color: rgba(227, 77, 89, 0.1);
 }
 
+/* 消息列表中的未读红点 */
 .unread-dot {
-  position: absolute;
-  top: -5rpx;
-  right: -5rpx;
-  width: 20rpx;
-  height: 20rpx;
-  border-radius: 50%;
-  background-color: #e34d59;
-  border: 3rpx solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 消息标题 */

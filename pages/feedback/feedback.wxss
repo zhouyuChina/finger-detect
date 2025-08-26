@@ -443,7 +443,7 @@
 
 /* 消息详情弹窗样式 */
 .detail-popup {
-  width: 600rpx;
+  width: 90vw;
   max-height: 90vh;
   background-color: #fff;
   border-radius: 16rpx;
@@ -462,7 +462,7 @@
 }
 
 .popup-content {
-  padding: 40rpx;
+  padding:0 40rpx;
   max-height: 70vh;
   overflow-y: auto;
 }

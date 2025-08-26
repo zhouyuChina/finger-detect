@@ -247,6 +247,11 @@ const systemMessagesApi = {
   // 获取未读系统消息数量
   getUnreadCount() {
     return request.get(config.api.systemMessages.unreadCount)
+  },
+
+  // 批量标记系统消息已读
+  markRead(count = 1) {
+    return request.post(config.api.systemMessages.markRead, { count })
   }
 }
 

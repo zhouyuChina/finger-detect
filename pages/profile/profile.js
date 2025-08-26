@@ -17,7 +17,8 @@ Page({
       totalReports: 0,
       familyMembers: 0,
       totalDetections: 0,
-      unreadMessages: 0
+      unreadMessages: 0,
+      unreadSystemMessages: 0
     },
 
     loading: false // 加载状态
@@ -43,8 +44,8 @@ Page({
     try {
       this.setData({ loading: true })
       
-      // 并行加载用户信息、统计信息、子用户信息、档案信息和未读消息数量
-      const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes] = await Promise.all([
+      // 并行加载用户信息、统计信息、子用户信息、档案信息、未读消息数量和系统消息未读数量
+      const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes, unreadSystemMessagesRes] = await Promise.all([
         api.user.getProfile().catch(error => {
           console.warn('获取用户信息失败:', error)
           return null
@@ -63,6 +64,10 @@ Page({
         }),
         api.message.getUnreadCount().catch(error => {
           console.warn('获取未读消息数量失败:', error)
+          return null
+        }),
+        api.systemMessages.getUnreadCount().catch(error => {
+          console.warn('获取系统消息未读数量失败:', error)
           return null
         })
       ])
@@ -89,7 +94,8 @@ Page({
         subUsers: subUsersRes?.data?.subUsers?.length || 0,
         totalArchives: archivesRes?.data?.totalAll || 0,
         totalDetections: archivesRes?.data?.totalDetections || 0,
-        unreadMessages: unreadMessagesRes?.data?.count || unreadMessagesRes?.data || 0
+        unreadMessages: unreadMessagesRes?.data?.count || unreadMessagesRes?.data || 0,
+        unreadSystemMessages: unreadSystemMessagesRes?.data?.unreadCount || 0
       })
       this.setData({ stats })
       console.log('统计信息加载成功:', stats)
@@ -118,7 +124,8 @@ Page({
       totalReports: this.ensureNumber(data.totalArchives || data.totalReports || data.reportRecords) || 0, // 建档记录（档案数量）
       familyMembers: this.ensureNumber(data.totalDetections || data.detectionCount || data.familyMembers) || 0, // 检测记录（检测数量）
       totalDetections: this.ensureNumber(data.totalDetections || data.detectionCount) || 0, // 保留原有字段，用于其他功能
-      unreadMessages: this.ensureNumber(data.unreadMessages || data.unreadCount) || 0 // 未读消息数量
+      unreadMessages: this.ensureNumber(data.unreadMessages || data.unreadCount) || 0, // 未读消息数量
+      unreadSystemMessages: this.ensureNumber(data.unreadSystemMessages) || 0 // 系统消息未读数量
     }
   },
 

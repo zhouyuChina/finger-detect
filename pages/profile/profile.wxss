@@ -133,3 +133,26 @@
   gap: 10rpx;
 }
 
+/* 带红点的描述容器 */
+.description-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+/* 自定义红点样式 */
+.red-dot {
+  width: 8rpx;
+  height: 8rpx;
+  background-color: #e34d59;
+  border-radius: 50%;
+  margin-left: 8rpx;
+}
+
+/* 带红点的note容器 */
+.note-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+

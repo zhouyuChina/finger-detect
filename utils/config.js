@@ -15,7 +15,7 @@ const ENV_CONFIG = {
 }
 
 // 当前使用的环境 - 修改这里来切换环境
-const CURRENT_ENV = 'TEST' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
+const CURRENT_ENV = 'LOCAL' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
 
 const baseUrl = ENV_CONFIG[CURRENT_ENV].baseUrl
 
@@ -94,8 +94,9 @@ const config = {
     // 系统消息相关
     systemMessages: {
       list: '/miniprogram/system-messages', // 获取系统消息列表
-      detail: '/miniprogram/system-messages', // 获取系统消息详情
-      unreadCount: '/miniprogram/system-messages/unread-count' // 获取未读系统消息数量
+      detail: '/miniprogram/system-messages', // 获取系统消息详情（自动标记已读）
+      unreadCount: '/miniprogram/system-messages/unread-count', // 获取未读系统消息数量
+      markRead: '/miniprogram/system-messages/mark-read' // 批量标记消息已读
     },
 
     // 关于我们相关

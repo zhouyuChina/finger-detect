@@ -61,12 +61,19 @@ Page({
       
       if (res.success && res.data) {
         const newMessages = res.data.messages || []
-        const messages = refresh ? newMessages : [...this.data.messages, ...newMessages]
+        
+        // 保持后端返回的isRead状态，如果没有则默认为false
+        const formattedMessages = newMessages.map(msg => ({
+          ...msg,
+          isRead: msg.isRead !== undefined ? msg.isRead : false
+        }))
+        
+        const messages = refresh ? formattedMessages : [...this.data.messages, ...formattedMessages]
         
         this.setData({
           messages: messages,
           page: page + 1,
-          hasMore: newMessages.length === this.data.limit
+          hasMore: formattedMessages.length === this.data.limit
         })
       } else {
         wx.showToast({
@@ -110,7 +117,7 @@ Page({
     wx.showLoading({ title: '加载中...' })
 
     try {
-      // 获取消息详情
+      // 获取消息详情（会自动标记为已读）
       const res = await api.systemMessages.getDetail(id)
       
       if (res.success && res.data) {
@@ -118,6 +125,9 @@ Page({
           currentMessage: res.data,
           showDetailPopup: true
         })
+
+        // 更新本地消息状态（因为后端已自动标记为已读）
+        this.updateLocalMessageStatus(id)
       } else {
         wx.showToast({
           title: res.message || '获取消息详情失败',
@@ -133,6 +143,23 @@ Page({
     } finally {
       wx.hideLoading()
     }
+  },
+
+  // 更新本地消息状态
+  updateLocalMessageStatus(messageId) {
+    // 更新本地消息状态
+    const messages = this.data.messages.map(msg => {
+      if (msg.id === messageId) {
+        return { ...msg, isRead: true }
+      }
+      return msg
+    })
+    
+    this.setData({ messages })
+    
+    // 更新未读数量
+    this.loadUnreadCount()
+    console.log('系统消息已标记为已读:', messageId)
   },
 
   // 弹窗状态变化

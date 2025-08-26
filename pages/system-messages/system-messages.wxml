@@ -5,7 +5,7 @@
     <text class="page-title">系统消息</text>
     <view class="header-actions">
       <view wx:if="{{unreadCount > 0}}" class="unread-badge">
-        <t-badge count="{{unreadCount}}" theme="danger" />
+        <t-badge dot theme="danger" />
       </view>
     </view>
   </view>
@@ -20,15 +20,6 @@
         data-id="{{item.id}}"
         hover
       >
-        <view slot="left-icon" class="message-icon">
-          <view class="icon-container">
-            <t-icon 
-              name="{{getMessageIcon(item.type)}}" 
-              size="48rpx" 
-              color="#666"
-            />
-          </view>
-        </view>
         
         <view slot="title" class="message-title">
           <text class="title-text">{{item.title}}</text>
@@ -46,6 +37,10 @@
           <view class="read-count">
             <text class="count-text">{{item.readCount}}/{{item.totalCount}}</text>
           </view>
+        </view>
+
+        <view slot="right-icon" wx:if="{{!item.isRead}}" class="unread-dot">
+          <t-badge dot theme="danger" />
         </view>
       </t-cell>
     </t-cell-group>
