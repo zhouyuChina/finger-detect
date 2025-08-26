@@ -9,7 +9,7 @@ const ENV_CONFIG = {
     name: '测试环境'
   },
   PRODUCTION: {
-    baseUrl: 'your-production-domain.com',
+    baseUrl: 'tbqzy.com',
     name: '生产环境'
   }
 }

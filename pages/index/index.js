@@ -218,6 +218,9 @@ Page({
           imageUrl: imageUrl,
           linkUrl: item.linkUrl || item.link || item.url || '',
           background: item.background || item.bgColor || this.getDefaultBackground(index),
+          titlePosition: this.mapPosition(item.position) || 'center', // 映射position字段到titlePosition
+          titleColor: item.textColor || item.titleColor || '#ffffff', // 优先使用textColor
+          descColor: item.descColor || item.textColor || '#f0f0f0', // 描述颜色，如果没有单独设置则使用textColor
           sort: item.sort || item.order || index,
           status: item.status || 1,
           createTime: item.createTime || item.createdAt || new Date().toISOString()
@@ -245,6 +248,9 @@ Page({
           imageUrl: imageUrl,
           linkUrl: item.linkUrl || item.link || item.url || '',
           background: item.background || item.bgColor || this.getDefaultBackground(index),
+          titlePosition: this.mapPosition(item.position) || 'center', // 映射position字段到titlePosition
+          titleColor: item.textColor || item.titleColor || '#ffffff', // 优先使用textColor
+          descColor: item.descColor || item.textColor || '#f0f0f0', // 描述颜色，如果没有单独设置则使用textColor
           sort: item.sort || item.order || index,
           status: item.status || 1,
           createTime: item.createTime || item.createdAt || new Date().toISOString()
@@ -254,6 +260,16 @@ Page({
     
     console.warn('Banner数据格式不支持:', data)
     return []
+  },
+
+  // 映射position字段到标准的titlePosition
+  mapPosition(position) {
+    const positionMap = {
+      'top': 'flex-start',
+      'middle': 'center', 
+      'bottom': 'flex-end'
+    }
+    return positionMap[position] || 'center'
   },
 
   // 获取默认背景色
@@ -612,7 +628,7 @@ Page({
       console.log('一键已读响应:', response)
       
       if (response.success && response.data) {
-        const { markedCount, totalArticles, message } = response.data
+        const { markedCount, message } = response.data
         
         // 更新本地状态
         const messages = this.data.messages.map(msg => ({

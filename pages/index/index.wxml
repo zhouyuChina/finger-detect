@@ -14,13 +14,13 @@
       <swiper-item wx:for="{{bannerList}}" wx:key="id">
         <view 
           class="banner-item" 
-          style="background: {{item.background}}"
+          style="background: {{item.background}}; justify-content: {{item.titlePosition}};"
           bindtap="onBannerTap"
           data-index="{{index}}"
         >
           <view class="banner-content">
-            <text class="banner-title">{{item.title}}</text>
-            <text class="banner-desc">{{item.desc}}</text>
+            <text class="banner-title" style="color: {{item.titleColor}};">{{item.title}}</text>
+            <text class="banner-desc" style="color: {{item.descColor}};">{{item.desc}}</text>
           </view>
           <!-- 如果有图片，显示图片 -->
           <image 

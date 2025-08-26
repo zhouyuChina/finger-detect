@@ -25,6 +25,8 @@ Authorization: Bearer ${token}
       "imageUrl": "https://example.com/banner1.jpg",
       "linkUrl": "/pages/about/about",
       "background": "linear-gradient(135deg, #4CAF50, #45a049)",
+      "position": "middle",
+      "textColor": "#ffffff",
       "sort": 1,
       "status": 1,
       "autoplay": true,
@@ -39,6 +41,8 @@ Authorization: Bearer ${token}
       "imageUrl": "https://example.com/banner2.jpg",
       "linkUrl": "/pages/detection/detection",
       "background": "linear-gradient(135deg, #2196F3, #1976D2)",
+      "position": "left",
+      "textColor": "#ffffff",
       "sort": 2,
       "status": 1,
       "autoplay": true,
@@ -64,6 +68,8 @@ Authorization: Bearer ${token}
         "imageUrl": "https://example.com/banner1.jpg",
         "linkUrl": "/pages/about/about",
         "background": "linear-gradient(135deg, #4CAF50, #45a049)",
+        "position": "middle",
+        "textColor": "#ffffff",
         "sort": 1,
         "status": 1
       },
@@ -74,6 +80,8 @@ Authorization: Bearer ${token}
         "imageUrl": "https://example.com/banner2.jpg",
         "linkUrl": "/pages/detection/detection",
         "background": "linear-gradient(135deg, #2196F3, #1976D2)",
+        "position": "top",
+        "textColor": "#ffffff",
         "sort": 2,
         "status": 1
       }
@@ -99,6 +107,8 @@ Authorization: Bearer ${token}
 | imageUrl | string | 否 | 图片地址 |
 | linkUrl | string | 否 | 点击跳转链接 |
 | background | string | 否 | 背景色或渐变 |
+| position | string | 否 | 文字位置：top/middle/bottom，默认middle |
+| textColor | string | 否 | 文字颜色，默认#ffffff |
 | sort | number | 否 | 排序，数字越小越靠前 |
 | status | number | 否 | 状态：1-启用，0-禁用 |
 
@@ -117,6 +127,35 @@ Authorization: Bearer ${token}
 3. **默认配置**：如果都没有，使用默认值
 
 ## 示例配置
+
+### 标题样式示例
+
+#### 顶部位置
+```json
+{
+  "position": "top",
+  "textColor": "#ffffff"
+}
+```
+
+#### 底部位置
+```json
+{
+  "position": "bottom", 
+  "textColor": "#000000"
+}
+```
+
+#### 中间深色主题
+```json
+{
+  "position": "middle",
+  "textColor": "#2c3e50",
+  "background": "linear-gradient(135deg, #ecf0f1, #bdc3c7)"
+}
+```
+
+### 轮播配置示例
 
 ### 快速切换（2秒）
 ```json
@@ -167,4 +206,11 @@ Authorization: Bearer ${token}
    - 内部页面：`/pages/xxx/xxx`
    - 外部链接：`https://example.com`
 5. **状态控制**：status为0的项目不会显示
-6. **排序规则**：按sort字段升序排列 
+6. **排序规则**：按sort字段升序排列
+7. **文字位置**：
+   - `top`: 顶部居中
+   - `middle`: 中间居中（默认）
+   - `bottom`: 底部居中
+8. **颜色格式**：支持十六进制颜色码（如#ffffff）和rgba格式
+9. **向下兼容**：如果不提供新字段，会使用默认样式
+10. **字段映射**：前端会自动将position映射为对应的垂直位置 
