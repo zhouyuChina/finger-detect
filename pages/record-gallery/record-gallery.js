@@ -113,8 +113,15 @@ Page({
           detections: sortedDetections,  // 使用排序后的检测记录
           firstDetectionImage: firstDetectionImage,
           firstDetectionDate: firstDetectionDate,
-          pagination: pagination || this.data.pagination
+          pagination: pagination || this.data.pagination,
+          currentIndex: Math.max(0, sortedDetections.length - 1) // 默认显示最后一张图片
         })
+        
+        // 如果有检测记录，滚动到最后一张图片的位置
+        if (sortedDetections.length > 0) {
+          const lastIndex = sortedDetections.length - 1
+          this.scrollThumbnailToView(lastIndex)
+        }
         
         console.log('档案检测记录加载成功，数量:', formattedDetections.length)
         console.log('当前页面数据状态:', {

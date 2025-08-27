@@ -22,6 +22,8 @@ Page({
   onShow() {
     // 页面显示时刷新未读数量
     this.loadUnreadCount()
+    // 检查并更新Tab栏红点
+    this.checkTabBarBadge()
   },
 
   // 下拉刷新
@@ -160,6 +162,9 @@ Page({
     // 更新未读数量
     this.loadUnreadCount()
     console.log('系统消息已标记为已读:', messageId)
+    
+    // 更新Tab栏红点
+    this.checkTabBarBadge()
   },
 
   // 弹窗状态变化
@@ -266,5 +271,13 @@ Page({
     wx.switchTab({
       url: '/pages/index/index'
     })
+  },
+
+  // 检查并更新Tab栏红点
+  checkTabBarBadge() {
+    const app = getApp()
+    if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
+      app.checkAndUpdateTabBarBadge()
+    }
   }
 }) 

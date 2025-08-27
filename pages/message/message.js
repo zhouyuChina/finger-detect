@@ -15,6 +15,11 @@ Page({
     this.loadMessages()
   },
 
+  onShow() {
+    // 页面显示时检查并更新Tab栏红点
+    this.checkTabBarBadge()
+  },
+
   // 加载消息数据
   async loadMessages() {
     try {
@@ -213,6 +218,9 @@ Page({
           storage.setMessages(messageList)
           
           console.log('标记资讯已读成功:', message.id)
+          
+          // 更新Tab栏红点
+          this.checkTabBarBadge()
         }
 
         // 跳转到消息详情页面
@@ -228,6 +236,14 @@ Page({
       }
     }
   },
+
+  // 检查并更新Tab栏红点
+  checkTabBarBadge() {
+    const app = getApp()
+    if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
+      app.checkAndUpdateTabBarBadge()
+    }
+  }
 
 
 }) 

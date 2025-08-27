@@ -37,6 +37,8 @@ Page({
   onShow() {
     // 页面显示时刷新数据
     this.loadUserData()
+    // 检查并更新Tab栏红点
+    this.checkTabBarBadge()
   },
 
   // 加载用户数据
@@ -275,6 +277,14 @@ Page({
       })
     } catch (error) {
       console.error('调试失败:', error)
+    }
+  },
+
+  // 检查并更新Tab栏红点
+  checkTabBarBadge() {
+    const app = getApp()
+    if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
+      app.checkAndUpdateTabBarBadge()
     }
   }
 }) 

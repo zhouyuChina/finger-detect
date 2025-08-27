@@ -403,5 +403,96 @@ App({
   // 检查是否有有效的openId
   hasValidOpenId() {
     return !!storage.getOpenId()
+  },
+
+  // 检查并更新Tab栏未读红点
+  async checkAndUpdateTabBarBadge() {
+    try {
+      const api = require('./utils/api.js')
+      
+      // 获取文章未读数量和系统消息未读数量
+      const [articleUnreadRes, systemUnreadRes] = await Promise.all([
+        api.message.getUnreadCount().catch(() => ({ data: { count: 0 } })),
+        api.systemMessages.getUnreadCount().catch(() => ({ data: { unreadCount: 0 } }))
+      ])
+
+      // 文章未读数量
+      const articleUnread = articleUnreadRes?.data?.count || articleUnreadRes?.data?.unreadCount || 0
+      
+      // 系统消息未读数量
+      const systemUnread = systemUnreadRes?.data?.unreadCount || systemUnreadRes?.data?.count || 0
+
+      console.log('未读消息统计:', {
+        articleUnread,
+        systemUnread
+      })
+
+      // 处理消息中心Tab（index: 2）- 对应文章未读
+      if (articleUnread > 0) {
+        wx.showTabBarRedDot({
+          index: 2,
+          success: () => {
+            console.log('显示消息中心红点成功（文章未读）')
+          },
+          fail: (err) => {
+            console.error('显示消息中心红点失败:', err)
+          }
+        })
+      } else {
+        wx.hideTabBarRedDot({
+          index: 2,
+          success: () => {
+            console.log('隐藏消息中心红点成功')
+          },
+          fail: (err) => {
+            console.error('隐藏消息中心红点失败:', err)
+          }
+        })
+      }
+
+      // 处理"我的"Tab（index: 3）- 对应系统消息未读
+      if (systemUnread > 0) {
+        wx.showTabBarRedDot({
+          index: 3,
+          success: () => {
+            console.log('显示"我的"红点成功（系统消息未读）')
+          },
+          fail: (err) => {
+            console.error('显示"我的"红点失败:', err)
+          }
+        })
+      } else {
+        wx.hideTabBarRedDot({
+          index: 3,
+          success: () => {
+            console.log('隐藏"我的"红点成功')
+          },
+          fail: (err) => {
+            console.error('隐藏"我的"红点失败:', err)
+          }
+        })
+      }
+    } catch (error) {
+      console.error('检查未读消息失败:', error)
+    }
+  },
+
+  // 清除Tab栏红点
+  clearTabBarBadge() {
+    // 清除消息中心红点
+    wx.hideTabBarRedDot({
+      index: 2,
+      success: () => {
+        console.log('清除消息中心红点成功')
+      }
+    })
+    
+    // 清除"我的"红点
+    wx.hideTabBarRedDot({
+      index: 3,
+      success: () => {
+        console.log('清除"我的"红点成功')
+      }
+    })
   }
 })

@@ -40,6 +40,9 @@ Page({
   onShow() {
     // 暂时禁用消息加载，避免404错误影响页面显示
     // this.loadMessages()
+    
+    // 检查并更新Tab栏红点
+    this.checkTabBarBadge()
   },
 
   // 下拉刷新
@@ -865,5 +868,13 @@ Page({
     //   wx.hideLoading()
     //   console.error('数据格式测试失败:', error)
     // }
+  },
+
+  // 检查并更新Tab栏红点
+  checkTabBarBadge() {
+    const app = getApp()
+    if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
+      app.checkAndUpdateTabBarBadge()
+    }
   }
 }) 
