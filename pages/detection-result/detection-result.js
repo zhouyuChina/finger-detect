@@ -47,8 +47,8 @@ Page({
           description = '检测结果显示指甲状态正常'
           suggestions = '建议继续保持良好的卫生习惯'
         } else if (finalResult === 'UNKNOWN') {
-          description = '未能识别指甲状态'
-          suggestions = '未识别'
+          description = `可能照片模糊；可能灰指甲特征不明显；光线不足等其他原因。`
+          suggestions = '未能识别'
         } else {
           description = '检测完成'
           suggestions = '请查看详细结果'
