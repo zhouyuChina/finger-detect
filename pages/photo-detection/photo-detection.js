@@ -59,6 +59,19 @@ Page({
       console.warn('未传递档案信息')
       this.handleError('档案信息缺失')
     }
+
+    // 如果有照片路径参数，说明是从相机页面返回的
+    if (options.photoPath) {
+      this.setData({
+        photoTaken: true,
+        photoPath: decodeURIComponent(options.photoPath)
+      })
+    }
+  },
+
+  onShow() {
+    // 页面显示时的处理
+    console.log('Photo-detection页面显示')
   },
 
   // 拍照
@@ -79,11 +92,56 @@ Page({
     })
   },
 
-  // 重新拍照
+  // 上传图片 (临时功能)
+  uploadPhoto() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album'],
+      success: (res) => {
+        const tempFilePath = res.tempFiles[0].tempFilePath
+        console.log('选择的图片路径:', tempFilePath)
+        
+        // 设置选择的图片路径和状态
+        this.setData({
+          photoTaken: true,
+          photoPath: tempFilePath
+        })
+        
+        wx.showToast({
+          title: '图片上传成功',
+          icon: 'success'
+        })
+      },
+      fail: (error) => {
+        console.error('选择图片失败:', error)
+        wx.showToast({
+          title: '选择图片失败',
+          icon: 'none'
+        })
+      }
+    })
+  },
+
+  // 重新拍照/上传
   retakePhoto() {
-    this.setData({
-      photoTaken: false,
-      photoPath: ""
+    wx.showActionSheet({
+      itemList: ['重新拍照', '重新上传图片'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          // 重新拍照
+          this.setData({
+            photoTaken: false,
+            photoPath: ""
+          })
+        } else if (res.tapIndex === 1) {
+          // 重新上传
+          this.uploadPhoto()
+        }
+      },
+      fail: (res) => {
+        console.log(res.errMsg)
+      }
     })
   },
 

@@ -229,6 +229,11 @@ page {
   color: #ffffff;
 }
 
+.btn-upload {
+  background-color: #FF9800;
+  color: #ffffff;
+}
+
 .btn-group {
   display: flex;
   gap: 20rpx;

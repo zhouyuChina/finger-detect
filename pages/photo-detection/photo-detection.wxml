@@ -72,8 +72,16 @@
           bindtap="takePhoto"
         >拍照</button>
         
+        <!-- 临时上传按钮 -->
+        <!-- <button 
+          class="btn btn-upload" 
+          wx:if="{{!photoTaken}}"
+          bindtap="uploadPhoto"
+        >上传图片</button> -->
+        
         <view class="btn-group" wx:if="{{photoTaken}}">
           <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button> -->
+          <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照/上传</button> -->
           <!-- 两个选择按钮：任何时候都显示 -->
           <button class="btn btn-detect" bindtap="startDetection">
             开始检测
