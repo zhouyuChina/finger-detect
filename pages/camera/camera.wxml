@@ -48,4 +48,11 @@
       <button class="action-btn confirm-btn" bindtap="confirmPhoto">使用照片</button>
     </view>
   </view>
+
+  <!-- 隐藏的canvas用于图片裁剪 -->
+  <canvas 
+    canvas-id="cropCanvas" 
+    class="crop-canvas"
+    style="width: {{canvasWidth}}px; height: {{canvasHeight}}px;"
+  ></canvas>
 </view>

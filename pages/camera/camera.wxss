@@ -197,3 +197,11 @@ page {
 .confirm-btn {
   background: #4CAF50;
 }
+
+/* 隐藏的裁剪canvas */
+.crop-canvas {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  z-index: -1;
+}
