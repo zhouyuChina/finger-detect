@@ -56,12 +56,22 @@
           <text class="placeholder-text">点击拍照</text>
         </view>
         
-        <image 
-          class="photo-preview" 
-          wx:if="{{photoTaken}}" 
-          src="{{photoPath}}" 
-          mode="aspectFit"
-        ></image>
+        <!-- 图片预览容器 -->
+        <view class="photo-preview-container" wx:if="{{photoTaken}}">
+          <image 
+            class="photo-preview" 
+            src="{{photoPath}}" 
+            mode="aspectFit"
+          ></image>
+          
+          <!-- 检测扫描动画 -->
+          <view class="scan-loading" wx:if="{{isDetecting}}">
+            <view class="scan-overlay">
+              <view class="scan-line"></view>
+              <text class="scan-text">AI检测分析中...</text>
+            </view>
+          </view>
+        </view>
       </view>
 
       <!-- 拍照按钮 -->
@@ -83,10 +93,18 @@
           <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button> -->
           <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照/上传</button> -->
           <!-- 两个选择按钮：任何时候都显示 -->
-          <button class="btn btn-detect" bindtap="startDetection">
-            开始检测
+          <button 
+            class="btn btn-detect {{isDetecting ? 'btn-disabled' : ''}}" 
+            bindtap="startDetection"
+            disabled="{{isDetecting}}"
+          >
+            {{isDetecting ? '检测中...' : '开始检测'}}
           </button>
-          <button class="btn btn-save" bindtap="savePhotoOnly">
+          <button 
+            class="btn btn-save {{isDetecting ? 'btn-disabled' : ''}}" 
+            bindtap="savePhotoOnly"
+            disabled="{{isDetecting}}"
+          >
             仅保存图片
           </button>
         </view>

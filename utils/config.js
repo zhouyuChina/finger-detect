@@ -5,7 +5,7 @@ const ENV_CONFIG = {
     name: '本地环境'
   },
   TEST: {
-    baseUrl: '47.76.126.85:4000',
+    baseUrl: 'nail.yiloud.com',
     name: '测试环境'
   },
   PRODUCTION: {
@@ -24,10 +24,10 @@ const config = {
   // 环境配置
   env: {
     development: {
-      baseUrl: `http://${baseUrl}/api`,
-      uploadUrl: `http://${baseUrl}/api/upload`,
-      wsUrl: `ws://${baseUrl}`,
-      staticUrl: `http://${baseUrl}` // 静态资源基础URL
+      baseUrl: `https://${baseUrl}/api`,
+      uploadUrl: `https://${baseUrl}/api/upload`,
+      wsUrl: `wss://${baseUrl}`,
+      staticUrl: `https://${baseUrl}` // 静态资源基础URL
     },
     production: {
       baseUrl: 'https://your-production-domain.com/api',
