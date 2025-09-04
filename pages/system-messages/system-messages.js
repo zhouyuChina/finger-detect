@@ -97,6 +97,18 @@ Page({
   // 加载未读消息数量
   async loadUnreadCount() {
     try {
+      // 检查用户是否已登录
+      const storage = require('../../utils/storage.js')
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        // 未登录用户，设置未读数量为0
+        console.log('未登录用户，跳过获取未读数量')
+        this.setData({ unreadCount: 0 })
+        return
+      }
+      
       const res = await api.systemMessages.getUnreadCount()
       if (res.success && res.data) {
         this.setData({

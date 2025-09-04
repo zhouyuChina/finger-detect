@@ -133,6 +133,17 @@ Page({
   // 获取阅读状态
   async fetchReadStatus(messageList) {
     try {
+      // 检查用户是否已登录
+      const storage = require('../../utils/storage.js')
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        // 未登录用户，跳过阅读状态获取
+        console.log('未登录用户，跳过阅读状态获取')
+        return messageList
+      }
+      
       // 获取所有消息ID
       const articleIds = messageList.map(item => item.id)
       
@@ -204,8 +215,13 @@ Page({
     
     if (message) {
       try {
-        // 标记资讯为已读
-        if (!message.isRead) {
+        // 检查用户是否已登录
+        const storage = require('../../utils/storage.js')
+        const userInfo = storage.getUserInfo()
+        const openId = storage.getOpenId()
+        
+        // 标记资讯为已读（仅限已登录用户）
+        if (!message.isRead && userInfo && openId) {
           await api.message.markArticleRead(message.id)
           
           // 更新本地数据
@@ -221,6 +237,8 @@ Page({
           
           // 更新Tab栏红点
           this.checkTabBarBadge()
+        } else if (!userInfo || !openId) {
+          console.log('未登录用户，跳过标记已读')
         }
 
         // 跳转到消息详情页面

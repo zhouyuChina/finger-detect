@@ -426,6 +426,19 @@ Page({
 
       // 获取阅读状态
       try {
+        // 检查用户是否已登录
+        const userInfo = storage.getUserInfo()
+        const openId = storage.getOpenId()
+        
+        if (!userInfo || !openId) {
+          // 未登录用户，跳过阅读状态获取
+          console.log('未登录用户，跳过阅读状态获取')
+          this.setData({ messages: topMessages })
+          this.calculateUnreadCount()
+          storage.setMessages(topMessages)
+          return
+        }
+        
         // 提取文章ID列表
         const articleIds = topMessages.map(msg => msg.id)
         console.log('获取阅读状态，文章ID列表:', articleIds)
@@ -558,6 +571,17 @@ Page({
   // 从服务器获取未读数量
   async fetchUnreadCount() {
     try {
+      // 检查用户是否已登录
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        // 未登录用户，跳过获取未读数量
+        console.log('未登录用户，跳过获取未读数量')
+        this.calculateUnreadCount()
+        return
+      }
+      
       const response = await api.message.getUnreadCount()
       console.log('未读数量接口响应:', response)
       
@@ -646,8 +670,12 @@ Page({
     const message = this.data.messages[index]
 
     try {
-      // 标记资讯为已读
-      if (!message.isRead) {
+      // 检查用户是否已登录
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      // 标记资讯为已读（仅限已登录用户）
+      if (!message.isRead && userInfo && openId) {
         await api.message.markArticleRead(message.id)
         
         const messages = this.data.messages
@@ -660,6 +688,8 @@ Page({
         storage.setMessages(messages)
         
         console.log('标记资讯已读成功:', message.id)
+      } else if (!userInfo || !openId) {
+        console.log('未登录用户，跳过标记已读')
       }
 
       // 跳转到消息详情页面

@@ -453,6 +453,12 @@ App({
   // 检查并更新Tab栏未读红点
   async checkAndUpdateTabBarBadge() {
     try {
+      // 检查用户是否已登录
+      if (!this.isLoggedIn()) {
+        console.log('用户未登录，跳过Tab栏红点更新')
+        return
+      }
+      
       const api = require('./utils/api.js')
       
       // 获取文章未读数量和系统消息未读数量
