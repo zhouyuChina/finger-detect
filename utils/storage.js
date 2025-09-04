@@ -57,10 +57,12 @@ class Storage {
 
   // 检查是否过期
   isExpired(data) {
-    if (!data || !data.expireTime) {
-      return false
+    if (!data) {
+      return true
     }
-    return Date.now() - data.timestamp > data.expireTime
+    // 如果没有设置过期时间，默认24小时后过期
+    const expireTime = data.expireTime || (24 * 60 * 60 * 1000)
+    return Date.now() - data.timestamp > expireTime
   }
 
   // 删除缓存
@@ -117,7 +119,12 @@ class Storage {
 
   // 获取用户信息缓存
   getUserInfo() {
-    return this.get('userInfo')
+    const userInfo = this.get('userInfo')
+    // 如果用户信息过期或无效，返回 null
+    if (!userInfo || !userInfo.openid) {
+      return null
+    }
+    return userInfo
   }
 
   // 设置轮播图缓存
@@ -194,17 +201,92 @@ class Storage {
 
   // 获取openId
   getOpenId() {
-    return this.get('openId')
+    const openId = this.get('openId')
+    // 如果openId过期或无效，返回 null
+    if (!openId || openId === 'undefined' || openId === 'null') {
+      return null
+    }
+    return openId
   }
 
   // 清除用户相关缓存
   clearUserData() {
-    this.remove('userInfo')
-    this.remove('token')
-    this.remove('refreshToken')
-    this.remove('openId')
-    this.remove('subUsers')
-    this.remove('currentSubUser')
+    console.log('开始清除用户相关缓存...')
+    
+    // 清除所有用户相关的缓存
+    const userKeys = [
+      'userInfo', 'token', 'refreshToken', 'openId', 
+      'subUsers', 'currentSubUser', 'userProfiles', 
+      'userRecords', 'userMessages', 'userSettings'
+    ]
+    
+    userKeys.forEach(key => {
+      this.remove(key)
+      console.log(`已清除缓存: ${key}`)
+    })
+    
+    // 清除内存缓存
+    this.cache.clear()
+    console.log('已清除内存缓存')
+    
+    // 强制清除微信本地存储中的用户数据
+    this.clearWechatStorage()
+    
+    console.log('用户相关缓存清除完成')
+  }
+
+  // 清除微信本地存储中的用户数据
+  clearWechatStorage() {
+    try {
+      const storageInfo = wx.getStorageInfoSync()
+      const keys = storageInfo.keys || []
+      
+      // 查找并清除所有可能包含用户数据的键
+      const userDataKeys = keys.filter(key => 
+        key.includes('user') || 
+        key.includes('User') || 
+        key.includes('profile') || 
+        key.includes('Profile') ||
+        key.includes('record') ||
+        key.includes('Record') ||
+        key.includes('auth') ||
+        key.includes('Auth') ||
+        key.includes('login') ||
+        key.includes('Login')
+      )
+      
+      userDataKeys.forEach(key => {
+        try {
+          wx.removeStorageSync(key)
+          console.log(`已清除微信存储: ${key}`)
+        } catch (error) {
+          console.warn(`清除微信存储失败: ${key}`, error)
+        }
+      })
+    } catch (error) {
+      console.error('获取微信存储信息失败:', error)
+    }
+  }
+
+  // 检查用户是否真正已登录
+  isUserLoggedIn() {
+    const userInfo = this.getUserInfo()
+    const openId = this.getOpenId()
+    
+    // 必须同时有有效的用户信息和openId
+    return !!(userInfo && openId && userInfo.openid)
+  }
+
+  // 强制清除所有过期数据
+  clearExpiredData() {
+    const keys = ['userInfo', 'token', 'refreshToken', 'openId', 'subUsers', 'currentSubUser']
+    keys.forEach(key => {
+      const data = this.get(key)
+      if (data && this.isExpired(data)) {
+        this.remove(key)
+        console.log(`清除过期数据: ${key}`)
+      }
+    })
   }
 
   // 检查用户信息是否完整（性别、年龄、地址）

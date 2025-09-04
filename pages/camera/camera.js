@@ -69,24 +69,10 @@ Page({
       return
     }
 
-    // 返回上一页并传递照片路径
-    const pages = getCurrentPages()
-    const prevPage = pages[pages.length - 2]
-    
-    if (prevPage && prevPage.route.includes('photo-detection')) {
-      // 更新上一页的数据
-      prevPage.setData({
-        photoTaken: true,
-        photoPath: this.data.photoPath
-      })
-      
-      wx.navigateBack()
-    } else {
-      // 如果无法找到上一页，直接跳转到拍照页面
-      wx.redirectTo({
-        url: `/pages/photo-detection/photo-detection?photoPath=${encodeURIComponent(this.data.photoPath)}`
-      })
-    }
+    // 统一使用 redirectTo 返回拍照页面，确保参数传递
+    wx.redirectTo({
+      url: `/pages/photo-detection/photo-detection?photoPath=${encodeURIComponent(this.data.photoPath)}`
+    })
   },
 
   // 返回上一页

@@ -57,6 +57,8 @@
     <!-- <text class="action-desc">早检测，早知道</text> -->
   </view>
 
+
+
   <!-- 消息列表 -->
   <view class="message-section" wx:if="{{messages.length > 0}}">
     <view class="section-header">
@@ -136,42 +138,5 @@
     <text class="empty-desc">请稍后再试或检查网络连接</text>
   </view>
 
-  <!-- 调试区域 -->
-  <view class="debug-section" wx:if="{{showDebug}}">
-    <view class="debug-header">
-      <text class="debug-title">🔧 环境调试</text>
-      <text class="debug-close" bindtap="toggleDebug">关闭</text>
-    </view>
-    
-    <view class="debug-content">
-      <view class="debug-item">
-        <text class="debug-label">当前环境:</text>
-        <text class="debug-value">{{currentEnv.name}}</text>
-      </view>
-      <view class="debug-item">
-        <text class="debug-label">API地址:</text>
-        <text class="debug-value">{{currentEnv.apiUrl}}</text>
-      </view>
-      <view class="debug-item">
-        <text class="debug-label">连接状态:</text>
-        <text class="debug-value {{connectionStatus.success ? 'success' : 'error'}}">
-          {{connectionStatus.success ? '✅ 正常' : '❌ 异常'}}
-        </text>
-      </view>
-    </view>
-    
-    <view class="debug-actions">
-      <button class="debug-btn" bindtap="testConnection">测试连接</button>
-      <button class="debug-btn" bindtap="switchToLocal">切换到本地</button>
-      <button class="debug-btn" bindtap="switchToTest">切换到测试</button>
-      <button class="debug-btn" bindtap="compareEnvs">对比环境</button>
-      <button class="debug-btn" bindtap="compareApis">对比接口</button>
-      <button class="debug-btn" bindtap="testDataFormats">测试数据格式</button>
-    </view>
-  </view>
 
-  <!-- 调试按钮 -->
-  <view class="debug-toggle" bindtap="toggleDebug">
-    <text class="debug-toggle-text">🔧</text>
-  </view>
 </view> 

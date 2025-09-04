@@ -53,16 +53,35 @@ Page({
     try {
       this.setData({ loading: true })
       
+      // 检查用户是否已登录
+      const storage = require('../../utils/storage.js')
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        console.log('用户未登录，跳过档案数据加载')
+        this.setData({ 
+          loading: false,
+          ownArchives: [],
+          otherArchives: [],
+          subUsers: [],
+          totalOwn: 0,
+          totalOthers: 0,
+          totalAll: 0
+        })
+        return
+      }
+      
       const params = {
         page: this.data.page,
         limit: this.data.limit,
         filter: this.data.filter
       }
       
-      // console.log('加载档案数据，参数:', params)
+      console.log('用户已登录，开始加载档案数据，参数:', params)
       
       const response = await api.profile.getAllArchives(params)
-      // console.log('档案数据响应:', response)
+      console.log('档案数据响应:', response)
       
       if (response.success && response.data) {
         const { 

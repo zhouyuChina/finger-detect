@@ -3,7 +3,7 @@ const api = require('../../utils/api.js')
 const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
 const config = require('../../utils/config.js')
-const profileDebug = require('../../utils/profile-debug.js')
+
 
 Page({
   data: {
@@ -27,11 +27,6 @@ Page({
   onLoad() {
     console.log('Profile页面加载')
     this.loadUserData()
-    
-    // 调试模式：自动运行调试
-    if (this.data.debugMode) {
-      this.debugProfile()
-    }
   },
 
   onShow() {
@@ -45,6 +40,34 @@ Page({
   async loadUserData() {
     try {
       this.setData({ loading: true })
+      
+      // 检查用户是否已登录
+      const storage = require('../../utils/storage.js')
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        console.log('用户未登录，跳过数据加载')
+        this.setData({
+          loading: false,
+          userInfo: {
+            name: '未登录用户',
+            phone: '',
+            avatar: '/images/default-avatar.png'
+          },
+          stats: {
+            totalRecords: 0,
+            totalReports: 0,
+            familyMembers: 0,
+            totalDetections: 0,
+            unreadMessages: 0,
+            unreadSystemMessages: 0
+          }
+        })
+        return
+      }
+      
+      console.log('用户已登录，开始加载数据')
       
       // 并行加载用户信息、统计信息、子用户信息、档案信息、未读消息数量和系统消息未读数量
       const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes, unreadSystemMessagesRes] = await Promise.all([
@@ -263,22 +286,7 @@ Page({
     }
   },
 
-  // 调试方法
-  async debugProfile() {
-    try {
-      console.log('开始调试个人中心...')
-      const result = await profileDebug.debugProfile()
-      
-      // 显示调试结果
-      wx.showModal({
-        title: '调试结果',
-        content: `Token: ${result.token ? '存在' : '不存在'}\nProfile接口: ${result.profile.success ? '成功' : '失败'}\nStats接口: ${result.stats.success ? '成功' : '失败'}`,
-        showCancel: false
-      })
-    } catch (error) {
-      console.error('调试失败:', error)
-    }
-  },
+
 
   // 检查并更新Tab栏红点
   checkTabBarBadge() {

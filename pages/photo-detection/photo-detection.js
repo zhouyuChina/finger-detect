@@ -14,7 +14,9 @@ Page({
     profile: null, // 当前档案信息
     hasReports: false, // 是否有报告
     loading: true, // 加载状态
-    error: false // 错误状态
+    error: false, // 错误状态
+    wxLoginCode: null, // 微信登录code
+    showUserProfileModal: false // 是否显示用户信息获取弹窗
   },
 
   onLoad(options) {
@@ -56,16 +58,31 @@ Page({
       // 需要重新检查档案的真实检测数量
       this.checkProfileReports(profile.id)
     } else {
-      console.warn('未传递档案信息')
-      this.handleError('档案信息缺失')
+      // 没有档案信息的情况（未登录用户或直接访问）
+      console.log('未传递档案信息，允许无档案拍照')
+      
+      this.setData({ 
+        loading: false,
+        profile: null,
+        // 设置默认档案信息用于显示
+        defaultProfile: {
+          name: '临时档案',
+          bodyPart: '未指定',
+          detailPart: '未指定'
+        }
+      })
     }
 
     // 如果有照片路径参数，说明是从相机页面返回的
     if (options.photoPath) {
+      console.log('检测到照片路径参数:', options.photoPath)
       this.setData({
         photoTaken: true,
         photoPath: decodeURIComponent(options.photoPath)
       })
+      console.log('设置拍照状态成功，photoTaken:', true, 'photoPath:', decodeURIComponent(options.photoPath))
+    } else {
+      console.log('没有照片路径参数，options:', options)
     }
   },
 
@@ -77,8 +94,11 @@ Page({
   // 拍照
   takePhoto() {
     // 跳转到自定义相机页面
+    const profile = this.data.profile || this.data.defaultProfile
+    const profileParam = profile ? encodeURIComponent(JSON.stringify(profile)) : ''
+    
     wx.navigateTo({
-      url: `/pages/camera/camera?profile=${encodeURIComponent(JSON.stringify(this.data.profile))}`,
+      url: `/pages/camera/camera?profile=${profileParam}`,
       success: () => {
         console.log('跳转到相机页面成功')
       },
@@ -246,8 +266,208 @@ Page({
     }
   },
 
+  // 用户授权
+  async onUserAuth() {
+    console.log('用户点击授权按钮')
+    
+    try {
+      // 先获取微信登录code
+      const loginResult = await wx.login()
+      console.log('微信登录结果:', loginResult)
+      
+      if (loginResult.code) {
+        // 保存code到页面数据中，用于后续获取用户信息
+        this.setData({ 
+          wxLoginCode: loginResult.code,
+          showUserProfileModal: true 
+        })
+      } else {
+        throw new Error('微信登录失败')
+      }
+    } catch (error) {
+      console.error('微信登录失败:', error)
+      wx.showToast({
+        title: '登录失败，请重试',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 获取用户信息（在用户点击事件中调用）
+  async getUserProfile() {
+    if (!this.data.wxLoginCode) {
+      wx.showToast({
+        title: '登录凭证获取失败',
+        icon: 'none'
+      })
+      return
+    }
+
+    try {
+      // 获取用户信息（必须在用户点击事件中调用）
+      const userProfileResult = await wx.getUserProfile({
+        desc: '用于完善用户资料和个性化服务'
+      })
+      console.log('用户信息获取结果:', userProfileResult)
+      
+      // 获取系统信息
+      const systemInfo = wx.getSystemInfoSync()
+      
+      // 构建注册数据（与授权页面保持一致）
+      const registerData = {
+        code: this.data.wxLoginCode,
+        userInfo: userProfileResult.userInfo,
+        systemInfo: {
+          platform: systemInfo.platform,
+          system: systemInfo.system,
+          version: systemInfo.version,
+          SDKVersion: systemInfo.SDKVersion,
+          brand: systemInfo.brand,
+          model: systemInfo.model,
+          screenWidth: systemInfo.screenWidth,
+          screenHeight: systemInfo.screenHeight,
+          windowWidth: systemInfo.windowWidth,
+          windowHeight: systemInfo.windowHeight,
+          pixelRatio: systemInfo.pixelRatio,
+          language: systemInfo.language
+        },
+        registerTime: new Date().toISOString(),
+        appVersion: '1.0.0'
+      }
+
+      console.log('开始注册用户...')
+      console.log('注册数据:', registerData)
+
+      // 调用后端注册接口
+      const api = require('../../utils/api.js')
+      const storage = require('../../utils/storage.js')
+      const response = await api.user.miniProgramRegister(registerData)
+      
+      console.log('注册响应:', response)
+      
+      if (response.success || response.code === 200) {
+        console.log('注册成功，保存用户数据')
+        
+        // 保存用户信息（与授权页面保持一致）
+        const responseData = response.data || response
+        console.log('注册响应数据:', responseData)
+        
+        // 从新接口格式中提取数据
+        const user = responseData.user
+        if (user) {
+          // 保存openId（从user.openid获取）
+          if (user.openid) {
+            storage.setOpenId(user.openid)
+            console.log('保存openId成功:', user.openid)
+          } else {
+            console.warn('响应中没有openid')
+          }
+          
+          // 保存用户信息（使用user对象）
+          storage.setUserInfo(user)
+          console.log('保存用户信息成功:', user)
+          
+          // 保存子用户列表
+          if (user.subUsers) {
+            storage.setSubUsers(user.subUsers)
+            console.log('保存子用户列表成功，数量:', user.subUsers.length)
+          }
+          
+          // 保存当前子用户
+          if (user.currentSubUser) {
+            storage.setCurrentSubUser(user.currentSubUser)
+            console.log('保存当前子用户成功:', user.currentSubUser)
+          }
+        } else {
+          console.warn('响应中没有user对象')
+        }
+        
+        // 验证保存的数据
+        const savedUserInfo = storage.getUserInfo()
+        const savedOpenId = storage.getOpenId()
+        const savedSubUsers = storage.getSubUsers()
+        const savedCurrentSubUser = storage.getCurrentSubUser()
+        console.log('保存后的数据验证:', {
+          userInfo: !!savedUserInfo,
+          openId: !!savedOpenId,
+          subUsers: !!savedSubUsers,
+          currentSubUser: !!savedCurrentSubUser
+        })
+        
+        // 如果用户提供了真实信息，调用同步接口
+        if (userProfileResult.userInfo && userProfileResult.userInfo.nickName !== '微信用户') {
+          try {
+            console.log('调用同步用户信息接口')
+            const syncResponse = await api.user.syncProfile(userProfileResult.userInfo)
+            console.log('同步用户信息响应:', syncResponse.code, syncResponse.message)
+          } catch (syncError) {
+            console.warn('同步用户信息失败，但不影响使用:', syncError)
+          }
+        }
+        
+        // 关闭弹窗
+        this.setData({
+          showUserProfileModal: false,
+          wxLoginCode: null
+        })
+        
+        // 显示成功提示
+        wx.showToast({
+          title: '授权成功',
+          icon: 'success',
+          duration: 2000
+        })
+
+        // 验证数据完整性后跳转到首页（与授权页面保持一致）
+        const finalUserInfo = storage.getUserInfo()
+        const finalOpenId = storage.getOpenId()
+        
+        if (finalUserInfo && finalOpenId) {
+          console.log('数据保存完整，准备跳转到首页')
+          // 延迟跳转到首页
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/index/index'
+            })
+          }, 2000)
+        } else {
+          console.error('数据保存不完整，无法跳转:', {
+            userInfo: !!finalUserInfo,
+            openId: !!finalOpenId
+          })
+          wx.showToast({
+            title: '登录数据保存失败，请重试',
+            icon: 'none'
+          })
+        }
+        
+      } else {
+        throw new Error(response.message || '注册失败')
+      }
+    } catch (error) {
+      console.error('用户授权失败:', error)
+      wx.showToast({
+        title: error.message || '授权失败，请重试',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 关闭用户信息获取弹窗
+  closeUserProfileModal() {
+    this.setData({ 
+      showUserProfileModal: false,
+      wxLoginCode: null 
+    })
+  },
+
   // 开始检测（总是进行检测流程）
   async startDetection() {
+    console.log('开始检测，当前状态:', {
+      photoTaken: this.data.photoTaken,
+      photoPath: this.data.photoPath
+    })
+    
     if (!this.data.photoTaken) {
       wx.showToast({
         title: '请先拍照',
@@ -256,11 +476,46 @@ Page({
       return
     }
 
+    // 检查用户是否已登录
+    const storage = require('../../utils/storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      // 未登录用户，提示需要授权
+      wx.showModal({
+        title: '需要授权',
+        content: '检测功能需要用户授权，是否现在授权？',
+        confirmText: '立即授权',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            this.onUserAuth()
+          }
+        }
+      })
+      return
+    }
+
     const profile = this.data.profile
     if (!profile) {
-      wx.showToast({
-        title: '档案信息缺失',
-        icon: 'none'
+      // 已登录但无档案信息用户，提示需要先创建档案
+      wx.showModal({
+        title: '提示',
+        content: '检测功能需要档案信息，是否先创建档案？',
+        confirmText: '创建档案',
+        cancelText: '仅保存图片',
+        success: (res) => {
+          if (res.confirm) {
+            // 跳转到创建档案页面
+            wx.navigateTo({
+              url: '/pages/create-profile/create-profile'
+            })
+          } else {
+            // 仅保存图片
+            this.savePhotoOnly()
+          }
+        }
       })
       return
     }
@@ -279,11 +534,43 @@ Page({
       return
     }
 
+    // 检查用户是否已登录
+    const storage = require('../../utils/storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      // 未登录用户，提示需要授权
+      wx.showModal({
+        title: '需要授权',
+        content: '保存图片需要用户授权，是否现在授权？',
+        confirmText: '立即授权',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            this.onUserAuth()
+          }
+        }
+      })
+      return
+    }
+
     const profile = this.data.profile
     if (!profile) {
-      wx.showToast({
-        title: '档案信息缺失',
-        icon: 'none'
+      // 已登录但无档案信息用户，提示需要先创建档案
+      wx.showModal({
+        title: '提示',
+        content: '保存图片需要档案信息，是否先创建档案？',
+        confirmText: '创建档案',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            // 跳转到创建档案页面
+            wx.navigateTo({
+              url: '/pages/create-profile/create-profile'
+            })
+          }
+        }
       })
       return
     }

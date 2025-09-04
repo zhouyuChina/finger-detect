@@ -49,6 +49,13 @@
         <text class="profile-desc">{{profile.bodyPart}} - {{profile.detailPart}}</text>
       </view>
       
+      <!-- 无档案信息提示 -->
+      <view class="profile-info no-profile" wx:if="{{!profile}}">
+        <text class="profile-name">{{defaultProfile.name}}</text>
+        <text class="profile-desc">{{defaultProfile.bodyPart}} - {{defaultProfile.detailPart}}</text>
+        <text class="profile-tip">临时档案，拍照后可进行授权</text>
+      </view>
+      
       <!-- 拍照区域 -->
       <view class="photo-area">
         <view class="photo-placeholder" wx:if="{{!photoTaken}}">
@@ -74,8 +81,9 @@
         </view>
       </view>
 
-      <!-- 拍照按钮 -->
+      <!-- 操作按钮区域 -->
       <view class="photo-actions">
+        <!-- 拍照按钮 -->
         <button 
           class="btn btn-photo" 
           wx:if="{{!photoTaken}}"
@@ -89,6 +97,7 @@
           bindtap="uploadPhoto"
         >上传图片</button> -->
         
+        <!-- 拍照后的操作按钮 -->
         <view class="btn-group" wx:if="{{photoTaken}}">
           <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button> -->
           <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照/上传</button> -->
@@ -108,6 +117,22 @@
             仅保存图片
           </button>
         </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户信息获取弹窗 -->
+  <view class="user-profile-modal" wx:if="{{showUserProfileModal}}">
+    <view class="modal-overlay" bindtap="closeUserProfileModal"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">获取用户信息</text>
+        <text class="modal-close" bindtap="closeUserProfileModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <text class="modal-desc">为了提供更好的服务，需要获取您的微信头像和昵称</text>
+        <button class="btn btn-primary" bindtap="getUserProfile">确认授权</button>
+        <button class="btn btn-cancel" bindtap="closeUserProfileModal">取消</button>
       </view>
     </view>
   </view>

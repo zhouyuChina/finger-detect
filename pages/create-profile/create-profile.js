@@ -211,7 +211,22 @@ Page({
     try {
       this.setData({ loading: true, error: false })
       
-      console.log('开始加载用户数据')
+      // 检查用户是否已登录
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        // 未登录用户，直接进入拍照检测流程
+        console.log('未登录用户，直接进入拍照检测流程')
+        this.setData({ 
+          loading: false,
+          currentStep: 2, // 直接进入第二步：拍照检测
+          showUserSelector: false
+        })
+        return
+      }
+      
+      console.log('已登录用户，开始加载用户数据')
       const response = await api.user.getUsers()
       console.log('用户数据接口响应:', response)
       
@@ -283,6 +298,23 @@ Page({
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
     }))
+  },
+
+  // 开始拍照检测（未登录用户）
+  startPhotoDetection() {
+    console.log('未登录用户开始拍照检测')
+    
+    // 直接跳转到拍照检测页面
+    wx.navigateTo({
+      url: '/pages/photo-detection/photo-detection',
+      success: () => {
+        console.log('跳转到拍照检测页面成功')
+      },
+      fail: (error) => {
+        console.error('跳转到拍照检测页面失败:', error)
+        common.showError('页面跳转失败')
+      }
+    })
   },
 
   // 格式化档案数据

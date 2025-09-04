@@ -19,23 +19,23 @@ class Request {
       'X-Requested-With': 'XMLHttpRequest'
     }
 
-    // 添加token
+    // 添加token（只有在有token时才添加）
     const token = storage.getToken()
     console.log('当前存储的token:', token)
-    if (token) {
+    if (token && token !== 'undefined' && token !== 'null') {
       headers['Authorization'] = `Bearer ${token}`
       console.log('添加Authorization头:', headers['Authorization'])
     } else {
-      console.log('没有找到token，请求头中不包含Authorization')
+      console.log('没有找到有效token，请求头中不包含Authorization')
     }
 
-    // 添加openId
+    // 添加openId（只有在有openId时才添加）
     const openId = storage.getOpenId()
-    if (openId) {
+    if (openId && openId !== 'undefined' && openId !== 'null') {
       headers['X-Openid'] = openId
       console.log('添加X-Openid头:', openId)
     } else {
-      console.log('没有找到openId，请求头中不包含X-Openid')
+      console.log('没有找到有效openId，请求头中不包含X-Openid')
     }
 
     return headers
@@ -99,10 +99,8 @@ class Request {
             storage.setToken(token)
             console.log('获取access_token成功:', token)
           } else {
-            // 开发模式可能没有token，生成一个临时token
-            const tempToken = 'dev_token_' + Date.now()
-            storage.setToken(tempToken)
-            console.log('开发模式生成临时token:', tempToken)
+            // 没有token，不自动生成
+            console.log('响应中没有token字段')
           }
         } else if (data.code === config.errorCodes.SUCCESS) {
           // 标准格式：{code: 200, data: {...}, message: "xxx"}
@@ -117,25 +115,21 @@ class Request {
             storage.setToken(token)
             console.log('获取access_token成功:', token)
           } else {
-            // 开发模式可能没有token，生成一个临时token
-            const tempToken = 'dev_token_' + Date.now()
-            storage.setToken(tempToken)
-            console.log('开发模式生成临时token:', tempToken)
+            // 没有token，不自动生成
+            console.log('响应中没有token字段')
           }
         } else {
-          console.log('未知响应格式，生成临时token')
-          // 未知格式，生成临时token
-          const tempToken = 'dev_token_' + Date.now()
-          storage.setToken(tempToken)
-          console.log('生成临时token:', tempToken)
+          console.log('未知响应格式，不生成临时token')
+          // 未知格式，不生成临时token
+          console.log('无法获取有效token')
         }
       } else {
         throw new Error(`HTTP ${response.statusCode}: ${response.data?.message || '获取token失败'}`)
       }
     } catch (error) {
       console.error('获取token失败:', error)
-      // 开发模式下不抛出错误，静默处理
-      console.log('开发模式：静默处理token获取失败')
+      // 不再静默处理，让调用方知道获取失败
+      console.log('Token获取失败，需要用户授权')
     } finally {
       this.isGettingToken = false
     }
@@ -173,9 +167,9 @@ class Request {
     console.log('handleResponse - data.code:', data.code)
 
     if (statusCode === 200 || statusCode === 201) {
-      // 支持开发模式测试接口格式：{success: true, data: {...}, message: "xxx"}
+      // 支持两种响应格式：{success: true, data: {...}} 或 {code: 200, data: {...}}
       if (data.success === true) {
-        console.log('检测到开发模式成功响应')
+        console.log('检测到success格式成功响应')
         resolve(data)
       } else if (data.code === config.errorCodes.SUCCESS) {
         // 标准格式：{code: 200, data: {...}, message: "xxx"}

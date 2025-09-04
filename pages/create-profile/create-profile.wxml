@@ -48,6 +48,15 @@
       </view>
     </view>
 
+    <!-- 未登录用户提示 -->
+    <view class="step-content" wx:if="{{currentStep === 1 && !selectedUser && !loading}}">
+      <view class="section-title">欢迎使用健康检测</view>
+      <view class="welcome-message">
+        <text class="welcome-text">您可以直接进行拍照检测，无需完善个人信息</text>
+        <text class="welcome-desc">点击下方按钮开始检测</text>
+      </view>
+    </view>
+
     <!-- 第二步：选择档案 -->
     <view class="step-content" wx:if="{{currentStep === 2}}">
       <view class="section-title">请选择档案</view>
@@ -99,6 +108,11 @@
       wx:if="{{currentStep === 1 && selectedUser}}"
       bindtap="nextStep"
     >下一步</button>
+    <button 
+      class="btn btn-primary" 
+      wx:if="{{currentStep === 1 && !selectedUser && !loading}}"
+      bindtap="startPhotoDetection"
+    >开始拍照检测</button>
   </view>
 
   <!-- 用户选择弹窗 -->

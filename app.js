@@ -30,8 +30,8 @@ App({
       // 检查更新
       this.checkUpdate()
 
-      // 自动登录
-      await this.autoLogin()
+      // 检查登录状态（不自动登录）
+      this.checkLoginStatus()
 
       // 应用初始化完成
       console.log('应用初始化完成')
@@ -84,38 +84,28 @@ App({
     }
   },
 
-  // 自动登录
-  async autoLogin() {
+  // 检查登录状态（不再自动登录）
+  checkLoginStatus() {
     try {
-      // 检查localStorage中是否有完整的用户数据
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
       
-      console.log('检查localStorage数据:', {
+      console.log('检查登录状态:', {
         hasUserInfo: !!userInfo,
-        hasOpenId: !!openId,
-        userInfoExpired: userInfo ? '未过期' : '已过期或不存在',
-        openIdExpired: openId ? '未过期' : '已过期或不存在'
+        hasOpenId: !!openId
       })
       
-      // 优化授权检查逻辑：只要有有效的openId和用户信息就认为已登录
-      // 不再依赖token，因为新接口格式不需要token
       if (userInfo && openId) {
-        console.log('localStorage数据完整，使用现有登录状态')
+        console.log('用户已登录')
         this.globalData.userInfo = userInfo
         this.globalData.isLoggedIn = true
-        
-        // 可选：静默刷新用户信息（不强制要求用户重新授权）
-        this.silentRefreshUserInfo()
       } else {
-        console.log('localStorage数据不完整，开始注册流程')
-        // 清除可能存在的临时数据
-        storage.clearUserData()
-        // 触发微信登录并注册
-        await this.wxLoginAndRegister()
+        console.log('用户未登录，等待后续操作时授权')
+        this.globalData.userInfo = null
+        this.globalData.isLoggedIn = false
       }
     } catch (error) {
-      console.error('自动登录失败:', error)
+      console.error('检查登录状态失败:', error)
     }
   },
 
@@ -373,9 +363,61 @@ App({
 
   // 清除用户信息
   clearUserInfo() {
+    // 清除全局数据
     this.globalData.userInfo = null
     this.globalData.isLoggedIn = false
+    
+    // 清除存储数据
     storage.clearUserData()
+    
+    // 清除所有页面的用户相关数据
+    this.clearAllPagesUserData()
+    
+    console.log('已彻底清除所有用户数据')
+  },
+
+  // 清除所有页面的用户相关数据
+  clearAllPagesUserData() {
+    try {
+      const pages = getCurrentPages()
+      pages.forEach(page => {
+        if (page && page.route) {
+          console.log('清除页面数据:', page.route)
+          
+          // 根据页面类型清除相应的用户数据
+          if (page.route.includes('index')) {
+            // 首页
+            if (page.setData) {
+              page.setData({
+                userInfo: null,
+                isLoggedIn: false
+              })
+            }
+          } else if (page.route.includes('profile')) {
+            // 档案页面
+            if (page.setData) {
+              page.setData({
+                userInfo: null,
+                currentUser: null,
+                userProfiles: [],
+                loading: false
+              })
+            }
+          } else if (page.route.includes('records')) {
+            // 记录页面
+            if (page.setData) {
+              page.setData({
+                userInfo: null,
+                records: [],
+                loading: false
+              })
+            }
+          }
+        }
+      })
+    } catch (error) {
+      console.error('清除页面数据失败:', error)
+    }
   },
 
   // 检查登录状态

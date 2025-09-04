@@ -98,9 +98,32 @@ page {
 .section-title {
   font-size: 36rpx;
   color: #333;
-  font-weight: 600;
-  margin-bottom: 40rpx;
+  margin-bottom: 30rpx;
+}
+
+/* 未登录用户欢迎信息 */
+.welcome-message {
   text-align: center;
+  padding: 60rpx 40rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.welcome-text {
+  display: block;
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 20rpx;
+  line-height: 1.5;
+}
+
+.welcome-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
 }
 
 /* 用户选择区域 */
@@ -505,6 +528,12 @@ page {
 .btn-next, .btn-complete {
   background-color: #2B81E8;
   color: #ffffff;
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: #ffffff;
+  font-weight: 500;
 }
 
 /* 弹窗样式 */

@@ -3,8 +3,6 @@ const api = require('../../utils/api.js')
 const storage = require('../../utils/storage.js')
 const common = require('../../utils/common.js')
 const config = require('../../utils/config.js')
-// const envDebug = require('../../utils/env-debug.js')
-// const apiDebug = require('../../utils/api-debug.js')
 
 Page({
   data: {
@@ -16,18 +14,7 @@ Page({
     },
     unreadCount: 0, // 未读消息数量
     messages: [], // 消息列表
-    loading: false, // 加载状态
-    
-    // 调试相关
-    showDebug: false,
-    currentEnv: {
-      name: '测试环境',
-      apiUrl: 'http://47.76.126.85:4000/api'
-    },
-    connectionStatus: {
-      success: false,
-      message: '未测试'
-    }
+    loading: false // 加载状态
   },
 
   // 页面加载时
@@ -52,53 +39,119 @@ Page({
 
   // 检查授权并初始化（新接口格式）
   checkAuthAndInit() {
+    // 先清除过期的数据
+    storage.clearExpiredData()
+    
+    // 使用新的登录状态检查方法
+    const isLoggedIn = storage.isUserLoggedIn()
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
-    // 使用新的授权状态检查方法
-    const authStatus = storage.checkAuthStatus()
-    const authDescription = storage.getAuthStatusDescription()
-    
-    console.log('index页面检查授权状态:', {
+    console.log('index页面检查登录状态:', {
+      isLoggedIn: isLoggedIn,
       hasUserInfo: !!userInfo,
       hasOpenId: !!openId,
-      userInfoExpired: userInfo ? '未过期' : '已过期或不存在',
-      openIdExpired: openId ? '未过期' : '已过期或不存在',
-      authStatus: authStatus,
-      authDescription: authDescription,
-      userInfoValue: userInfo ? JSON.stringify(userInfo).substring(0, 50) + '...' : null,
-      openIdValue: openId ? openId.substring(0, 10) + '...' : null
+      userInfo: userInfo ? '有效' : '无效或过期',
+      openId: openId ? '有效' : '无效或过期'
     })
     
-    // 优化授权检查：只要有有效的openId和用户信息就认为已授权
-    // 缓存时间已延长到30天，用户不需要频繁重新授权
-    if (!userInfo || !openId) {
-      console.log('index页面缺少授权数据，跳转到授权页面')
-      console.log('缺少的数据:', {
-        missingUserInfo: !userInfo,
-        missingOpenId: !openId
-      })
-      
-      // 显示友好的提示信息
-      wx.showToast({
-        title: '需要重新授权',
-        icon: 'none',
-        duration: 1500
-      })
-      
-      // 延迟跳转，让用户看到提示
-      setTimeout(() => {
-        wx.redirectTo({
-          url: '/pages/auth/auth'
-        })
-      }, 1500)
-      return
+    // 不再强制跳转授权页面，允许用户正常浏览首页
+    // 授权将在用户进行拍照检测时自动处理
+    if (isLoggedIn) {
+      console.log('index页面用户已登录，初始化页面')
+    } else {
+      console.log('index页面用户未登录，但允许正常浏览')
+      console.log('授权将在用户进行拍照检测时自动处理')
     }
-    
-    console.log('index页面授权数据完整，初始化页面')
-    console.log('用户信息有效期：30天，当前状态：有效')
-    console.log('授权状态描述：', authDescription)
     this.initPage()
+  },
+
+   // 测试清除所有用户数据（开发调试用）
+  testClearAllUserData() {
+    console.log('=== 开始测试清除所有用户数据 ===')
+    
+    // 获取当前所有存储的键
+    try {
+      const storageInfo = wx.getStorageInfoSync()
+      console.log('当前存储的所有键:', storageInfo.keys)
+      
+      // 显示当前用户信息
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      console.log('清除前的用户信息:', { userInfo, openId })
+      
+      // 调用app的清除方法
+      const app = getApp()
+      if (app && app.clearUserInfo) {
+        app.clearUserInfo()
+        console.log('已调用app.clearUserInfo()')
+      }
+      
+      // 再次检查清除后的状态
+      setTimeout(() => {
+        const userInfoAfter = storage.getUserInfo()
+        const openIdAfter = storage.getOpenId()
+        console.log('清除后的用户信息:', { userInfoAfter, openIdAfter })
+        
+        // 刷新页面数据
+        this.setData({
+          userInfo: null,
+          isLoggedIn: false
+        })
+        
+        console.log('=== 测试清除完成 ===')
+      }, 100)
+      
+    } catch (error) {
+      console.error('测试清除失败:', error)
+    }
+  },
+
+  // 检查当前状态（开发调试用）
+  checkCurrentStatus() {
+    console.log('=== 检查当前状态 ===')
+    
+    try {
+      // 检查存储状态
+      const storageInfo = wx.getStorageInfoSync()
+      console.log('存储信息:', storageInfo)
+      
+      // 检查用户信息
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      const token = storage.getToken()
+      
+      console.log('用户数据状态:', {
+        userInfo: userInfo ? '存在' : '不存在',
+        openId: openId ? '存在' : '不存在',
+        token: token ? '存在' : '不存在'
+      })
+      
+      // 检查app全局数据
+      const app = getApp()
+      if (app) {
+        console.log('App全局数据:', {
+          userInfo: app.globalData.userInfo ? '存在' : '不存在',
+          isLoggedIn: app.globalData.isLoggedIn
+        })
+      }
+      
+      // 检查当前页面数据
+      console.log('当前页面数据:', {
+        userInfo: this.data.userInfo ? '存在' : '不存在',
+        isLoggedIn: this.data.isLoggedIn
+      })
+      
+      // 显示状态信息
+      wx.showModal({
+        title: '当前状态',
+        content: `用户信息: ${userInfo ? '存在' : '不存在'}\nOpenID: ${openId ? '存在' : '不存在'}\nToken: ${token ? '存在' : '不存在'}`,
+        showCancel: false
+      })
+      
+    } catch (error) {
+      console.error('检查状态失败:', error)
+    }
   },
 
   // 初始化页面
@@ -526,38 +579,44 @@ Page({
 
   // 拍照检测
   async onPhotoDetection() {
-    // 检查登录状态
-    if (!storage.isLoggedIn()) {
-      common.showError('请先登录')
-      return
-    }
-
-    // 检查用户信息是否完整
-    if (!storage.isUserInfoComplete()) {
-      console.log('用户信息不完整，需要完善信息')
-      const missingFields = storage.getMissingUserInfoFields()
-      console.log('缺失的字段:', missingFields)
-      
-      // 显示提示信息
-      const result = await common.showConfirm(
-        '完善个人信息', 
-        '检测到您的个人信息不完整（性别、年龄、地址），需要先完善信息才能进行检测。是否现在完善？'
-      )
-      
-      if (result) {
-        // 跳转到完善信息页面
-        wx.navigateTo({
-          url: '/pages/create-profile/create-profile?mode=complete'
-        })
+    // 检查用户是否已登录
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (userInfo && openId) {
+      // 已登录用户，检查用户信息是否完整
+      if (!storage.isUserInfoComplete()) {
+        console.log('用户信息不完整，需要完善信息')
+        const missingFields = storage.getMissingUserInfoFields()
+        console.log('缺失的字段:', missingFields)
+        
+        // 显示提示信息
+        const result = await common.showConfirm(
+          '完善个人信息', 
+          '检测到您的个人信息不完整（性别、年龄、地址），需要先完善信息才能进行检测。是否现在完善？'
+        )
+        
+        if (result) {
+          // 跳转到完善信息页面
+          wx.navigateTo({
+            url: '/pages/create-profile/create-profile?mode=complete'
+          })
+        }
+        return
       }
-      return
-    }
 
-    // 用户信息完整，直接跳转到拍照检测页面
-    console.log('用户信息完整，直接进行拍照检测')
-    wx.navigateTo({
-      url: '/pages/create-profile/create-profile'
-    })
+      // 用户信息完整，直接跳转到拍照检测页面
+      console.log('用户信息完整，直接进行拍照检测')
+      wx.navigateTo({
+        url: '/pages/create-profile/create-profile'
+      })
+    } else {
+      // 未登录用户，直接跳转到拍照检测页面
+      console.log('未登录用户，直接进行拍照检测')
+      wx.navigateTo({
+        url: '/pages/photo-detection/photo-detection'
+      })
+    }
   },
 
   // 查看全部消息
@@ -734,141 +793,11 @@ Page({
     }
   },
 
-  // 测试JWT认证（开发阶段使用）
-  async testAuth() {
-    try {
-      const testAuth = require('../../utils/auth-test.js')
-      await testAuth.runFullTest()
-    } catch (error) {
-      console.error('JWT测试失败:', error)
-      common.showError('测试失败')
-    }
-  },
 
-  // 调试相关方法
-  toggleDebug() {
-    this.setData({
-      showDebug: !this.data.showDebug
-    })
-    if (this.data.showDebug) {
-      this.updateEnvInfo()
-    }
-  },
 
-  updateEnvInfo() {
-    // const envInfo = envDebug.getCurrentEnv()
-    // this.setData({
-    //   currentEnv: envInfo
-    // })
-  },
 
-  async testConnection() {
-    // try {
-    //   this.setData({
-    //     'connectionStatus.success': false,
-    //     'connectionStatus.message': '测试中...'
-    //   })
-    //   
-    //   const result = await envDebug.testCurrentEnv()
-    //   
-    //   this.setData({
-    //     connectionStatus: {
-    //       success: result.success,
-    //       message: result.success ? '连接正常' : result.error.errMsg
-    //     }
-    //   })
-    //   
-    //   wx.showToast({
-    //     title: result.success ? '连接成功' : '连接失败',
-    //     icon: result.success ? 'success' : 'error'
-    //   })
-    // } catch (error) {
-    //   console.error('测试连接失败:', error)
-    //   this.setData({
-    //     connectionStatus: {
-    //       success: false,
-    //       message: '测试失败'
-    //     }
-    //   })
-    // }
-  },
 
-  switchToLocal() {
-    // envDebug.switchToLocal()
-    // this.updateEnvInfo()
-    wx.showToast({
-      title: '已切换到本地环境',
-      icon: 'success'
-    })
-  },
 
-  switchToTest() {
-    // envDebug.switchToTest()
-    // this.updateEnvInfo()
-    wx.showToast({
-      title: '已切换到测试环境',
-      icon: 'success'
-    })
-  },
-
-  async compareEnvs() {
-    // try {
-    //   wx.showLoading({ title: '对比中...' })
-    //   await envDebug.compareAllEnvs()
-    //   wx.hideLoading()
-    //   wx.showToast({
-    //     title: '对比完成，查看控制台',
-    //     icon: 'none'
-    //   })
-    // } catch (error) {
-    //   wx.hideLoading()
-    //   console.error('环境对比失败:', error)
-    // }
-  },
-
-  async compareApis() {
-    // try {
-    //   wx.showLoading({ title: '对比接口中...' })
-    //   const result = await apiDebug.compareApis()
-    //   wx.hideLoading()
-    //   
-    //   if (result.auth.success && !result.register.success) {
-    //     wx.showToast({
-    //     title: 'Auth成功，Register失败',
-    //     icon: 'none',
-    //     duration: 3000
-    //   })
-    //   } else if (result.auth.success && result.register.success) {
-    //     wx.showToast({
-    //     title: '两个接口都成功',
-    //     icon: 'success'
-    //   })
-    //   } else {
-    //     wx.showToast({
-    //     title: '两个接口都失败',
-    //     icon: 'error'
-    //   })
-    //   }
-    // } catch (error) {
-    //   wx.hideLoading()
-    //   console.error('接口对比失败:', error)
-    // }
-  },
-
-  async testDataFormats() {
-    // try {
-    //   wx.showLoading({ title: '测试数据格式...' })
-    //   await apiDebug.testDataFormats()
-    //   wx.hideLoading()
-    //   wx.showToast({
-    //     title: '测试完成，查看控制台',
-    //     icon: 'none'
-    //   })
-    // } catch (error) {
-    //   wx.hideLoading()
-    //   console.error('数据格式测试失败:', error)
-    // }
-  },
 
   // 检查并更新Tab栏红点
   checkTabBarBadge() {

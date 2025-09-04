@@ -26,6 +26,22 @@ const userApi = {
 
   // 获取用户信息
   getProfile() {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      console.log('用户未登录，跳过getProfile接口调用')
+      return Promise.resolve({
+        success: false,
+        code: 401,
+        message: '用户未登录',
+        data: null
+      })
+    }
+    
+    console.log('用户已登录，调用getProfile接口')
     return request.get(config.api.user.profile)
   },
 
@@ -56,11 +72,43 @@ const userApi = {
 
   // 获取用户统计信息
   getStats() {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      console.log('用户未登录，跳过getStats接口调用')
+      return Promise.resolve({
+        success: false,
+        code: 401,
+        message: '用户未登录',
+        data: null
+      })
+    }
+    
+    console.log('用户已登录，调用getStats接口')
     return request.get(config.api.user.stats)
   },
 
   // 获取子用户列表
   getUsers() {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      console.log('用户未登录，跳过getUsers接口调用')
+      return Promise.resolve({
+        success: false,
+        code: 401,
+        message: '用户未登录',
+        data: null
+      })
+    }
+    
+    console.log('用户已登录，调用getUsers接口')
     return request.get(config.api.user.getUsers)
   },
 
@@ -301,6 +349,30 @@ const profileApi = {
 
   // 获取所有档案列表（包括本人和其他用户）
   getAllArchives(params = {}) {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      console.log('用户未登录，跳过getAllArchives接口调用')
+      return Promise.resolve({
+        success: false,
+        code: 401,
+        message: '用户未登录',
+        data: {
+          ownArchives: [],
+          otherArchives: [],
+          totalOwn: 0,
+          totalOthers: 0,
+          totalAll: 0,
+          subUsers: [],
+          ownSubUserId: ''
+        }
+      })
+    }
+    
+    console.log('用户已登录，调用getAllArchives接口')
     return request.get(config.api.profile.allArchives, params)
   },
 
