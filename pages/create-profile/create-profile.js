@@ -697,10 +697,6 @@ Page({
       
       // 根据实际返回的数据结构，档案信息在 archive 字段中
       const archiveData = newArchive.archive || newArchive
-        id: archiveData.id,
-        archiveId: archiveData.archiveId,
-        _id: archiveData._id
-      });
       
       // 检查档案是否有ID，尝试不同的字段名
       const archiveId = archiveData.id || archiveData.archiveId || archiveData._id;
@@ -718,10 +714,6 @@ Page({
       
       // 设置新创建的档案为选中状态
       const formattedArchive = this.formatArchives([archiveData])[0]
-        id: formattedArchive.id,
-        archiveId: formattedArchive.archiveId,
-        _id: formattedArchive._id
-      });
       
       // 再次检查格式化后的档案是否有ID，尝试不同的字段名
       const formattedArchiveId = formattedArchive.id || formattedArchive.archiveId || formattedArchive._id;
