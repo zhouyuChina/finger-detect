@@ -53,7 +53,7 @@
       <view class="profile-info no-profile" wx:if="{{!profile}}">
         <text class="profile-name">{{defaultProfile.name}}</text>
         <text class="profile-desc">{{defaultProfile.bodyPart}} - {{defaultProfile.detailPart}}</text>
-        <text class="profile-tip">临时档案，拍照后可进行授权</text>
+        <text class="profile-tip">临时拍照，授权后可进行检测</text>
       </view>
       
       <!-- 拍照区域 -->

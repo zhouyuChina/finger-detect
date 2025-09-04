@@ -52,6 +52,11 @@ Page({
     this.setData({ loading: true })
 
     try {
+      // 检查用户是否已登录
+      const storage = require('../../utils/storage.js')
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
       const page = refresh ? 1 : this.data.page
       const params = {
         page: page,
@@ -64,10 +69,10 @@ Page({
       if (res.success && res.data) {
         const newMessages = res.data.messages || []
         
-        // 保持后端返回的isRead状态，如果没有则默认为false
+        // 根据登录状态处理isRead状态
         const formattedMessages = newMessages.map(msg => ({
           ...msg,
-          isRead: msg.isRead !== undefined ? msg.isRead : false
+          isRead: (!userInfo || !openId) ? true : (msg.isRead !== undefined ? msg.isRead : false) // 未登录时都标记为已读
         }))
         
         const messages = refresh ? formattedMessages : [...this.data.messages, ...formattedMessages]
@@ -125,6 +130,20 @@ Page({
     const message = this.data.messages.find(msg => msg.id === id)
     
     if (!message) return
+
+    // 检查用户是否已登录
+    const storage = require('../../utils/storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      // 未登录用户，直接显示消息内容，不调用API
+      this.setData({
+        currentMessage: message,
+        showDetailPopup: true
+      })
+      return
+    }
 
     // 显示加载状态
     wx.showLoading({ title: '加载中...' })

@@ -219,6 +219,18 @@ const messageApi = {
 
   // 获取未读消息数量
   getUnreadCount() {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      return Promise.resolve({
+        success: true,
+        data: { count: 0, unreadCount: 0 }
+      })
+    }
+    
     return request.get(config.api.message.unreadCount)
   },
 
@@ -288,6 +300,18 @@ const systemMessagesApi = {
 
   // 获取未读系统消息数量
   getUnreadCount() {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      return Promise.resolve({
+        success: true,
+        data: { unreadCount: 0, count: 0 }
+      })
+    }
+    
     return request.get(config.api.systemMessages.unreadCount)
   },
 

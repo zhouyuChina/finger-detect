@@ -66,9 +66,18 @@ Page({
       return
     }
 
-    // 统一使用 redirectTo 返回拍照页面，确保参数传递
+    // 构建返回URL，需要传递档案信息和照片路径
+    let url = `/pages/photo-detection/photo-detection?photoPath=${encodeURIComponent(this.data.photoPath)}`
+    
+    // 如果有档案信息，也一并传递
+    if (this.data.profile) {
+      const profileParam = encodeURIComponent(JSON.stringify(this.data.profile))
+      url += `&profile=${profileParam}`
+    }
+    
+    // 使用 redirectTo 返回拍照页面
     wx.redirectTo({
-      url: `/pages/photo-detection/photo-detection?photoPath=${encodeURIComponent(this.data.photoPath)}`
+      url: url
     })
   },
 
@@ -140,13 +149,6 @@ Page({
       const actualCropWidth = Math.min(imageWidth - actualCropX, guideFrameWidth * scaleX)
       const actualCropHeight = Math.min(imageHeight - actualCropY, guideFrameHeight * scaleY)
 
-        screenSize: { width: screenWidth, height: screenHeight, windowHeight },
-        imageSize: { width: imageWidth, height: imageHeight },
-        guideFrame: { x: guideFrameX, y: guideFrameY, width: guideFrameWidth, height: guideFrameHeight },
-        scale: { scaleX, scaleY },
-        offset: { offsetX, offsetY },
-        cropArea: { x: actualCropX, y: actualCropY, width: actualCropWidth, height: actualCropHeight }
-      })
 
       // 使用canvas进行裁剪
       const croppedImagePath = await this.performCrop(

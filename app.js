@@ -88,9 +88,6 @@ App({
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
       
-        hasUserInfo: !!userInfo,
-        hasOpenId: !!openId
-      })
       
       if (userInfo && openId) {
         this.globalData.userInfo = userInfo
@@ -240,11 +237,6 @@ App({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-          userInfo: !!savedUserInfo,
-          openId: !!savedOpenId,
-          subUsers: !!savedSubUsers,
-          currentSubUser: !!savedCurrentSubUser
-        })
         
         // 显示欢迎信息
         wx.showToast({
@@ -351,6 +343,9 @@ App({
     // 清除存储数据
     storage.clearUserData()
     
+    // 清除Tab栏红点
+    this.clearTabBarBadge()
+    
     // 清除所有页面的用户相关数据
     this.clearAllPagesUserData()
     
@@ -434,6 +429,8 @@ App({
     try {
       // 检查用户是否已登录
       if (!this.isLoggedIn()) {
+        // 未登录时清除所有红点
+        this.clearTabBarBadge()
         return
       }
       
@@ -451,9 +448,6 @@ App({
       // 系统消息未读数量
       const systemUnread = systemUnreadRes?.data?.unreadCount || systemUnreadRes?.data?.count || 0
 
-        articleUnread,
-        systemUnread
-      })
 
       // 处理消息中心Tab（index: 2）- 对应文章未读
       if (articleUnread > 0) {

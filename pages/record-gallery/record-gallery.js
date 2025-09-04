@@ -84,21 +84,11 @@ Page({
           return timeA - timeB  // 升序排列，最早的在前
         })
         
-          id: item.id,
-          createdAt: item.originalData.createdAt,
-          detectionTime: item.originalData.detectionTime,
-          uploadTime: item.uploadTime
-        })))
         
         const firstDetection = sortedDetections.length > 0 ? sortedDetections[0] : null
         const firstDetectionImage = firstDetection ? firstDetection.imagePath : ''
         const firstDetectionDate = firstDetection ? firstDetection.uploadTime : ''
         
-          id: firstDetection.id,
-          imagePath: firstDetection.imagePath,
-          uploadTime: firstDetection.uploadTime,
-          createdAt: firstDetection.originalData.createdAt
-        } : null)
         
         this.setData({
           archive: report || {},
@@ -115,10 +105,6 @@ Page({
           this.scrollThumbnailToView(lastIndex)
         }
         
-          loading: this.data.loading,
-          detectionsLength: this.data.detections.length,
-          archive: this.data.archive
-        })
       } else {
         console.warn('获取档案检测记录失败:', response)
         common.showError(response.message || '获取档案检测记录失败')

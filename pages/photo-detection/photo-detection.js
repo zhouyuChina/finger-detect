@@ -16,7 +16,14 @@ Page({
     loading: true, // 加载状态
     error: false, // 错误状态
     wxLoginCode: null, // 微信登录code
-    showUserProfileModal: false // 是否显示用户信息获取弹窗
+    showUserProfileModal: false, // 是否显示用户信息获取弹窗
+    
+    // 默认档案信息（未登录用户使用）
+    defaultProfile: {
+      name: '临时检测',
+      bodyPart: '未选择',
+      detailPart: '手指'
+    }
   },
 
   onLoad(options) {
@@ -69,11 +76,21 @@ Page({
           showUserProfileModal: false
         })
       } else {
-        // 已登录但没有档案信息，跳转到档案选择页面
-        wx.redirectTo({
-          url: '/pages/create-profile/create-profile'
-        })
-        return
+        // 已登录但没有档案信息
+        // 如果没有照片路径参数，跳转到档案选择页面
+        // 如果有照片路径参数，说明是拍照后返回，允许继续
+        if (!options.photoPath) {
+          wx.redirectTo({
+            url: '/pages/create-profile/create-profile'
+          })
+          return
+        } else {
+          // 有照片但没有档案，设置加载完成状态
+          this.setData({ 
+            loading: false,
+            profile: null 
+          })
+        }
       }
     }
 
@@ -93,9 +110,16 @@ Page({
 
   // 拍照
   takePhoto() {
+    // 检查用户登录状态
+    const storage = require('../../utils/storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
     // 检查是否有档案信息
     const profile = this.data.profile
-    if (!profile) {
+    
+    if (!profile && userInfo && openId) {
+      // 已登录用户必须选择档案
       wx.showToast({
         title: '请先选择档案',
         icon: 'none'
@@ -104,10 +128,16 @@ Page({
     }
     
     // 跳转到自定义相机页面
-    const profileParam = encodeURIComponent(JSON.stringify(profile))
+    let url = '/pages/camera/camera'
+    
+    // 如果有档案信息，传递给相机页面
+    if (profile) {
+      const profileParam = encodeURIComponent(JSON.stringify(profile))
+      url = `/pages/camera/camera?profile=${profileParam}`
+    }
     
     wx.navigateTo({
-      url: `/pages/camera/camera?profile=${profileParam}`,
+      url: url,
       success: () => {
       },
       fail: (error) => {
@@ -210,10 +240,6 @@ Page({
         this.setData({ profile: updatedProfile })
       }
       
-        hasReports, 
-        actualPhotoCount,
-        archiveName: profile.name 
-      })
       
       this.setData({ 
         hasReports,
@@ -378,11 +404,6 @@ Page({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-          userInfo: !!savedUserInfo,
-          openId: !!savedOpenId,
-          subUsers: !!savedSubUsers,
-          currentSubUser: !!savedCurrentSubUser
-        })
         
         // 如果用户提供了真实信息，调用同步接口
         if (userProfileResult.userInfo && userProfileResult.userInfo.nickName !== '微信用户') {
@@ -460,9 +481,6 @@ Page({
 
   // 开始检测
   async startDetection() {
-      photoTaken: this.data.photoTaken,
-      photoPath: this.data.photoPath
-    })
     
     if (!this.data.photoTaken) {
       wx.showToast({

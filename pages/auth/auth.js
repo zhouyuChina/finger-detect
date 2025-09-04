@@ -143,11 +143,6 @@ Page({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-          userInfo: !!savedUserInfo,
-          openId: !!savedOpenId,
-          subUsers: !!savedSubUsers,
-          currentSubUser: !!savedCurrentSubUser
-        })
         
         // 如果用户提供了真实信息，调用同步接口
         if (userInfo && userInfo.nickName !== '微信用户') {

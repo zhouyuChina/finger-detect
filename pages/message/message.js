@@ -130,8 +130,11 @@ Page({
       const openId = storage.getOpenId()
       
       if (!userInfo || !openId) {
-        // 未登录用户，跳过阅读状态获取
-        return messageList
+        // 未登录用户，跳过阅读状态获取，并将所有消息标记为已读（不显示未读状态）
+        return messageList.map(message => ({
+          ...message,
+          isRead: true // 未登录用户不显示未读状态
+        }))
       }
       
       // 获取所有消息ID

@@ -46,12 +46,6 @@ Page({
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
-      isLoggedIn: isLoggedIn,
-      hasUserInfo: !!userInfo,
-      hasOpenId: !!openId,
-      userInfo: userInfo ? '有效' : '无效或过期',
-      openId: openId ? '有效' : '无效或过期'
-    })
     
     // 不再强制跳转授权页面，允许用户正常浏览首页
     // 授权将在用户进行拍照检测时自动处理
@@ -108,23 +102,13 @@ Page({
       const openId = storage.getOpenId()
       const token = storage.getToken()
       
-        userInfo: userInfo ? '存在' : '不存在',
-        openId: openId ? '存在' : '不存在',
-        token: token ? '存在' : '不存在'
-      })
       
       // 检查app全局数据
       const app = getApp()
       if (app) {
-          userInfo: app.globalData.userInfo ? '存在' : '不存在',
-          isLoggedIn: app.globalData.isLoggedIn
-        })
       }
       
       // 检查当前页面数据
-        userInfo: this.data.userInfo ? '存在' : '不存在',
-        isLoggedIn: this.data.isLoggedIn
-      })
       
       // 显示状态信息
       wx.showModal({
@@ -397,10 +381,14 @@ Page({
         const openId = storage.getOpenId()
         
         if (!userInfo || !openId) {
-          // 未登录用户，跳过阅读状态获取
-          this.setData({ messages: topMessages })
+          // 未登录用户，跳过阅读状态获取，并将所有消息标记为已读（不显示未读状态）
+          const messagesWithReadStatus = topMessages.map(message => ({
+            ...message,
+            isRead: true // 未登录用户不显示未读状态
+          }))
+          this.setData({ messages: messagesWithReadStatus })
           this.calculateUnreadCount()
-          storage.setMessages(topMessages)
+          storage.setMessages(messagesWithReadStatus)
           return
         }
         
@@ -443,6 +431,11 @@ Page({
       console.warn('消息数据不是数组格式:', data)
       return []
     }
+    
+    // 检查用户是否已登录
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    const defaultIsRead = (!userInfo || !openId) // 未登录用户默认已读
 
     return data.map((item, index) => {
       // 处理封面图片URL，如果是相对路径则拼接完整URL
@@ -475,7 +468,7 @@ Page({
         isTop: isTop,
         isImportant: isImportant,
         readCount: item.readCount || 0,
-        isRead: item.isRead || false,
+        isRead: defaultIsRead || item.isRead || false, // 未登录时默认已读
         publishedAt: publishedAt,
         publishTime: publishTime,
         createdAt: item.createdAt || item.createTime || publishedAt
@@ -523,6 +516,16 @@ Page({
 
   // 计算未读消息数量
   calculateUnreadCount() {
+    // 检查用户是否已登录
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+    
+    if (!userInfo || !openId) {
+      // 未登录用户，设置未读数量为0
+      this.setData({ unreadCount: 0 })
+      return
+    }
+    
     const unreadCount = this.data.messages.filter(msg => !msg.isRead).length
     this.setData({ unreadCount })
   },
@@ -658,6 +661,16 @@ Page({
   // 全部标记已读
   async markAllAsRead() {
     try {
+      // 检查用户是否已登录
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        // 未登录用户，不执行标记已读操作
+        common.showToast('请先登录')
+        return
+      }
+      
       // 获取所有未读消息的ID
       const unreadMessages = this.data.messages.filter(msg => !msg.isRead)
       
