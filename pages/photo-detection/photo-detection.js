@@ -59,18 +59,28 @@ Page({
       this.checkProfileReports(profile.id)
     } else {
       // 没有档案信息的情况（未登录用户或直接访问）
-      console.log('未传递档案信息，允许无档案拍照')
+      console.log('未传递档案信息，需要先授权')
       
-      this.setData({ 
-        loading: false,
-        profile: null,
-        // 设置默认档案信息用于显示
-        defaultProfile: {
-          name: '临时档案',
-          bodyPart: '未指定',
-          detailPart: '未指定'
-        }
-      })
+      // 检查用户是否已登录
+      const storage = require('../../utils/storage.js')
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+      
+      if (!userInfo || !openId) {
+        // 未登录用户，显示授权提示
+        this.setData({ 
+          loading: false,
+          profile: null,
+          showUserProfileModal: false
+        })
+      } else {
+        // 已登录但没有档案信息，跳转到档案选择页面
+        console.log('已登录用户但未传递档案信息，跳转到档案选择页面')
+        wx.redirectTo({
+          url: '/pages/create-profile/create-profile'
+        })
+        return
+      }
     }
 
     // 如果有照片路径参数，说明是从相机页面返回的
@@ -93,9 +103,18 @@ Page({
 
   // 拍照
   takePhoto() {
+    // 检查是否有档案信息
+    const profile = this.data.profile
+    if (!profile) {
+      wx.showToast({
+        title: '请先选择档案',
+        icon: 'none'
+      })
+      return
+    }
+    
     // 跳转到自定义相机页面
-    const profile = this.data.profile || this.data.defaultProfile
-    const profileParam = profile ? encodeURIComponent(JSON.stringify(profile)) : ''
+    const profileParam = encodeURIComponent(JSON.stringify(profile))
     
     wx.navigateTo({
       url: `/pages/camera/camera?profile=${profileParam}`,
@@ -418,18 +437,30 @@ Page({
           duration: 2000
         })
 
-        // 验证数据完整性后跳转到首页（与授权页面保持一致）
+        // 验证数据完整性后，根据用户信息完整性决定跳转逻辑
         const finalUserInfo = storage.getUserInfo()
         const finalOpenId = storage.getOpenId()
         
         if (finalUserInfo && finalOpenId) {
-          console.log('数据保存完整，准备跳转到首页')
-          // 延迟跳转到首页
-          setTimeout(() => {
-            wx.switchTab({
-              url: '/pages/index/index'
-            })
-          }, 2000)
+          console.log('数据保存完整，检查用户信息是否完整')
+          
+          // 检查用户信息是否完整
+          const storage = require('../../utils/storage.js')
+          if (!storage.isUserInfoComplete()) {
+            console.log('用户信息不完整，跳转到完善信息页面')
+            setTimeout(() => {
+              wx.navigateTo({
+                url: '/pages/create-profile/create-profile?mode=complete'
+              })
+            }, 2000)
+          } else {
+            console.log('用户信息完整，跳转到用户选择页面')
+            setTimeout(() => {
+              wx.navigateTo({
+                url: '/pages/create-profile/create-profile'
+              })
+            }, 2000)
+          }
         } else {
           console.error('数据保存不完整，无法跳转:', {
             userInfo: !!finalUserInfo,
@@ -461,7 +492,7 @@ Page({
     })
   },
 
-  // 开始检测（总是进行检测流程）
+  // 开始检测
   async startDetection() {
     console.log('开始检测，当前状态:', {
       photoTaken: this.data.photoTaken,
@@ -499,21 +530,18 @@ Page({
 
     const profile = this.data.profile
     if (!profile) {
-      // 已登录但无档案信息用户，提示需要先创建档案
+      // 已登录但无档案信息，跳转到档案选择页面
       wx.showModal({
         title: '提示',
-        content: '检测功能需要档案信息，是否先创建档案？',
-        confirmText: '创建档案',
-        cancelText: '仅保存图片',
+        content: '检测功能需要档案信息，是否先选择档案？',
+        confirmText: '选择档案',
+        cancelText: '取消',
         success: (res) => {
           if (res.confirm) {
-            // 跳转到创建档案页面
+            // 跳转到档案选择页面
             wx.navigateTo({
               url: '/pages/create-profile/create-profile'
             })
-          } else {
-            // 仅保存图片
-            this.savePhotoOnly()
           }
         }
       })

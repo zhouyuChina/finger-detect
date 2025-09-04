@@ -583,40 +583,41 @@ Page({
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
-    if (userInfo && openId) {
-      // 已登录用户，检查用户信息是否完整
-      if (!storage.isUserInfoComplete()) {
-        console.log('用户信息不完整，需要完善信息')
-        const missingFields = storage.getMissingUserInfoFields()
-        console.log('缺失的字段:', missingFields)
-        
-        // 显示提示信息
-        const result = await common.showConfirm(
-          '完善个人信息', 
-          '检测到您的个人信息不完整（性别、年龄、地址），需要先完善信息才能进行检测。是否现在完善？'
-        )
-        
-        if (result) {
-          // 跳转到完善信息页面
-          wx.navigateTo({
-            url: '/pages/create-profile/create-profile?mode=complete'
-          })
-        }
-        return
-      }
-
-      // 用户信息完整，直接跳转到拍照检测页面
-      console.log('用户信息完整，直接进行拍照检测')
-      wx.navigateTo({
-        url: '/pages/create-profile/create-profile'
-      })
-    } else {
-      // 未登录用户，直接跳转到拍照检测页面
-      console.log('未登录用户，直接进行拍照检测')
+    if (!userInfo || !openId) {
+      // 未登录用户，跳转到拍照检测页面，由该页面处理授权
+      console.log('未登录用户，跳转到拍照检测页面进行授权')
       wx.navigateTo({
         url: '/pages/photo-detection/photo-detection'
       })
+      return
     }
+
+    // 已登录用户，检查用户信息是否完整
+    if (!storage.isUserInfoComplete()) {
+      console.log('用户信息不完整，需要完善信息')
+      const missingFields = storage.getMissingUserInfoFields()
+      console.log('缺失的字段:', missingFields)
+      
+      // 显示提示信息
+      const result = await common.showConfirm(
+        '完善个人信息', 
+        '检测到您的个人信息不完整（性别、年龄、地址），需要先完善信息才能进行检测。是否现在完善？'
+      )
+      
+      if (result) {
+        // 跳转到完善信息页面
+        wx.navigateTo({
+          url: '/pages/create-profile/create-profile?mode=complete'
+        })
+      }
+      return
+    }
+
+    // 用户信息完整，跳转到档案选择页面
+    console.log('用户信息完整，跳转到档案选择页面')
+    wx.navigateTo({
+      url: '/pages/create-profile/create-profile'
+    })
   },
 
   // 查看全部消息
