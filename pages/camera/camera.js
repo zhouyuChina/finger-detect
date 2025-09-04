@@ -10,14 +10,12 @@ Page({
   },
 
   onLoad(options) {
-    console.log('Camera页面加载，参数:', options)
     
     // 获取传递的档案信息
     if (options.profile) {
       try {
         const profile = JSON.parse(decodeURIComponent(options.profile))
         this.setData({ profile })
-        console.log('设置档案信息成功:', profile)
       } catch (error) {
         console.error('解析档案信息失败:', error)
       }
@@ -30,7 +28,6 @@ Page({
     ctx.takePhoto({
       quality: 'high',
       success: (res) => {
-        console.log('拍照成功:', res)
         // 拍照后立即进行裁剪
         this.cropPhoto(res.tempImagePath)
       },
@@ -143,7 +140,6 @@ Page({
       const actualCropWidth = Math.min(imageWidth - actualCropX, guideFrameWidth * scaleX)
       const actualCropHeight = Math.min(imageHeight - actualCropY, guideFrameHeight * scaleY)
 
-      console.log('裁剪参数:', {
         screenSize: { width: screenWidth, height: screenHeight, windowHeight },
         imageSize: { width: imageWidth, height: imageHeight },
         guideFrame: { x: guideFrameX, y: guideFrameY, width: guideFrameWidth, height: guideFrameHeight },
@@ -169,7 +165,6 @@ Page({
         showCamera: false
       })
 
-      console.log('图片裁剪完成:', croppedImagePath)
     } catch (error) {
       wx.hideLoading()
       console.error('图片裁剪失败:', error)
@@ -240,7 +235,6 @@ Page({
               destWidth: Math.round(width),
               destHeight: Math.round(height),
               success: (res) => {
-                console.log('Canvas导出成功:', res.tempFilePath)
                 resolve(res.tempFilePath)
               },
               fail: (error) => {

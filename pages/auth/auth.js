@@ -12,7 +12,6 @@ Page({
   },
 
   onLoad() {
-    console.log('授权页面加载')
     this.getWxLoginCode()
   },
 
@@ -28,7 +27,6 @@ Page({
 
       if (loginRes.code) {
         this.setData({ code: loginRes.code })
-        console.log('获取微信登录code成功:', loginRes.code)
       } else {
         console.error('获取微信登录code失败')
         common.showError('获取登录凭证失败')
@@ -51,7 +49,6 @@ Page({
     wx.getUserProfile({
       desc: '用于完善用户资料和个性化服务', // 声明获取用户个人信息后的用途
       success: (res) => {
-        console.log('获取用户信息成功:', res.userInfo)
         this.setData({ 
           userInfo: res.userInfo,
           loading: false 
@@ -61,7 +58,6 @@ Page({
         this.registerUser(res.userInfo)
       },
       fail: (err) => {
-        console.log('获取用户信息失败:', err)
         this.setData({ loading: false })
         
         // 用户拒绝授权，使用默认信息
@@ -107,19 +103,14 @@ Page({
         appVersion: '1.0.0'
       }
 
-      console.log('开始注册用户...')
-      console.log('注册数据:', registerData)
 
       const response = await api.user.miniProgramRegister(registerData)
       
-      console.log('注册响应:', response)
       
       if (response.success || response.code === 200) {
-        console.log('注册成功，保存用户数据')
         
         // 保存用户信息（新接口格式）
         const responseData = response.data || response
-        console.log('注册响应数据:', responseData)
         
         // 从新接口格式中提取数据
         const user = responseData.user
@@ -127,25 +118,21 @@ Page({
           // 保存openId（从user.openid获取）
           if (user.openid) {
             storage.setOpenId(user.openid)
-            console.log('保存openId成功:', user.openid)
           } else {
             console.warn('响应中没有openid')
           }
           
           // 保存用户信息（使用user对象）
           storage.setUserInfo(user)
-          console.log('保存用户信息成功:', user)
           
           // 保存子用户列表
           if (user.subUsers) {
             storage.setSubUsers(user.subUsers)
-            console.log('保存子用户列表成功，数量:', user.subUsers.length)
           }
           
           // 保存当前子用户
           if (user.currentSubUser) {
             storage.setCurrentSubUser(user.currentSubUser)
-            console.log('保存当前子用户成功:', user.currentSubUser)
           }
         } else {
           console.warn('响应中没有user对象')
@@ -156,7 +143,6 @@ Page({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-        console.log('保存后的数据验证:', {
           userInfo: !!savedUserInfo,
           openId: !!savedOpenId,
           subUsers: !!savedSubUsers,
@@ -166,9 +152,7 @@ Page({
         // 如果用户提供了真实信息，调用同步接口
         if (userInfo && userInfo.nickName !== '微信用户') {
           try {
-            console.log('调用同步用户信息接口')
             const syncResponse = await api.user.syncProfile(userInfo)
-            console.log('同步用户信息响应:', syncResponse.code, syncResponse.message)
           } catch (syncError) {
             console.warn('同步用户信息失败，但不影响使用:', syncError)
           }
@@ -189,7 +173,6 @@ Page({
         const finalOpenId = storage.getOpenId()
         
         if (finalUserInfo && finalOpenId) {
-          console.log('数据保存完整，准备跳转到首页')
           // 延迟跳转到首页
           setTimeout(() => {
             wx.switchTab({
@@ -218,7 +201,6 @@ Page({
 
   // 跳过授权（使用默认信息）
   skipAuth() {
-    console.log('用户选择跳过授权')
     this.registerUser({
       nickName: '微信用户',
       avatarUrl: '/images/default-avatar.png',

@@ -20,13 +20,11 @@ Page({
   },
 
   onLoad(options) {
-    console.log('Photo-detection页面加载，参数:', options)
     
     // 获取传递的档案信息
     if (options.profile) {
       try {
         const profile = JSON.parse(decodeURIComponent(options.profile))
-        console.log('解析到的档案信息:', profile)
         
         // 检查档案是否有ID
         if (!profile || !profile.id) {
@@ -36,7 +34,6 @@ Page({
         }
         
         this.setData({ profile })
-        console.log('设置档案信息成功，档案ID:', profile.id)
         
         // 检查档案是否有报告
         this.checkProfileReports(profile.id)
@@ -53,13 +50,11 @@ Page({
         photoCount: 0 // 初始化为0，需要重新获取真实数据
       }
       this.setData({ profile })
-      console.log('从record-gallery获取到档案信息:', profile)
       
       // 需要重新检查档案的真实检测数量
       this.checkProfileReports(profile.id)
     } else {
       // 没有档案信息的情况（未登录用户或直接访问）
-      console.log('未传递档案信息，需要先授权')
       
       // 检查用户是否已登录
       const storage = require('../../utils/storage.js')
@@ -75,7 +70,6 @@ Page({
         })
       } else {
         // 已登录但没有档案信息，跳转到档案选择页面
-        console.log('已登录用户但未传递档案信息，跳转到档案选择页面')
         wx.redirectTo({
           url: '/pages/create-profile/create-profile'
         })
@@ -85,20 +79,16 @@ Page({
 
     // 如果有照片路径参数，说明是从相机页面返回的
     if (options.photoPath) {
-      console.log('检测到照片路径参数:', options.photoPath)
       this.setData({
         photoTaken: true,
         photoPath: decodeURIComponent(options.photoPath)
       })
-      console.log('设置拍照状态成功，photoTaken:', true, 'photoPath:', decodeURIComponent(options.photoPath))
     } else {
-      console.log('没有照片路径参数，options:', options)
     }
   },
 
   onShow() {
     // 页面显示时的处理
-    console.log('Photo-detection页面显示')
   },
 
   // 拍照
@@ -119,7 +109,6 @@ Page({
     wx.navigateTo({
       url: `/pages/camera/camera?profile=${profileParam}`,
       success: () => {
-        console.log('跳转到相机页面成功')
       },
       fail: (error) => {
         console.error('跳转到相机页面失败:', error)
@@ -139,7 +128,6 @@ Page({
       sourceType: ['album'],
       success: (res) => {
         const tempFilePath = res.tempFiles[0].tempFilePath
-        console.log('选择的图片路径:', tempFilePath)
         
         // 设置选择的图片路径和状态
         this.setData({
@@ -179,7 +167,6 @@ Page({
         }
       },
       fail: (res) => {
-        console.log(res.errMsg)
       }
     })
   },
@@ -187,7 +174,6 @@ Page({
   // 检查档案报告
   async checkProfileReports(profileId) {
     try {
-      console.log('检查档案报告，档案ID:', profileId)
       
       // 获取档案信息，检查是否有报告
       const profile = this.data.profile
@@ -208,7 +194,6 @@ Page({
         limit: 1 // 只需要检查是否有记录，不需要获取所有数据
       })
       
-      console.log('档案检测记录查询结果:', response)
       
       let hasReports = false
       let actualPhotoCount = 0
@@ -225,7 +210,6 @@ Page({
         this.setData({ profile: updatedProfile })
       }
       
-      console.log('档案报告检查结果:', { 
         hasReports, 
         actualPhotoCount,
         archiveName: profile.name 
@@ -287,12 +271,10 @@ Page({
 
   // 用户授权
   async onUserAuth() {
-    console.log('用户点击授权按钮')
     
     try {
       // 先获取微信登录code
       const loginResult = await wx.login()
-      console.log('微信登录结果:', loginResult)
       
       if (loginResult.code) {
         // 保存code到页面数据中，用于后续获取用户信息
@@ -327,7 +309,6 @@ Page({
       const userProfileResult = await wx.getUserProfile({
         desc: '用于完善用户资料和个性化服务'
       })
-      console.log('用户信息获取结果:', userProfileResult)
       
       // 获取系统信息
       const systemInfo = wx.getSystemInfoSync()
@@ -354,22 +335,17 @@ Page({
         appVersion: '1.0.0'
       }
 
-      console.log('开始注册用户...')
-      console.log('注册数据:', registerData)
 
       // 调用后端注册接口
       const api = require('../../utils/api.js')
       const storage = require('../../utils/storage.js')
       const response = await api.user.miniProgramRegister(registerData)
       
-      console.log('注册响应:', response)
       
       if (response.success || response.code === 200) {
-        console.log('注册成功，保存用户数据')
         
         // 保存用户信息（与授权页面保持一致）
         const responseData = response.data || response
-        console.log('注册响应数据:', responseData)
         
         // 从新接口格式中提取数据
         const user = responseData.user
@@ -377,25 +353,21 @@ Page({
           // 保存openId（从user.openid获取）
           if (user.openid) {
             storage.setOpenId(user.openid)
-            console.log('保存openId成功:', user.openid)
           } else {
             console.warn('响应中没有openid')
           }
           
           // 保存用户信息（使用user对象）
           storage.setUserInfo(user)
-          console.log('保存用户信息成功:', user)
           
           // 保存子用户列表
           if (user.subUsers) {
             storage.setSubUsers(user.subUsers)
-            console.log('保存子用户列表成功，数量:', user.subUsers.length)
           }
           
           // 保存当前子用户
           if (user.currentSubUser) {
             storage.setCurrentSubUser(user.currentSubUser)
-            console.log('保存当前子用户成功:', user.currentSubUser)
           }
         } else {
           console.warn('响应中没有user对象')
@@ -406,7 +378,6 @@ Page({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-        console.log('保存后的数据验证:', {
           userInfo: !!savedUserInfo,
           openId: !!savedOpenId,
           subUsers: !!savedSubUsers,
@@ -416,9 +387,7 @@ Page({
         // 如果用户提供了真实信息，调用同步接口
         if (userProfileResult.userInfo && userProfileResult.userInfo.nickName !== '微信用户') {
           try {
-            console.log('调用同步用户信息接口')
             const syncResponse = await api.user.syncProfile(userProfileResult.userInfo)
-            console.log('同步用户信息响应:', syncResponse.code, syncResponse.message)
           } catch (syncError) {
             console.warn('同步用户信息失败，但不影响使用:', syncError)
           }
@@ -442,19 +411,16 @@ Page({
         const finalOpenId = storage.getOpenId()
         
         if (finalUserInfo && finalOpenId) {
-          console.log('数据保存完整，检查用户信息是否完整')
           
           // 检查用户信息是否完整
           const storage = require('../../utils/storage.js')
           if (!storage.isUserInfoComplete()) {
-            console.log('用户信息不完整，跳转到完善信息页面')
             setTimeout(() => {
               wx.navigateTo({
                 url: '/pages/create-profile/create-profile?mode=complete'
               })
             }, 2000)
           } else {
-            console.log('用户信息完整，跳转到用户选择页面')
             setTimeout(() => {
               wx.navigateTo({
                 url: '/pages/create-profile/create-profile'
@@ -494,7 +460,6 @@ Page({
 
   // 开始检测
   async startDetection() {
-    console.log('开始检测，当前状态:', {
       photoTaken: this.data.photoTaken,
       photoPath: this.data.photoPath
     })
@@ -633,11 +598,9 @@ Page({
         remark: '仅保存图片' // 备注信息
       }
 
-      console.log('保存图片数据:', saveData)
       
       // 调用新的保存图片接口
       const response = await api.detection.savePhotoRecord(saveData)
-      console.log('保存图片接口响应:', response)
       
       wx.hideLoading()
       
@@ -702,11 +665,9 @@ Page({
         base64Image: base64Image // base64图片数据（必填）
       }
 
-      console.log('保存检测数据:', detectionData)
       
       // 调用检测接口保存照片
       const response = await api.detection.create(detectionData)
-      console.log('检测保存接口响应:', response)
       
       wx.hideLoading()
       
@@ -715,7 +676,6 @@ Page({
         
         // 处理检测结果
         const finalResult = thirdPartyResult.final_result
-        console.log('最终检测结果:', finalResult)
         
         // 根据检测结果进行不同处理
         if (finalResult === 'blurred') {
@@ -741,12 +701,10 @@ Page({
         this.updateProfilePhotoCount(this.data.profile.id)
         
         // 跳转到恢复记录页面（tabBar页面）
-        console.log('准备跳转到恢复记录页面，profileId:', this.data.profile.id)
         setTimeout(() => {
           wx.switchTab({
             url: '/pages/records-compare/records-compare',
             success: () => {
-              console.log('跳转到tabBar页面成功')
             },
             fail: (error) => {
               console.error('跳转到tabBar页面失败:', error)
@@ -824,23 +782,18 @@ Page({
         base64Image: base64Image // base64图片数据（必填）
       }
 
-      console.log('开始检测，数据:', detectionData)
       
       // 调用检测接口
       const response = await api.detection.create(detectionData)
-      console.log('检测接口响应:', response)
       
       wx.hideLoading()
       
       if (response.success && response.data) {
         const { detection, thirdPartyResult, isFirstReport, shouldSaveToDatabase } = response.data
         
-        console.log('检测完成，是否为第一次报告:', isFirstReport)
-        console.log('是否需要保存到数据库:', shouldSaveToDatabase)
         
         // 处理检测结果
         const finalResult = thirdPartyResult.final_result
-        console.log('最终检测结果:', finalResult)
         
         // 根据检测结果进行不同处理
         if (finalResult === 'blurred') {
@@ -973,7 +926,6 @@ Page({
     }
     
     const detectionType = detectionTypeMap[archiveName]
-    console.log('档案名称:', archiveName, '映射到检测类型:', detectionType)
     
     if (!detectionType) {
       console.warn('未找到对应的检测类型，使用默认值 left_hand_thumb')
@@ -1017,7 +969,6 @@ Page({
     }
     
     const bodyPart = bodyPartMap[archiveName]
-    console.log('档案名称:', archiveName, '映射到bodyPart:', bodyPart)
     
     if (!bodyPart) {
       console.warn('未找到对应的bodyPart，使用默认值 left_hand_thumb')
@@ -1038,7 +989,6 @@ Page({
       }
       this.setData({ profile: updatedProfile })
       
-      console.log('更新档案照片数量:', updatedProfile.photoCount)
       
       // 通知上一页更新档案列表
       const pages = getCurrentPages()

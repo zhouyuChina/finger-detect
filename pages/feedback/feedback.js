@@ -181,7 +181,6 @@ Page({
   async onFeedbackClick(e) {
     const feedbackId = e.currentTarget.dataset.id
     
-    console.log('点击查看详情，ID:', feedbackId)
     
     wx.showLoading({
       title: '加载中...'
@@ -190,13 +189,11 @@ Page({
     try {
       const res = await api.feedback.getDetailByQuery(feedbackId)
       
-      console.log('详情接口响应:', res)
       
       if (res.success && res.data && res.data.list && res.data.list.length > 0) {
         // 从列表中取第一个匹配的反馈（按ID匹配）
         const feedbackDetail = res.data.list.find(item => item.id === feedbackId) || res.data.list[0]
         
-        console.log('当前反馈详情数据:', feedbackDetail)
         
         this.setData({
           currentFeedback: feedbackDetail,

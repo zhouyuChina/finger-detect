@@ -20,21 +20,14 @@ class Request {
 
     // 添加token（只有在有token时才添加）
     const token = storage.getToken()
-    console.log('当前存储的token:', token)
     if (token && token !== 'undefined' && token !== 'null') {
       headers['Authorization'] = `Bearer ${token}`
-      console.log('添加Authorization头:', headers['Authorization'])
-    } else {
-      console.log('没有找到有效token，请求头中不包含Authorization')
     }
 
     // 添加openId（只有在有openId时才添加）
     const openId = storage.getOpenId()
     if (openId && openId !== 'undefined' && openId !== 'null') {
       headers['X-Openid'] = openId
-      console.log('添加X-Openid头:', openId)
-    } else {
-      console.log('没有找到有效openId，请求头中不包含X-Openid')
     }
 
     return headers
@@ -76,51 +69,29 @@ class Request {
         })
       })
 
-      console.log('Token接口响应:', response)
-      console.log('Token接口响应数据:', response.data)
-
       if (response.statusCode === 200) {
         const data = response.data
-        console.log('处理Token响应数据:', data)
         
         // 检查响应格式
         if (data.success) {
           // 成功格式：{success: true, data: {...}, message: "xxx"}
-          console.log('检测到success格式响应')
-          
           if (data.data && data.data.token) {
             const token = data.data.token
             storage.setToken(token)
-            console.log('获取token成功:', token)
           } else if (data.data && data.data.access_token) {
             // 有些接口使用access_token字段
             const token = data.data.access_token
             storage.setToken(token)
-            console.log('获取access_token成功:', token)
-          } else {
-            // 没有token，不自动生成
-            console.log('响应中没有token字段')
           }
         } else if (data.code === config.errorCodes.SUCCESS) {
           // 标准格式：{code: 200, data: {...}, message: "xxx"}
-          console.log('检测到code格式响应')
-          
           if (data.data && data.data.token) {
             const token = data.data.token
             storage.setToken(token)
-            console.log('获取token成功:', token)
           } else if (data.data && data.data.access_token) {
             const token = data.data.access_token
             storage.setToken(token)
-            console.log('获取access_token成功:', token)
-          } else {
-            // 没有token，不自动生成
-            console.log('响应中没有token字段')
           }
-        } else {
-          console.log('未知响应格式，不生成临时token')
-          // 未知格式，不生成临时token
-          console.log('无法获取有效token')
         }
       } else {
         throw new Error(`HTTP ${response.statusCode}: ${response.data?.message || '获取token失败'}`)
@@ -128,7 +99,6 @@ class Request {
     } catch (error) {
       console.error('获取token失败:', error)
       // 不再静默处理，让调用方知道获取失败
-      console.log('Token获取失败，需要用户授权')
     } finally {
       this.isGettingToken = false
     }
@@ -159,33 +129,23 @@ class Request {
   // 处理响应
   handleResponse(response, resolve, reject) {
     const { statusCode, data } = response
-    
-    console.log('handleResponse - 状态码:', statusCode)
-    console.log('handleResponse - 响应数据:', data)
-    console.log('handleResponse - data.success:', data.success)
-    console.log('handleResponse - data.code:', data.code)
 
     if (statusCode === 200 || statusCode === 201) {
       // 支持两种响应格式：{success: true, data: {...}} 或 {code: 200, data: {...}}
       if (data.success === true) {
-        console.log('检测到success格式成功响应')
         resolve(data)
       } else if (data.code === config.errorCodes.SUCCESS) {
         // 标准格式：{code: 200, data: {...}, message: "xxx"}
-        console.log('检测到标准格式成功响应')
         resolve(data)
       } else if (data.code === config.errorCodes.UNAUTHORIZED) {
         // token过期，尝试刷新
-        console.log('检测到token过期')
         this.handleTokenExpired(resolve, reject)
       } else {
-        console.log('检测到业务错误:', data.code, data.message)
         const errorMsg = data.message || config.errorMessages[data.code] || config.errorMessages.default
         this.showError(errorMsg)
         reject(data)
       }
     } else {
-      console.log('检测到HTTP错误:', statusCode)
       const errorMsg = config.errorMessages[statusCode] || config.errorMessages.default
       this.showError(errorMsg)
       reject({
@@ -311,7 +271,6 @@ class Request {
 
           // 网络错误，尝试重试
           if (retry < this.retryCount) {
-            console.log(`请求失败，第${retry + 1}次重试:`, url)
             setTimeout(() => {
               this.request({
                 ...options,

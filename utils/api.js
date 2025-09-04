@@ -32,7 +32,6 @@ const userApi = {
     const openId = storage.getOpenId()
     
     if (!userInfo || !openId) {
-      console.log('用户未登录，跳过getProfile接口调用')
       return Promise.resolve({
         success: false,
         code: 401,
@@ -41,7 +40,6 @@ const userApi = {
       })
     }
     
-    console.log('用户已登录，调用getProfile接口')
     return request.get(config.api.user.profile)
   },
 
@@ -78,7 +76,6 @@ const userApi = {
     const openId = storage.getOpenId()
     
     if (!userInfo || !openId) {
-      console.log('用户未登录，跳过getStats接口调用')
       return Promise.resolve({
         success: false,
         code: 401,
@@ -87,7 +84,6 @@ const userApi = {
       })
     }
     
-    console.log('用户已登录，调用getStats接口')
     return request.get(config.api.user.stats)
   },
 
@@ -99,7 +95,6 @@ const userApi = {
     const openId = storage.getOpenId()
     
     if (!userInfo || !openId) {
-      console.log('用户未登录，跳过getUsers接口调用')
       return Promise.resolve({
         success: false,
         code: 401,
@@ -108,7 +103,6 @@ const userApi = {
       })
     }
     
-    console.log('用户已登录，调用getUsers接口')
     return request.get(config.api.user.getUsers)
   },
 
@@ -355,7 +349,6 @@ const profileApi = {
     const openId = storage.getOpenId()
     
     if (!userInfo || !openId) {
-      console.log('用户未登录，跳过getAllArchives接口调用')
       return Promise.resolve({
         success: false,
         code: 401,
@@ -372,7 +365,6 @@ const profileApi = {
       })
     }
     
-    console.log('用户已登录，调用getAllArchives接口')
     return request.get(config.api.profile.allArchives, params)
   },
 

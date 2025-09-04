@@ -18,7 +18,6 @@ Page({
   },
 
   onLoad(options) {
-    console.log('Detection-result页面加载，参数:', options)
     
     // 如果有传递的图片路径，使用传递的路径
     if (options.imagePath) {
@@ -34,7 +33,6 @@ Page({
         const thirdPartyResult = JSON.parse(decodeURIComponent(options.thirdPartyResult))
         const finalResult = options.finalResult ? decodeURIComponent(options.finalResult) : null
         
-        console.log('解析检测结果:', { detection, thirdPartyResult, finalResult })
         
         // 根据检测结果生成描述和建议
         let description = ''
@@ -66,9 +64,7 @@ Page({
         
         // 根据是否为第一次报告显示不同的提示
         if (detection.isFirstReport) {
-          console.log('这是第一次检测，生成了报告')
         } else {
-          console.log('这是治疗过程中的检测记录')
         }
       } catch (error) {
         console.error('解析检测结果失败:', error)

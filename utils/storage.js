@@ -211,7 +211,6 @@ class Storage {
 
   // 清除用户相关缓存
   clearUserData() {
-    console.log('开始清除用户相关缓存...')
     
     // 清除所有用户相关的缓存
     const userKeys = [
@@ -222,17 +221,14 @@ class Storage {
     
     userKeys.forEach(key => {
       this.remove(key)
-      console.log(`已清除缓存: ${key}`)
     })
     
     // 清除内存缓存
     this.cache.clear()
-    console.log('已清除内存缓存')
     
     // 强制清除微信本地存储中的用户数据
     this.clearWechatStorage()
     
-    console.log('用户相关缓存清除完成')
   }
 
   // 清除微信本地存储中的用户数据
@@ -258,7 +254,6 @@ class Storage {
       userDataKeys.forEach(key => {
         try {
           wx.removeStorageSync(key)
-          console.log(`已清除微信存储: ${key}`)
         } catch (error) {
           console.warn(`清除微信存储失败: ${key}`, error)
         }
@@ -284,7 +279,6 @@ class Storage {
       const data = this.get(key)
       if (data && this.isExpired(data)) {
         this.remove(key)
-        console.log(`清除过期数据: ${key}`)
       }
     })
   }
@@ -295,22 +289,12 @@ class Storage {
     
     // 主要检查当前用户信息是否完整
     if (!userInfo) {
-      console.log('用户信息不存在')
       return false
     }
 
-    console.log('=== 用户信息完整性检查 ===')
-    console.log('完整的userInfo对象:', JSON.stringify(userInfo, null, 2))
-    console.log('userInfo类型:', typeof userInfo)
-    console.log('userInfo是否为对象:', typeof userInfo === 'object')
     
     if (userInfo.currentSubUser) {
-      console.log('currentSubUser存在:', JSON.stringify(userInfo.currentSubUser, null, 2))
-      console.log('currentSubUser.gender:', userInfo.currentSubUser.gender, '类型:', typeof userInfo.currentSubUser.gender)
-      console.log('currentSubUser.age:', userInfo.currentSubUser.age, '类型:', typeof userInfo.currentSubUser.age)
-      console.log('currentSubUser.address:', userInfo.currentSubUser.address, '类型:', typeof userInfo.currentSubUser.address)
     } else {
-      console.log('currentSubUser不存在')
     }
 
     // 检查性别（0-未知，1-男，2-女）
@@ -322,9 +306,6 @@ class Storage {
     // 检查地址（省市）
     const hasAddress = userInfo.currentSubUser && userInfo.currentSubUser.address !== undefined && userInfo.currentSubUser.address !== null && userInfo.currentSubUser.address !== '' && userInfo.currentSubUser.address !== 0 && userInfo.currentSubUser.address !== '0'
 
-    console.log('检查结果:', { hasGender, hasAge, hasAddress })
-    console.log('最终结果:', hasGender && hasAge && hasAddress)
-    console.log('=== 检查结束 ===')
 
     return hasGender && hasAge && hasAddress
   }
@@ -453,13 +434,11 @@ class Storage {
     if (userInfo) {
       // 重新设置用户信息，延长30天有效期
       this.setUserInfo(userInfo)
-      console.log('用户信息有效期已延长30天')
     }
     
     if (openId) {
       // 重新设置openId，延长30天有效期
       this.setOpenId(openId)
-      console.log('OpenId有效期已延长30天')
     }
   }
 }

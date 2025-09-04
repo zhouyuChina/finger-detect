@@ -66,22 +66,16 @@ Page({
         limit: this.data.pagination.limit
       }
       
-      console.log('加载档案检测记录，参数:', params)
       
       const response = await api.profile.getArchiveDetections(params)
-      console.log('档案检测记录响应:', response)
       
       if (response.success && response.data) {
         const { report, images, pagination, subUser } = response.data
         
-        console.log('原始检测记录数据:', images)
-        console.log('检测记录数组长度:', images ? images.length : 0)
         
         // 格式化检测记录
         const formattedDetections = this.formatDetections(images)
         
-        console.log('格式化后的检测记录:', formattedDetections)
-        console.log('格式化后数组长度:', formattedDetections.length)
         
         // 设置首次检测图片数据（按时间排序，获取最早的检测记录）
         const sortedDetections = formattedDetections.sort((a, b) => {
@@ -90,7 +84,6 @@ Page({
           return timeA - timeB  // 升序排列，最早的在前
         })
         
-        console.log('排序后的检测记录时间:', sortedDetections.map(item => ({
           id: item.id,
           createdAt: item.originalData.createdAt,
           detectionTime: item.originalData.detectionTime,
@@ -101,7 +94,6 @@ Page({
         const firstDetectionImage = firstDetection ? firstDetection.imagePath : ''
         const firstDetectionDate = firstDetection ? firstDetection.uploadTime : ''
         
-        console.log('首次检测记录:', firstDetection ? {
           id: firstDetection.id,
           imagePath: firstDetection.imagePath,
           uploadTime: firstDetection.uploadTime,
@@ -123,8 +115,6 @@ Page({
           this.scrollThumbnailToView(lastIndex)
         }
         
-        console.log('档案检测记录加载成功，数量:', formattedDetections.length)
-        console.log('当前页面数据状态:', {
           loading: this.data.loading,
           detectionsLength: this.data.detections.length,
           archive: this.data.archive
@@ -291,7 +281,6 @@ Page({
 
   // 图片加载成功
   onImageLoad(e) {
-    console.log('图片加载成功:', e.detail)
   },
 
   // 图片加载失败
@@ -341,7 +330,6 @@ Page({
 
   // 首次检测图片加载成功
   onFirstDetectionLoad(e) {
-    console.log('首次检测图片加载成功:', e.detail)
   },
 
   // 首次检测图片加载失败

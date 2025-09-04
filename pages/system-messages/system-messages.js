@@ -104,7 +104,6 @@ Page({
       
       if (!userInfo || !openId) {
         // 未登录用户，设置未读数量为0
-        console.log('未登录用户，跳过获取未读数量')
         this.setData({ unreadCount: 0 })
         return
       }
@@ -173,7 +172,6 @@ Page({
     
     // 更新未读数量
     this.loadUnreadCount()
-    console.log('系统消息已标记为已读:', messageId)
     
     // 更新Tab栏红点
     this.checkTabBarBadge()

@@ -40,7 +40,6 @@ Page({
       this.setData({ loading: true })
       
       const response = await api.user.getUsers()
-      console.log('获取用户档案响应:', response)
       
       if (response.success && response.data && response.data.subUsers) {
         const profiles = this.formatProfiles(response.data.subUsers)
@@ -51,7 +50,6 @@ Page({
         // 过滤数据
         this.filterProfiles()
         
-        console.log('用户档案加载成功:', profiles)
       } else {
         console.warn('获取用户档案失败:', response)
         common.showError(response.message || '获取用户档案失败')
@@ -209,7 +207,6 @@ Page({
     try {
       // 获取最新的用户信息
       const response = await api.user.getSubUser(id)
-      console.log('获取用户详情响应:', response)
       
       wx.hideLoading()
       
@@ -432,11 +429,9 @@ Page({
         address: editingProfile.address
       }
 
-      console.log('更新用户数据:', updateData)
       
       // 调用更新接口
       const response = await api.user.updateSubUser(editingProfile.id, updateData)
-      console.log('更新用户响应:', response)
       
       wx.hideLoading()
       

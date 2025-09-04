@@ -25,7 +25,6 @@ Page({
   },
 
   onLoad() {
-    console.log('Profile页面加载')
     this.loadUserData()
   },
 
@@ -47,7 +46,6 @@ Page({
       const openId = storage.getOpenId()
       
       if (!userInfo || !openId) {
-        console.log('用户未登录，跳过数据加载')
         this.setData({
           loading: false,
           userInfo: {
@@ -67,7 +65,6 @@ Page({
         return
       }
       
-      console.log('用户已登录，开始加载数据')
       
       // 并行加载用户信息、统计信息、子用户信息、档案信息、未读消息数量和系统消息未读数量
       const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes, unreadSystemMessagesRes] = await Promise.all([
@@ -101,9 +98,7 @@ Page({
       if (userInfoRes && userInfoRes.code === 200 && userInfoRes.data) {
         const userInfo = this.formatUserInfo(userInfoRes.data)
         this.setData({ userInfo })
-        console.log('用户信息加载成功:', userInfo)
       } else {
-        console.log('使用默认用户信息')
         this.setData({
           userInfo: {
             name: '未登录用户',
@@ -123,7 +118,6 @@ Page({
         unreadSystemMessages: unreadSystemMessagesRes?.data?.unreadCount || 0
       })
       this.setData({ stats })
-      console.log('统计信息加载成功:', stats)
 
     } catch (error) {
       console.error('加载用户数据失败:', error)
@@ -176,7 +170,6 @@ Page({
     if (avatarUrl && !avatarUrl.startsWith('http')) {
       const staticUrl = config.getCurrentConfig().staticUrl
       avatarUrl = staticUrl + avatarUrl
-      console.log('处理头像URL:', avatarUrl)
     }
     
     return avatarUrl

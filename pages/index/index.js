@@ -19,7 +19,6 @@ Page({
 
   // 页面加载时
   onLoad() {
-    console.log('首页加载')
     this.checkAuthAndInit()
   },
 
@@ -47,7 +46,6 @@ Page({
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
     
-    console.log('index页面检查登录状态:', {
       isLoggedIn: isLoggedIn,
       hasUserInfo: !!userInfo,
       hasOpenId: !!openId,
@@ -58,40 +56,32 @@ Page({
     // 不再强制跳转授权页面，允许用户正常浏览首页
     // 授权将在用户进行拍照检测时自动处理
     if (isLoggedIn) {
-      console.log('index页面用户已登录，初始化页面')
     } else {
-      console.log('index页面用户未登录，但允许正常浏览')
-      console.log('授权将在用户进行拍照检测时自动处理')
     }
     this.initPage()
   },
 
    // 测试清除所有用户数据（开发调试用）
   testClearAllUserData() {
-    console.log('=== 开始测试清除所有用户数据 ===')
     
     // 获取当前所有存储的键
     try {
       const storageInfo = wx.getStorageInfoSync()
-      console.log('当前存储的所有键:', storageInfo.keys)
       
       // 显示当前用户信息
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
-      console.log('清除前的用户信息:', { userInfo, openId })
       
       // 调用app的清除方法
       const app = getApp()
       if (app && app.clearUserInfo) {
         app.clearUserInfo()
-        console.log('已调用app.clearUserInfo()')
       }
       
       // 再次检查清除后的状态
       setTimeout(() => {
         const userInfoAfter = storage.getUserInfo()
         const openIdAfter = storage.getOpenId()
-        console.log('清除后的用户信息:', { userInfoAfter, openIdAfter })
         
         // 刷新页面数据
         this.setData({
@@ -99,7 +89,6 @@ Page({
           isLoggedIn: false
         })
         
-        console.log('=== 测试清除完成 ===')
       }, 100)
       
     } catch (error) {
@@ -109,19 +98,16 @@ Page({
 
   // 检查当前状态（开发调试用）
   checkCurrentStatus() {
-    console.log('=== 检查当前状态 ===')
     
     try {
       // 检查存储状态
       const storageInfo = wx.getStorageInfoSync()
-      console.log('存储信息:', storageInfo)
       
       // 检查用户信息
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
       const token = storage.getToken()
       
-      console.log('用户数据状态:', {
         userInfo: userInfo ? '存在' : '不存在',
         openId: openId ? '存在' : '不存在',
         token: token ? '存在' : '不存在'
@@ -130,14 +116,12 @@ Page({
       // 检查app全局数据
       const app = getApp()
       if (app) {
-        console.log('App全局数据:', {
           userInfo: app.globalData.userInfo ? '存在' : '不存在',
           isLoggedIn: app.globalData.isLoggedIn
         })
       }
       
       // 检查当前页面数据
-      console.log('当前页面数据:', {
         userInfo: this.data.userInfo ? '存在' : '不存在',
         isLoggedIn: this.data.isLoggedIn
       })
@@ -206,22 +190,18 @@ Page({
     try {
       // 从服务器获取banner数据
       const response = await api.system.getBanner()
-      console.log('Banner响应:', response.code, response.message)
       
       // 处理接口返回的数据
       if (response.code === 200 && response.data) {
         const bannerList = this.formatBannerData(response.data)
         const bannerConfig = this.formatBannerConfig(response.data)
         
-        console.log('格式化后的bannerList:', bannerList)
-        console.log('格式化后的bannerConfig:', bannerConfig)
         
         this.setData({ 
           bannerList,
           bannerConfig
         })
         
-        console.log('设置数据后的bannerList长度:', this.data.bannerList.length)
         
         // 缓存数据
         storage.setBanner(bannerList)
@@ -244,11 +224,9 @@ Page({
 
   // 格式化Banner数据
   formatBannerData(data) {
-    console.log('格式化Banner数据，输入:', data)
     
     // 处理新的数据结构：{banners: [...], config: {...}}
     if (typeof data === 'object' && data !== null && data.banners) {
-      console.log('检测到banners字段，处理banners数组')
       const banners = data.banners
       
       if (!Array.isArray(banners)) {
@@ -263,7 +241,6 @@ Page({
           // 如果是相对路径，拼接静态资源URL
           const staticUrl = config.getCurrentConfig().staticUrl
           imageUrl = staticUrl + imageUrl
-          console.log('处理图片URL:', item.imageUrl, '->', imageUrl)
         }
         
         // 根据接口返回的数据结构进行适配
@@ -286,7 +263,6 @@ Page({
     
     // 兼容旧的数据结构：直接是数组
     if (Array.isArray(data)) {
-      console.log('检测到数组格式，直接处理')
       return data.map((item, index) => {
         // 处理图片URL，如果是相对路径则拼接完整URL
         let imageUrl = item.imageUrl || item.image || item.img || ''
@@ -294,7 +270,6 @@ Page({
           // 如果是相对路径，拼接静态资源URL
           const staticUrl = config.getCurrentConfig().staticUrl
           imageUrl = staticUrl + imageUrl
-          console.log('处理图片URL:', item.imageUrl, '->', imageUrl)
         }
         
         return {
@@ -342,15 +317,12 @@ Page({
 
   // 格式化Banner配置
   formatBannerConfig(data) {
-    console.log('格式化Banner配置，输入:', data)
     
     // 从配置文件获取默认配置
     const defaultConfig = config.ui.banner
-    console.log('配置文件默认配置:', defaultConfig)
     
     // 处理新的数据结构：{banners: [...], config: {...}}
     if (typeof data === 'object' && data !== null && data.config) {
-      console.log('检测到config字段，合并接口配置')
       const apiConfig = data.config
       return {
         autoplay: apiConfig.autoplay !== undefined ? apiConfig.autoplay : defaultConfig.autoplay,
@@ -364,7 +336,6 @@ Page({
     
     // 如果data是数组，尝试从第一个元素获取配置
     if (Array.isArray(data)) {
-      console.log('检测到数组格式，从第一个元素获取配置')
       const firstItem = data[0]
       return {
         autoplay: firstItem?.autoplay !== undefined ? firstItem.autoplay : defaultConfig.autoplay,
@@ -378,7 +349,6 @@ Page({
     
     // 如果data是对象，可能包含配置信息
     if (typeof data === 'object' && data !== null) {
-      console.log('检测到对象格式，合并配置')
       return {
         autoplay: data.autoplay !== undefined ? data.autoplay : defaultConfig.autoplay,
         interval: data.interval || defaultConfig.interval,
@@ -389,7 +359,6 @@ Page({
       }
     }
     
-    console.log('使用配置文件默认配置')
     return { ...defaultConfig }
   },
 
@@ -398,7 +367,6 @@ Page({
     try {
       // 从服务器获取消息数据，只获取置顶信息
       const response = await api.message.getList({ limit: 50, isTop: true })
-      console.log('消息响应:', response.code, response.message)
       
       let messages = []
       
@@ -419,9 +387,7 @@ Page({
       let topMessages = messages.filter(msg => msg.isTop)
       if (topMessages.length === 0) {
         topMessages = messages.filter(msg => msg.isImportant).slice(0, 5)
-        console.log('没有置顶信息，显示重要信息数量:', topMessages.length)
       } else {
-        console.log('首页显示置顶信息数量:', topMessages.length)
       }
 
       // 获取阅读状态
@@ -432,7 +398,6 @@ Page({
         
         if (!userInfo || !openId) {
           // 未登录用户，跳过阅读状态获取
-          console.log('未登录用户，跳过阅读状态获取')
           this.setData({ messages: topMessages })
           this.calculateUnreadCount()
           storage.setMessages(topMessages)
@@ -441,11 +406,9 @@ Page({
         
         // 提取文章ID列表
         const articleIds = topMessages.map(msg => msg.id)
-        console.log('获取阅读状态，文章ID列表:', articleIds)
         
         if (articleIds.length > 0) {
           const readStatusResponse = await api.message.getReadStatus(articleIds)
-          console.log('阅读状态接口响应:', readStatusResponse)
           
           if (readStatusResponse.success && readStatusResponse.data) {
             // 合并阅读状态到消息数据
@@ -475,7 +438,6 @@ Page({
 
   // 格式化消息数据
   formatMessageData(data) {
-    console.log('格式化消息数据，输入:', data)
     
     if (!Array.isArray(data)) {
       console.warn('消息数据不是数组格式:', data)
@@ -489,7 +451,6 @@ Page({
         // 如果是相对路径，拼接静态资源URL
         const staticUrl = config.getCurrentConfig().staticUrl
         coverImage = staticUrl + coverImage
-        console.log('处理消息图片URL:', item.coverImage, '->', coverImage)
       }
 
       // 处理发布时间
@@ -531,7 +492,6 @@ Page({
 
   // 合并阅读状态到消息数据
   mergeReadStatus(messages, readStatusList) {
-    console.log('合并阅读状态，消息数量:', messages.length, '阅读状态数量:', readStatusList.length)
     
     if (!Array.isArray(readStatusList)) {
       console.warn('阅读状态数据不是数组格式:', readStatusList)
@@ -565,7 +525,6 @@ Page({
   calculateUnreadCount() {
     const unreadCount = this.data.messages.filter(msg => !msg.isRead).length
     this.setData({ unreadCount })
-    console.log('未读消息数量:', unreadCount)
   },
 
   // 从服务器获取未读数量
@@ -577,13 +536,11 @@ Page({
       
       if (!userInfo || !openId) {
         // 未登录用户，跳过获取未读数量
-        console.log('未登录用户，跳过获取未读数量')
         this.calculateUnreadCount()
         return
       }
       
       const response = await api.message.getUnreadCount()
-      console.log('未读数量接口响应:', response)
       
       if (response.success && response.data) {
         const { unreadCount, totalArticles, readArticles } = response.data
@@ -592,7 +549,6 @@ Page({
           totalArticles: totalArticles || 0,
           readArticles: readArticles || 0
         })
-        console.log('服务器未读数量:', unreadCount, '总数:', totalArticles, '已读:', readArticles)
       }
     } catch (error) {
       console.warn('获取未读数量失败，使用本地计算:', error)
@@ -609,7 +565,6 @@ Page({
     
     if (!userInfo || !openId) {
       // 未登录用户，跳转到拍照检测页面，由该页面处理授权
-      console.log('未登录用户，跳转到拍照检测页面进行授权')
       wx.navigateTo({
         url: '/pages/photo-detection/photo-detection'
       })
@@ -618,9 +573,7 @@ Page({
 
     // 已登录用户，检查用户信息是否完整
     if (!storage.isUserInfoComplete()) {
-      console.log('用户信息不完整，需要完善信息')
       const missingFields = storage.getMissingUserInfoFields()
-      console.log('缺失的字段:', missingFields)
       
       // 显示提示信息
       const result = await common.showConfirm(
@@ -638,7 +591,6 @@ Page({
     }
 
     // 用户信息完整，跳转到档案选择页面
-    console.log('用户信息完整，跳转到档案选择页面')
     wx.navigateTo({
       url: '/pages/create-profile/create-profile'
     })
@@ -687,9 +639,7 @@ Page({
         // 更新缓存
         storage.setMessages(messages)
         
-        console.log('标记资讯已读成功:', message.id)
       } else if (!userInfo || !openId) {
-        console.log('未登录用户，跳过标记已读')
       }
 
       // 跳转到消息详情页面
@@ -718,7 +668,6 @@ Page({
 
       // 调用一键已读接口
       const response = await api.message.markAllRead()
-      console.log('一键已读响应:', response)
       
       if (response.success && response.data) {
         const { markedCount, message } = response.data
@@ -774,7 +723,6 @@ Page({
     const index = e.currentTarget.dataset.index
     const banner = this.data.bannerList[index]
     
-    console.log('点击轮播图:', banner)
     
     // 处理轮播图点击跳转
     if (banner.linkUrl) {

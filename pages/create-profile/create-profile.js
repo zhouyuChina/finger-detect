@@ -91,11 +91,9 @@ Page({
   },
 
   onLoad(options) {
-    console.log('Create-profile页面加载，参数:', options)
     
     // 检查是否是完善信息模式
     const isCompleteMode = options.mode === 'complete'
-    console.log('是否完善信息模式:', isCompleteMode)
     
     // 生成出生年份选项（当前年份往前推100年）
     const currentYear = new Date().getFullYear();
@@ -132,7 +130,6 @@ Page({
   onShow() {
     // 页面显示时，如果已经选择了用户，重新加载档案
     if (this.data.selectedUser && this.data.selectedUser.username && this.data.selectedUser.id) {
-      console.log('页面显示，重新加载档案')
       this.loadUserProfiles(this.data.selectedUser.id);
     }
   },
@@ -142,7 +139,6 @@ Page({
     try {
       this.setData({ loading: true, error: false })
       
-      console.log('开始加载当前用户信息用于完善')
       
       // 获取当前用户信息
       const userInfo = storage.getUserInfo()
@@ -151,7 +147,6 @@ Page({
         return
       }
       
-      console.log('当前用户信息:', userInfo)
       
       // 设置当前用户为选中状态
       const currentUser = {
@@ -191,7 +186,6 @@ Page({
       
       this.setData({ userForm })
       
-      console.log('用户信息完善模式初始化完成')
       
       // 在完善信息模式下，直接显示信息编辑弹窗
       setTimeout(() => {
@@ -217,7 +211,6 @@ Page({
       
       if (!userInfo || !openId) {
         // 未登录用户，直接进入拍照检测流程
-        console.log('未登录用户，直接进入拍照检测流程')
         this.setData({ 
           loading: false,
           currentStep: 2, // 直接进入第二步：拍照检测
@@ -226,9 +219,7 @@ Page({
         return
       }
       
-      console.log('已登录用户，开始加载用户数据')
       const response = await api.user.getUsers()
-      console.log('用户数据接口响应:', response)
       
       if (response.success && response.data) {
         const { wechatUser, subUsers, currentSubUser } = response.data
@@ -242,12 +233,10 @@ Page({
           // 找到对应的默认用户
           selectedUser = formattedSubUsers.find(user => user.id === currentSubUser.id)
           if (selectedUser) {
-            console.log('自动选择默认用户:', selectedUser.nickname)
           }
         } else if (formattedSubUsers.length > 0) {
           // 如果没有找到currentSubUser，选择第一个用户作为默认
           selectedUser = formattedSubUsers[0]
-          console.log('未找到默认用户，选择第一个用户:', selectedUser.nickname)
         }
         
         this.setData({ 
@@ -257,7 +246,6 @@ Page({
           selectedUser: selectedUser
         })
         
-        console.log('用户数据加载成功，微信用户:', wechatUser?.nickname, '子用户数量:', formattedSubUsers.length)
         
         // 总是显示用户选择器，让用户确认选择
         setTimeout(() => {
@@ -302,13 +290,11 @@ Page({
 
   // 开始拍照检测（未登录用户）
   startPhotoDetection() {
-    console.log('未登录用户开始拍照检测')
     
     // 直接跳转到拍照检测页面
     wx.navigateTo({
       url: '/pages/photo-detection/photo-detection',
       success: () => {
-        console.log('跳转到拍照检测页面成功')
       },
       fail: (error) => {
         console.error('跳转到拍照检测页面失败:', error)
@@ -376,7 +362,6 @@ Page({
     }
     
     const bodyPart = bodyPartMap[archiveName]
-    console.log('档案名称:', archiveName, '映射到bodyPart:', bodyPart)
     
     if (!bodyPart) {
       console.warn('未找到对应的bodyPart，使用默认值 left_hand_thumb')
@@ -464,14 +449,12 @@ Page({
     // 更新 currentSubUser 缓存
     if (user && user.id) {
       storage.setCurrentSubUser(user);
-      console.log('已更新 currentSubUser 缓存:', user);
       
       // 同时更新全局用户信息中的 currentSubUser
       const currentUserInfo = storage.getUserInfo();
       if (currentUserInfo) {
         currentUserInfo.currentSubUser = user;
         storage.setUserInfo(currentUserInfo);
-        console.log('已更新全局用户信息中的 currentSubUser');
       }
     }
   },
@@ -490,13 +473,11 @@ Page({
   // 加载用户档案
   async loadUserProfiles(userId) {
     try {
-      console.log('开始加载用户档案，用户ID:', userId)
       
 
       
       // 获取用户信息
       const selectedUser = this.data.selectedUser;
-      console.log('当前选中的用户:', selectedUser)
 
       if (!selectedUser || !selectedUser.id) {
         console.warn('用户信息不完整，无法获取档案')
@@ -508,25 +489,17 @@ Page({
       
       // 调用档案列表接口
       const currentUser = storage.getUserInfo()
-      console.log('当前用户信息:', currentUser)
       
       // 确定正确的subUserId
       const subUserId = currentUser.currentSubUser.id
       
-      console.log('准备调用档案接口，subUserId:', subUserId)
       const response = await api.profile.getArchives(subUserId)
-      console.log('档案列表接口响应:', response)
-      console.log('响应状态:', response.success)
-      console.log('响应数据:', response.data)
       
       if (response.success && response.data) {
         const archives = response.data.archives || []
-        console.log('获取到档案列表:', archives)
         
         // 格式化档案数据
-        console.log('原始档案数据:', archives)
         const formattedProfiles = this.formatArchives(archives)
-        console.log('格式化后的档案数据:', formattedProfiles)
         
         // 为每个档案获取检测次数
         await this.loadDetectionCounts(formattedProfiles)
@@ -549,10 +522,6 @@ Page({
     const profile = e.currentTarget.dataset.profile;
     const index = e.currentTarget.dataset.index;
     
-    console.log('选择的档案索引:', index)
-    console.log('选择的档案详情:', profile)
-    console.log('档案的photoCount:', profile.photoCount)
-    console.log('档案的原始数据:', profile.originalData)
     
     this.setData({ selectedProfile: profile });
     
@@ -577,7 +546,6 @@ Page({
   // 为档案列表加载检测次数
   async loadDetectionCounts(profiles) {
     try {
-      console.log('开始为档案加载检测次数')
       
       const selectedUser = this.data.selectedUser
       if (!selectedUser || !selectedUser.id) {
@@ -591,16 +559,13 @@ Page({
         const currentUser = storage.getUserInfo()
         const subUserId = currentUser.currentSubUser.id
         
-        console.log('准备调用检测记录接口，subUserId:', subUserId)
         const detectionResponse = await api.detection.getList({
           subUserId: subUserId
         })
         
-        console.log('检测记录响应:', detectionResponse)
         
         if (detectionResponse.success && detectionResponse.data) {
           const detections = detectionResponse.data.detections || detectionResponse.data || []
-          console.log('获取到的检测记录:', detections)
           
           // 按档案名称统计检测次数
           const detectionCounts = {}
@@ -611,13 +576,11 @@ Page({
             }
           })
           
-          console.log('按档案名称统计的检测次数:', detectionCounts)
           
           // 更新每个档案的检测次数
           profiles.forEach((profile, index) => {
             const count = detectionCounts[profile.name] || 0
             profiles[index].photoCount = count
-            console.log(`档案"${profile.name}"的检测次数:`, count)
           })
         } else {
           console.warn('获取检测记录失败:', detectionResponse)
@@ -634,7 +597,6 @@ Page({
         })
       }
       
-      console.log('所有档案的检测次数加载完成:', profiles.map(p => ({ name: p.name, photoCount: p.photoCount })))
     } catch (error) {
       console.error('加载检测次数失败:', error)
     }
@@ -668,7 +630,6 @@ Page({
     
     // 获取用户信息
     const selectedUser = this.data.selectedUser;
-    console.log('创建档案时的用户信息:', selectedUser)
     
     if (!selectedUser) {
       console.error('用户信息不存在')
@@ -700,13 +661,11 @@ Page({
       archiveName: archiveName,
       bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
     }
-    console.log('准备创建档案，数据:', archiveData)
     
     // 创建档案
     let response
     try {
       response = await api.profile.create(archiveData)
-      console.log('创建档案接口响应:', response)
     } catch (error) {
       console.error('创建档案API调用失败:', error)
       // 处理API调用失败的情况
@@ -735,14 +694,9 @@ Page({
     
     if (response && response.success && response.data) {
       const newArchive = response.data
-      console.log('新创建的档案:', newArchive)
-      console.log('新档案的所有字段:', Object.keys(newArchive))
       
       // 根据实际返回的数据结构，档案信息在 archive 字段中
       const archiveData = newArchive.archive || newArchive
-      console.log('档案数据:', archiveData)
-      console.log('档案数据的所有字段:', Object.keys(archiveData))
-      console.log('可能的ID字段:', {
         id: archiveData.id,
         archiveId: archiveData.archiveId,
         _id: archiveData._id
@@ -764,9 +718,6 @@ Page({
       
       // 设置新创建的档案为选中状态
       const formattedArchive = this.formatArchives([archiveData])[0]
-      console.log('格式化后的档案:', formattedArchive)
-      console.log('格式化档案的所有字段:', Object.keys(formattedArchive));
-      console.log('格式化档案可能的ID字段:', {
         id: formattedArchive.id,
         archiveId: formattedArchive.archiveId,
         _id: formattedArchive._id
@@ -794,7 +745,6 @@ Page({
         icon: 'success'
       });
       
-      console.log('档案创建成功并选中:', formattedArchive)
     } else if (response) {
       console.error('创建档案失败，响应:', response)
       // 使用服务器返回的错误消息
@@ -1083,9 +1033,7 @@ Page({
           district: district
         }
         
-        console.log('更新用户信息:', updateData)
         const response = await api.user.updateProfile(updateData)
-        console.log('更新用户信息响应:', response)
         
         if (response.success && response.data) {
           // 更新本地存储的用户信息
@@ -1106,7 +1054,6 @@ Page({
           }
           
           storage.setUserInfo(updatedUserInfo)
-          console.log('更新后的用户信息:', updatedUserInfo)
           
           // 关闭弹窗
           this.setData({
@@ -1146,11 +1093,9 @@ Page({
           district: district
         };
 
-        console.log('创建子用户数据:', userData)
         
         // 调用创建子用户接口
         const response = await api.user.createSubUser(userData)
-        console.log('创建子用户接口响应:', response)
         
                   if (response.success && response.data) {
             const newUser = response.data.user || response.data
@@ -1228,7 +1173,6 @@ Page({
 
   // 显示用户信息编辑弹窗（完善信息模式使用）
   showUserInfoEditPopup() {
-    console.log('显示用户信息编辑弹窗')
     this.setData({ 
       showNicknamePopup: true,
       userCreateStep: 1

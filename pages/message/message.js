@@ -11,7 +11,6 @@ Page({
   },
 
   onLoad(options) {
-    console.log('Message页面加载')
     this.loadMessages()
   },
 
@@ -27,9 +26,6 @@ Page({
       
       // 从服务器获取消息数据
       const response = await api.message.getList({ limit: 20 })
-      console.log('Message页面消息响应:', response)
-      console.log('Message页面响应类型:', typeof response)
-      console.log('Message页面响应数据结构:', JSON.stringify(response, null, 2))
       
       let messageData = null
       
@@ -53,8 +49,6 @@ Page({
       }
       
       const messageList = this.formatMessageData(messageData)
-      console.log('Message页面格式化后的数据:', messageList)
-      console.log('Message页面格式化后的数据长度:', messageList.length)
       
       // 获取阅读状态
       const messageListWithReadStatus = await this.fetchReadStatus(messageList)
@@ -63,7 +57,6 @@ Page({
       
       // 缓存数据
       storage.setMessages(messageListWithReadStatus)
-      console.log('Message页面加载成功，消息数量:', messageListWithReadStatus.length)
     } catch (error) {
       console.error('Message页面加载消息失败:', error)
       this.setData({ messageList: [] })
@@ -75,7 +68,6 @@ Page({
 
   // 格式化消息数据
   formatMessageData(data) {
-    console.log('Message页面格式化消息数据，输入:', data)
     
     if (!Array.isArray(data)) {
       console.warn('消息数据不是数组格式:', data)
@@ -89,7 +81,6 @@ Page({
         // 如果是相对路径，拼接静态资源URL
         const staticUrl = config.getCurrentConfig().staticUrl
         image = staticUrl + image
-        console.log('处理消息图片URL:', item.coverImage, '->', image)
       }
 
       // 处理发布时间
@@ -140,7 +131,6 @@ Page({
       
       if (!userInfo || !openId) {
         // 未登录用户，跳过阅读状态获取
-        console.log('未登录用户，跳过阅读状态获取')
         return messageList
       }
       
@@ -153,7 +143,6 @@ Page({
       
       // 从服务器获取阅读状态
       const response = await api.message.getReadStatus(articleIds)
-      console.log('获取阅读状态响应:', response)
       
       if (response.success && response.data) {
         const readStatusMap = {}
@@ -233,12 +222,10 @@ Page({
           // 更新缓存
           storage.setMessages(messageList)
           
-          console.log('标记资讯已读成功:', message.id)
           
           // 更新Tab栏红点
           this.checkTabBarBadge()
         } else if (!userInfo || !openId) {
-          console.log('未登录用户，跳过标记已读')
         }
 
         // 跳转到消息详情页面

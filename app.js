@@ -34,7 +34,6 @@ App({
       this.checkLoginStatus()
 
       // 应用初始化完成
-      console.log('应用初始化完成')
 
     } catch (error) {
       console.error('应用初始化失败:', error)
@@ -46,7 +45,6 @@ App({
     try {
       const api = require('./utils/api.js')
       await api.user.getToken()
-      console.log('应用启动时获取token成功')
     } catch (error) {
       console.error('应用启动时获取token失败:', error)
       // 不阻止应用启动，后续请求时会重试
@@ -90,17 +88,14 @@ App({
       const userInfo = storage.getUserInfo()
       const openId = storage.getOpenId()
       
-      console.log('检查登录状态:', {
         hasUserInfo: !!userInfo,
         hasOpenId: !!openId
       })
       
       if (userInfo && openId) {
-        console.log('用户已登录')
         this.globalData.userInfo = userInfo
         this.globalData.isLoggedIn = true
       } else {
-        console.log('用户未登录，等待后续操作时授权')
         this.globalData.userInfo = null
         this.globalData.isLoggedIn = false
       }
@@ -121,7 +116,6 @@ App({
       })
       
       if (networkType === 'wifi' || networkType === '4g' || networkType === '5g') {
-        console.log('网络良好，尝试静默刷新用户信息')
         // 这里可以调用后端API获取最新的用户信息
         // 但不强制要求用户重新授权
         // const api = require('./utils/api.js')
@@ -132,7 +126,6 @@ App({
         // }
       }
     } catch (error) {
-      console.log('静默刷新用户信息失败:', error)
       // 静默刷新失败不影响正常使用
     }
   },
@@ -154,7 +147,6 @@ App({
         throw new Error('获取微信登录code失败')
       }
 
-      console.log('微信登录成功，code:', loginRes.code)
 
       // 2. 获取用户信息（如果用户授权）
       let userInfo = null
@@ -176,7 +168,6 @@ App({
           userInfo = userInfoRes.userInfo
         }
       } catch (error) {
-        console.log('获取用户信息失败，将使用默认信息:', error)
       }
 
       // 3. 获取系统信息
@@ -211,18 +202,14 @@ App({
         appVersion: this.globalData.appConfig.version
       }
 
-      console.log('开始注册用户...')
       
       const response = await api.user.miniProgramRegister(registerData)
       
-      console.log('注册响应:', response)
       
       if (response.success || response.code === 200) {
-        console.log('注册成功，保存用户数据')
         
         // 保存用户信息（新接口格式）
         const responseData = response.data || response
-        console.log('app.js 注册响应数据:', responseData)
         
         // 从新接口格式中提取数据
         const user = responseData.user
@@ -230,25 +217,21 @@ App({
           // 保存openId（从user.openid获取）
           if (user.openid) {
             storage.setOpenId(user.openid)
-            console.log('app.js 保存openId成功')
           }
           
           // 保存用户信息（使用user对象）
           storage.setUserInfo(user)
           this.globalData.userInfo = user
           this.globalData.isLoggedIn = true
-          console.log('app.js 保存用户信息成功')
           
           // 保存子用户列表
           if (user.subUsers) {
             storage.setSubUsers(user.subUsers)
-            console.log('app.js 保存子用户列表成功，数量:', user.subUsers.length)
           }
           
           // 保存当前子用户
           if (user.currentSubUser) {
             storage.setCurrentSubUser(user.currentSubUser)
-            console.log('app.js 保存当前子用户成功')
           }
         }
         
@@ -257,7 +240,6 @@ App({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-        console.log('app.js 保存后的数据验证:', {
           userInfo: !!savedUserInfo,
           openId: !!savedOpenId,
           subUsers: !!savedSubUsers,
@@ -303,7 +285,6 @@ App({
 
       if (loginRes.code) {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        console.log('微信登录成功，code:', loginRes.code)
         // 这里可以调用后端API进行登录
         // const response = await api.user.login({ code: loginRes.code })
         // if (response.code === 200) {
@@ -373,7 +354,6 @@ App({
     // 清除所有页面的用户相关数据
     this.clearAllPagesUserData()
     
-    console.log('已彻底清除所有用户数据')
   },
 
   // 清除所有页面的用户相关数据
@@ -382,7 +362,6 @@ App({
       const pages = getCurrentPages()
       pages.forEach(page => {
         if (page && page.route) {
-          console.log('清除页面数据:', page.route)
           
           // 根据页面类型清除相应的用户数据
           if (page.route.includes('index')) {
@@ -455,7 +434,6 @@ App({
     try {
       // 检查用户是否已登录
       if (!this.isLoggedIn()) {
-        console.log('用户未登录，跳过Tab栏红点更新')
         return
       }
       
@@ -473,7 +451,6 @@ App({
       // 系统消息未读数量
       const systemUnread = systemUnreadRes?.data?.unreadCount || systemUnreadRes?.data?.count || 0
 
-      console.log('未读消息统计:', {
         articleUnread,
         systemUnread
       })
@@ -483,7 +460,6 @@ App({
         wx.showTabBarRedDot({
           index: 2,
           success: () => {
-            console.log('显示消息中心红点成功（文章未读）')
           },
           fail: (err) => {
             console.error('显示消息中心红点失败:', err)
@@ -493,7 +469,6 @@ App({
         wx.hideTabBarRedDot({
           index: 2,
           success: () => {
-            console.log('隐藏消息中心红点成功')
           },
           fail: (err) => {
             console.error('隐藏消息中心红点失败:', err)
@@ -506,7 +481,6 @@ App({
         wx.showTabBarRedDot({
           index: 3,
           success: () => {
-            console.log('显示"我的"红点成功（系统消息未读）')
           },
           fail: (err) => {
             console.error('显示"我的"红点失败:', err)
@@ -516,7 +490,6 @@ App({
         wx.hideTabBarRedDot({
           index: 3,
           success: () => {
-            console.log('隐藏"我的"红点成功')
           },
           fail: (err) => {
             console.error('隐藏"我的"红点失败:', err)
@@ -534,7 +507,6 @@ App({
     wx.hideTabBarRedDot({
       index: 2,
       success: () => {
-        console.log('清除消息中心红点成功')
       }
     })
     
@@ -542,7 +514,6 @@ App({
     wx.hideTabBarRedDot({
       index: 3,
       success: () => {
-        console.log('清除"我的"红点成功')
       }
     })
   }
