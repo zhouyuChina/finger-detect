@@ -15,8 +15,7 @@ class Request {
   // 获取请求头
   getHeaders() {
     const headers = {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest'
+      'Content-Type': 'application/json'
     }
 
     // 添加token（只有在有token时才添加）

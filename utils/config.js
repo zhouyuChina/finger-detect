@@ -5,17 +5,17 @@ const ENV_CONFIG = {
     name: '本地环境'
   },
   TEST: {
-    baseUrl: 'nail.yiloud.com',
+    baseUrl: 'test.yiloud.com',
     name: '测试环境'
   },
   PRODUCTION: {
-    baseUrl: 'tbqzy.com',
+    baseUrl: 'nail.yiloud.com',
     name: '生产环境'
   }
 }
 
 // 当前使用的环境 - 修改这里来切换环境
-const CURRENT_ENV = 'TEST' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
+const CURRENT_ENV = 'PRODUCTION' // 可选: 'LOCAL', 'TEST', 'PRODUCTION'
 
 const baseUrl = ENV_CONFIG[CURRENT_ENV].baseUrl
 
@@ -30,15 +30,15 @@ const config = {
       staticUrl: `https://${baseUrl}` // 静态资源基础URL
     },
     production: {
-      baseUrl: 'https://your-production-domain.com/api',
-      uploadUrl: 'https://your-production-domain.com/api/upload',
-      wsUrl: 'wss://your-production-domain.com',
-      staticUrl: 'https://your-production-domain.com' // 静态资源基础URL
+      baseUrl: `https://${baseUrl}/api`,
+      uploadUrl: `https://${baseUrl}/api/upload`,
+      wsUrl: `wss://${baseUrl}`,
+      staticUrl: `https://${baseUrl}` // 静态资源基础URL
     }
   },
 
   // 当前环境
-  currentEnv: 'development',
+  currentEnv: 'production',
 
   // 获取当前环境配置
   getCurrentConfig() {
