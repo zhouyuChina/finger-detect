@@ -16,7 +16,7 @@
     "packNpmRelationList": [
       {
         "packageJsonPath": "./package.json",
-        "miniprogramNpmDistDir": "./"
+        "miniprogramNpmDistDir": "./miniprogram_npm/"
       }
     ],
     "babelSetting": {

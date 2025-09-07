@@ -5,7 +5,20 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(node:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm install)",
+      "Bash(chmod:*)",
+      "Bash(npm run build:npm:*)",
+      "Bash(./scripts/clear-cache.sh:*)",
+      "Bash(for component in badge icon tabs sticky)",
+      "Bash(do if [ -d \"miniprogram_npm/$component\" ])",
+      "Bash([ -f \"miniprogram_npm/$component/$component.json\" ])",
+      "Bash(then echo \"  ✓ $component\")",
+      "Bash(else echo \"  ✗ $component - 缺失\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(./scripts/build-npm.sh:*)",
+      "Bash(./build-npm.sh)"
     ],
     "deny": [],
     "ask": []
