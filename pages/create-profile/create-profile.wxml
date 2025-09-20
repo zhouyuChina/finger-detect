@@ -198,6 +198,7 @@
             bindinput="onNicknameInput"
             maxlength="20"
           />
+          <text class="form-tip {{nicknameError ? 'error-tip' : ''}}" wx:if="{{nicknameError}}">{{nicknameError}}</text>
         </view>
         <view class="form-item">
           <text class="form-label">性别</text>

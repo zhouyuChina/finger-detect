@@ -91,11 +91,11 @@
         >拍照</button>
         
         <!-- 临时上传按钮 -->
-        <!-- <button 
+        <button 
           class="btn btn-upload" 
           wx:if="{{!photoTaken}}"
           bindtap="uploadPhoto"
-        >上传图片</button> -->
+        >上传图片</button>
         
         <!-- 拍照后的操作按钮 -->
         <view class="btn-group" wx:if="{{photoTaken}}">
@@ -122,17 +122,19 @@
   </view>
 
   <!-- 用户信息获取弹窗 -->
-  <view class="user-profile-modal" wx:if="{{showUserProfileModal}}">
-    <view class="modal-overlay" bindtap="closeUserProfileModal"></view>
-    <view class="modal-content">
-      <view class="modal-header">
-        <text class="modal-title">获取用户信息</text>
-        <text class="modal-close" bindtap="closeUserProfileModal">✕</text>
+  <view class="user-auth-popup" wx:if="{{showUserProfileModal}}">
+    <view class="popup-overlay" bindtap="closeUserProfileModal"></view>
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">获取用户信息</text>
+        <text class="popup-close" bindtap="closeUserProfileModal">✕</text>
       </view>
-      <view class="modal-body">
-        <text class="modal-desc">为了提供更好的服务，需要获取您的微信头像和昵称</text>
-        <button class="btn btn-primary" bindtap="getUserProfile">确认授权</button>
-        <button class="btn btn-cancel" bindtap="closeUserProfileModal">取消</button>
+      <view class="popup-body">
+        <text class="popup-desc">为了提供更好的服务，需要获取您的微信头像和昵称</text>
+      </view>
+      <view class="popup-actions">
+        <button class="popup-btn cancel-btn" bindtap="closeUserProfileModal">取消</button>
+        <button class="popup-btn confirm-btn" bindtap="getUserProfile">确认授权</button>
       </view>
     </view>
   </view>

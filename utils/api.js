@@ -337,12 +337,12 @@ const profileApi = {
   },
 
   // 获取用户档案列表（新接口）
-  getArchives(subUserId, params = {}) {
+  getArchives(subUserId, params = {}, options = {}) {
     const queryParams = {
       subUserId: subUserId,
       ...params
     }
-    return request.get(config.api.profile.list, queryParams)
+    return request.get(config.api.profile.list, queryParams, options)
   },
 
   // 创建档案

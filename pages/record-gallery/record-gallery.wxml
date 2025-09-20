@@ -43,7 +43,7 @@
         bindload="onFirstDetectionLoad"
       />
       <view class="first-detection-overlay">
-        <text class="first-detection-label">首次检测</text>
+        <!-- <text class="first-detection-label">首次检测</text> -->
       </view>
     </view>
   </view>

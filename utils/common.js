@@ -250,7 +250,7 @@ const saveImageToPhotosAlbum = (filePath) => {
 }
 
 // 选择图片
-const chooseImage = (count = 1, sizeType = ['compressed'], sourceType = ['album', 'camera']) => {
+const chooseImage = (count = 1, sizeType = ['original'], sourceType = ['album', 'camera']) => {
   return new Promise((resolve, reject) => {
     wx.chooseImage({
       count: count,

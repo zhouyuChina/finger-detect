@@ -23,6 +23,12 @@ Page({
     isCompleteMode: false, // 是否是完善信息模式
     popupTitle: '新增用户', // 弹窗标题
     
+    // 表单验证
+    nicknameError: '', // 昵称错误信息
+    
+    // 图片状态保持
+    photoPath: '', // 从拍照页面传递过来的图片路径
+    
     // 档案相关
     selectedProfile: null, // 当前选择的档案
     
@@ -95,6 +101,9 @@ Page({
     // 检查是否是完善信息模式
     const isCompleteMode = options.mode === 'complete'
     
+    // 检查是否有图片路径参数
+    const photoPath = options.photoPath ? decodeURIComponent(options.photoPath) : ''
+    
     // 生成出生年份选项（当前年份往前推100年）
     const currentYear = new Date().getFullYear();
     const birthYearOptions = [];
@@ -107,7 +116,8 @@ Page({
     
     this.setData({ 
       birthYearOptions,
-      provinceOptions
+      provinceOptions,
+      photoPath: photoPath // 保存图片路径
     });
     
     if (isCompleteMode) {
@@ -291,9 +301,17 @@ Page({
   // 开始拍照检测（未登录用户）
   startPhotoDetection() {
     
+    // 构建跳转URL
+    let url = '/pages/photo-detection/photo-detection'
+    
+    // 如果有图片路径，传递给拍照检测页面
+    if (this.data.photoPath) {
+      url += `?photoPath=${encodeURIComponent(this.data.photoPath)}`
+    }
+    
     // 直接跳转到拍照检测页面
     wx.navigateTo({
-      url: '/pages/photo-detection/photo-detection',
+      url: url,
       success: () => {
       },
       fail: (error) => {
@@ -463,7 +481,8 @@ Page({
   addNewUser() {
     this.setData({
       isEditingMyself: false,
-      userForm: { nickname: '', birthYear: '', province: '', city: '', district: '' },
+      userForm: { nickname: '', gender: '1', birthYear: '', province: '', city: '', district: '' },
+      nicknameError: '', // 重置错误状态
       userCreateStep: 1,
       showUserSelector: false,
       showNicknamePopup: true
@@ -488,12 +507,10 @@ Page({
       }
       
       // 调用档案列表接口
-      const currentUser = storage.getUserInfo()
+      // 使用传入的userId参数，而不是currentSubUser.id
+      const subUserId = userId || selectedUser.id
       
-      // 确定正确的subUserId
-      const subUserId = currentUser.currentSubUser.id
-      
-      const response = await api.profile.getArchives(subUserId)
+      const response = await api.profile.getArchives(subUserId, {}, { showError: false })
       
       if (response.success && response.data) {
         const archives = response.data.archives || []
@@ -532,8 +549,16 @@ Page({
     });
 
     setTimeout(() => {
+      // 构建跳转URL
+      let url = `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(profile))}`
+      
+      // 如果有图片路径，也要传递过去
+      if (this.data.photoPath) {
+        url += `&photoPath=${encodeURIComponent(this.data.photoPath)}`
+      }
+      
       wx.navigateTo({
-        url: `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(profile))}`
+        url: url
       });
     }, 1000);
   },
@@ -555,9 +580,8 @@ Page({
       
       // 一次性获取所有检测记录，然后按档案名称分组统计
       try {
-        // 确定正确的subUserId - 从currentSubUser中获取
-        const currentUser = storage.getUserInfo()
-        const subUserId = currentUser.currentSubUser.id
+        // 使用当前选中的用户ID，而不是currentSubUser.id
+        const subUserId = selectedUser.id
         
         const detectionResponse = await api.detection.getList({
           subUserId: subUserId
@@ -652,9 +676,8 @@ Page({
     // 准备档案数据
     const archiveName = `${bodyPart.name}${part.name}`
     
-    // 获取当前用户的subUserId
-    const currentUser = storage.getUserInfo()
-    const subUserId = currentUser.currentSubUser.id
+    // 使用当前选中的用户ID，而不是currentSubUser.id
+    const subUserId = selectedUser.id
     
     const archiveData = {
       subUserId: subUserId,
@@ -668,27 +691,8 @@ Page({
       response = await api.profile.create(archiveData)
     } catch (error) {
       console.error('创建档案API调用失败:', error)
-      // 处理API调用失败的情况
-      let errorMessage = '创建档案失败'
-      
-      if (error.message) {
-        // 如果错误对象有message字段，直接使用
-        errorMessage = error.message
-      } else if (error.code) {
-        // 根据错误码判断
-        if (error.code === 409) {
-          errorMessage = '档案名称已存在'
-        } else if (error.code === 400) {
-          errorMessage = '请求参数错误'
-        } else {
-          errorMessage = error.message || '创建档案失败'
-        }
-      }
-      
-      wx.showToast({
-        title: errorMessage,
-        icon: 'none'
-      });
+      // request.js已经显示了错误提示，这里不需要再次显示
+      // 只需要处理特殊的错误逻辑
       return;
     }
     
@@ -736,6 +740,21 @@ Page({
         title: '档案创建成功',
         icon: 'success'
       });
+      
+      // 延迟跳转到拍照检测页面
+      setTimeout(() => {
+        // 构建跳转URL
+        let url = `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(formattedArchive))}`
+        
+        // 如果有图片路径，也要传递过去
+        if (this.data.photoPath) {
+          url += `&photoPath=${encodeURIComponent(this.data.photoPath)}`
+        }
+        
+        wx.navigateTo({
+          url: url
+        });
+      }, 1500);
       
     } else if (response) {
       console.error('创建档案失败，响应:', response)
@@ -817,8 +836,11 @@ Page({
 
   // 昵称输入处理
   onNicknameInput(e) {
+    const nickname = e.detail.value;
+    
     this.setData({
-      'userForm.nickname': e.detail.value
+      'userForm.nickname': nickname,
+      nicknameError: '' // 清除错误信息
     });
   },
 

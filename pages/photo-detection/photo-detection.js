@@ -17,6 +17,7 @@ Page({
     error: false, // 错误状态
     wxLoginCode: null, // 微信登录code
     showUserProfileModal: false, // 是否显示用户信息获取弹窗
+    isDetecting: false, // 是否正在检测（用于显示扫描动画）
     
     // 默认档案信息（未登录用户使用）
     defaultProfile: {
@@ -152,30 +153,43 @@ Page({
 
   // 上传图片 (临时功能)
   uploadPhoto() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      sourceType: ['album'],
+    // 先显示告知框
+    wx.showModal({
+      title: '上传提示',
+      content: '需上传只拍有一个指甲的图片，多指甲无法检测。',
+      showCancel: false,
+      confirmText: '我知道了',
       success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath
-        
-        // 设置选择的图片路径和状态
-        this.setData({
-          photoTaken: true,
-          photoPath: tempFilePath
-        })
-        
-        wx.showToast({
-          title: '图片上传成功',
-          icon: 'success'
-        })
-      },
-      fail: (error) => {
-        console.error('选择图片失败:', error)
-        wx.showToast({
-          title: '选择图片失败',
-          icon: 'none'
-        })
+        if (res.confirm) {
+          // 用户确认后，继续选择图片
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['album'],
+            sizeType: ['original'],
+            success: (res) => {
+              const tempFilePath = res.tempFiles[0].tempFilePath
+
+              // 设置选择的图片路径和状态
+              this.setData({
+                photoTaken: true,
+                photoPath: tempFilePath
+              })
+
+              wx.showToast({
+                title: '图片选择成功',
+                icon: 'success'
+              })
+            },
+            fail: (error) => {
+              console.error('选择图片失败:', error)
+              wx.showToast({
+                title: '选择图片失败',
+                icon: 'none'
+              })
+            }
+          })
+        }
       }
     })
   },
@@ -435,16 +449,29 @@ Page({
           
           // 检查用户信息是否完整
           const storage = require('../../utils/storage.js')
+          
+          // 构建跳转URL，如果有图片需要传递图片路径
+          let createProfileUrl = '/pages/create-profile/create-profile'
+          if (this.data.photoTaken && this.data.photoPath) {
+            const photoPathParam = encodeURIComponent(this.data.photoPath)
+            createProfileUrl += `?photoPath=${photoPathParam}`
+          }
+          
           if (!storage.isUserInfoComplete()) {
+            // 用户信息不完整，跳转到完善信息页面
+            const completeUrl = createProfileUrl.includes('?') 
+              ? `${createProfileUrl}&mode=complete` 
+              : `${createProfileUrl}?mode=complete`
             setTimeout(() => {
               wx.navigateTo({
-                url: '/pages/create-profile/create-profile?mode=complete'
+                url: completeUrl
               })
             }, 2000)
           } else {
+            // 用户信息完整，跳转到档案选择页面
             setTimeout(() => {
               wx.navigateTo({
-                url: '/pages/create-profile/create-profile'
+                url: createProfileUrl
               })
             }, 2000)
           }
@@ -531,8 +558,16 @@ Page({
       return
     }
 
-    // 直接进行检测流程
-    this.performDetection()
+    // 开始扫描动画
+    this.setData({ isDetecting: true })
+
+    // 添加1-1.5秒的延迟，让用户看到扫描动画
+    const delay = 1000 + Math.random() * 500 // 1000-1500ms随机延迟
+    
+    setTimeout(() => {
+      // 延迟后执行真正的检测
+      this.performDetection()
+    }, delay)
   },
 
   // 仅保存图片（新功能）
@@ -649,126 +684,130 @@ Page({
 
   // 保存到恢复记录（已有报告的情况）
   async saveToRecords() {
-    wx.showLoading({
-      title: '保存中...'
-    })
+    // 开始扫描动画
+    this.setData({ isDetecting: true })
 
-    try {
-      // 验证必填参数
-      const profile = this.data.profile
-      if (!profile) {
-        throw new Error('档案信息缺失')
-      }
-      
-      if (!profile.subUserId) {
-        throw new Error('子用户ID缺失')
-      }
-      
-      if (!profile.id) {
-        throw new Error('档案ID缺失')
-      }
-      
-      if (!this.data.photoPath) {
-        throw new Error('图片路径缺失')
-      }
-
-      // 将图片转换为base64
-      const base64Image = await this.convertImageToBase64(this.data.photoPath)
-      
-      // 准备检测数据
-      const detectionData = {
-        subUserId: profile.subUserId, // 子用户ID（必填）
-        archiveId: profile.id, // 档案ID（必填）
-        detectionType: this.getDetectionType(profile.name), // 获取检测类型
-        base64Image: base64Image // base64图片数据（必填）
-      }
-
-      
-      // 调用检测接口保存照片
-      const response = await api.detection.create(detectionData)
-      
-      wx.hideLoading()
-      
-      if (response.success && response.data) {
-        const { detection, thirdPartyResult, isFirstReport, shouldSaveToDatabase } = response.data
+    // 添加1-1.5秒的延迟，让用户看到扫描动画
+    const delay = 1000 + Math.random() * 500 // 1000-1500ms随机延迟
+    
+    setTimeout(async () => {
+      try {
+        // 验证必填参数
+        const profile = this.data.profile
+        if (!profile) {
+          throw new Error('档案信息缺失')
+        }
         
-        // 处理检测结果
-        const finalResult = thirdPartyResult.final_result
+        if (!profile.subUserId) {
+          throw new Error('子用户ID缺失')
+        }
         
-        // 根据检测结果进行不同处理
-        if (finalResult === 'blurred') {
-          // 图片模糊，提示重新拍照
-          wx.showModal({
-            title: '图片模糊',
-            content: '检测到图片模糊，请重新拍照',
-            showCancel: false,
-            success: () => {
-              // 返回拍照页面
-              wx.navigateBack()
-            }
+        if (!profile.id) {
+          throw new Error('档案ID缺失')
+        }
+        
+        if (!this.data.photoPath) {
+          throw new Error('图片路径缺失')
+        }
+
+        // 将图片转换为base64
+        const base64Image = await this.convertImageToBase64(this.data.photoPath)
+        
+        // 准备检测数据
+        const detectionData = {
+          subUserId: profile.subUserId, // 子用户ID（必填）
+          archiveId: profile.id, // 档案ID（必填）
+          detectionType: this.getDetectionType(profile.name), // 获取检测类型
+          base64Image: base64Image // base64图片数据（必填）
+        }
+
+        
+        // 调用检测接口保存照片
+        const response = await api.detection.create(detectionData)
+        
+        // 检测完成，关闭扫描动画
+        this.setData({ isDetecting: false })
+        
+        if (response.success && response.data) {
+          const { detection, thirdPartyResult, isFirstReport, shouldSaveToDatabase } = response.data
+          
+          // 处理检测结果
+          const finalResult = thirdPartyResult.final_result
+          
+          // 根据检测结果进行不同处理
+          if (finalResult === 'blurred') {
+            // 图片模糊，提示重新拍照
+            wx.showModal({
+              title: '图片模糊',
+              content: '检测到图片模糊，请重新拍照',
+              showCancel: false,
+              success: () => {
+                // 返回拍照页面
+                wx.navigateBack()
+              }
+            })
+            return
+          }
+          
+          wx.showToast({
+            title: '保存成功',
+            icon: 'success'
           })
-          return
+
+          // 更新档案的照片数量
+          this.updateProfilePhotoCount(this.data.profile.id)
+          
+          // 跳转到恢复记录页面（tabBar页面）
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/records-compare/records-compare',
+              success: () => {
+              },
+              fail: (error) => {
+                console.error('跳转到tabBar页面失败:', error)
+              }
+            })
+          }, 1500)
+        } else {
+          console.warn('检测保存接口返回错误:', response)
+          console.error('错误详情:', {
+            success: response.success,
+            code: response.code,
+            message: response.message,
+            data: response.data
+          })
+          wx.showToast({
+            title: response.message || '保存失败',
+            icon: 'none'
+          })
+        }
+      } catch (error) {
+        // 保存失败，关闭扫描动画
+        this.setData({ isDetecting: false })
+        console.error('保存失败，详细错误信息:', error)
+        console.error('错误类型:', typeof error)
+        console.error('错误消息:', error.message)
+        console.error('错误堆栈:', error.stack)
+        
+        // 根据错误类型显示不同的提示
+        let errorMessage = '保存失败，请重试'
+        if (error.message) {
+          errorMessage = error.message
+        } else if (error.code) {
+          errorMessage = `错误码: ${error.code}`
         }
         
         wx.showToast({
-          title: '保存成功',
-          icon: 'success'
-        })
-
-        // 更新档案的照片数量
-        this.updateProfilePhotoCount(this.data.profile.id)
-        
-        // 跳转到恢复记录页面（tabBar页面）
-        setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/records-compare/records-compare',
-            success: () => {
-            },
-            fail: (error) => {
-              console.error('跳转到tabBar页面失败:', error)
-            }
-          })
-        }, 1500)
-      } else {
-        console.warn('检测保存接口返回错误:', response)
-        console.error('错误详情:', {
-          success: response.success,
-          code: response.code,
-          message: response.message,
-          data: response.data
-        })
-        wx.showToast({
-          title: response.message || '保存失败',
+          title: errorMessage,
           icon: 'none'
         })
       }
-    } catch (error) {
-      wx.hideLoading()
-      console.error('保存失败，详细错误信息:', error)
-      console.error('错误类型:', typeof error)
-      console.error('错误消息:', error.message)
-      console.error('错误堆栈:', error.stack)
-      
-      // 根据错误类型显示不同的提示
-      let errorMessage = '保存失败，请重试'
-      if (error.message) {
-        errorMessage = error.message
-      } else if (error.code) {
-        errorMessage = `错误码: ${error.code}`
-      }
-      
-      wx.showToast({
-        title: errorMessage,
-        icon: 'none'
-      })
-    }
+    }, delay)
   },
 
   // 执行检测（没有报告的情况）
   async performDetection() {
-    wx.showLoading({
-      title: '检测中...'
-    })
+    // 不再显示loading，因为已经有扫描动画了
 
     try {
       // 验证必填参数
@@ -804,7 +843,8 @@ Page({
       // 调用检测接口
       const response = await api.detection.create(detectionData)
       
-      wx.hideLoading()
+      // 检测完成，关闭扫描动画
+      this.setData({ isDetecting: false })
       
       if (response.success && response.data) {
         const { detection, thirdPartyResult, isFirstReport, shouldSaveToDatabase } = response.data
@@ -862,7 +902,8 @@ Page({
         })
       }
     } catch (error) {
-      wx.hideLoading()
+      // 检测失败，关闭扫描动画
+      this.setData({ isDetecting: false })
       console.error('检测失败，详细错误信息:', error)
       console.error('错误类型:', typeof error)
       console.error('错误消息:', error.message)

@@ -127,7 +127,7 @@ class Request {
   }
 
   // 处理响应
-  handleResponse(response, resolve, reject) {
+  handleResponse(response, resolve, reject, showError = true) {
     const { statusCode, data } = response
 
     if (statusCode === 200 || statusCode === 201) {
@@ -142,12 +142,19 @@ class Request {
         this.handleTokenExpired(resolve, reject)
       } else {
         const errorMsg = data.message || config.errorMessages[data.code] || config.errorMessages.default
-        this.showError(errorMsg)
+        console.log('API响应错误 - data.code:', data.code, 'errorMsg:', errorMsg)
+        if (showError) {
+          this.showError(errorMsg)
+        }
         reject(data)
       }
     } else {
       const errorMsg = config.errorMessages[statusCode] || config.errorMessages.default
-      this.showError(errorMsg)
+      console.log('HTTP状态码错误 - statusCode:', statusCode, 'errorMsg:', errorMsg)
+      console.log('可用的错误消息映射:', config.errorMessages)
+      if (showError) {
+        this.showError(errorMsg)
+      }
       reject({
         code: statusCode,
         message: errorMsg
@@ -226,7 +233,7 @@ class Request {
 
   // 发送请求
   async request(options) {
-    const { url, method = 'GET', data = {}, showLoading = true, retry = 0, needToken = true } = options
+    const { url, method = 'GET', data = {}, showLoading = true, retry = 0, needToken = true, showError = true } = options
 
     // 如果需要token但没有token，先获取token
     if (needToken && !this.hasToken()) {
@@ -234,7 +241,9 @@ class Request {
         await this.getToken()
       } catch (error) {
         console.error('获取token失败:', error)
-        this.showError('获取认证失败，请重试')
+        if (showError) {
+          this.showError('获取认证失败，请重试')
+        }
         throw error
       }
     }
@@ -254,7 +263,7 @@ class Request {
           if (showLoading) {
             this.hideLoading()
           }
-          this.handleResponse(response, resolve, reject)
+          this.handleResponse(response, resolve, reject, showError)
         },
         fail: (error) => {
           if (showLoading) {
@@ -285,8 +294,10 @@ class Request {
             } else if (error.errMsg && error.errMsg.includes('CONNECTION_REFUSED')) {
               errorMessage = '服务器连接失败，请稍后重试'
             }
-            
-            this.showError(errorMessage)
+
+            if (showError) {
+              this.showError(errorMessage)
+            }
             reject({
               code: config.errorCodes.NETWORK_ERROR,
               message: errorMessage,
@@ -367,7 +378,7 @@ class Request {
             this.handleResponse({
               statusCode: response.statusCode,
               data: data
-            }, resolve, reject)
+            }, resolve, reject, options.showError !== false)
           } catch (error) {
             this.showError('上传失败')
             reject(error)
