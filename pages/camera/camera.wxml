@@ -2,16 +2,25 @@
 <view class="container">
   <!-- 相机预览区域 -->
   <view class="camera-container" wx:if="{{showCamera}}">
-    <camera 
-      device-position="{{devicePosition}}" 
-      flash="off" 
+    <camera
+      device-position="{{devicePosition}}"
+      flash="off"
       class="camera"
       binderror="onCameraError"
     >
-      <!-- 手指引导框 -->
+      <!-- 全屏遮罩层（置灰其他区域） -->
+      <view class="camera-overlay">
+        <!-- 透明的指甲区域 -->
+        <view class="nail-cutout"></view>
+      </view>
+
+      <!-- 手指甲引导框 -->
       <view class="finger-guide">
-        <view class="finger-outline"></view>
-        <text class="guide-text">将手指放在框内</text>
+        <!-- <view class="nail-outline"> -->
+          <!-- 指甲轮廓 -->
+          <!-- <view class="nail-shape"></view>
+        </view> -->
+        <text class="guide-text">请把指甲放进框内并尽量铺满框</text>
       </view>
       
       <!-- 顶部操作栏 -->

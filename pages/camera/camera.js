@@ -114,15 +114,15 @@ Page({
       const imageHeight = imageInfo.height
 
       // 计算虚线框在屏幕上的实际位置和大小
-      // 虚线框规格：300rpx × 500rpx，位置：top: 40%, left: 50%（居中）
+      // 指甲框规格：280rpx × 360rpx，位置：top: 40%, left: 50%（居中）
       const rpxToPixel = screenWidth / 750 // rpx到px的转换比例
-      const guideFrameWidth = 300 * rpxToPixel // 虚线框宽度(px)
-      const guideFrameHeight = 500 * rpxToPixel // 虚线框高度(px)
+      const guideFrameWidth = 280 * rpxToPixel // 指甲框宽度(px)
+      const guideFrameHeight = 360 * rpxToPixel // 指甲框高度(px)
       
-      // 虚线框在相机视图中的位置
-      // 相机组件占满全屏，虚线框位于相机中央上方40%
+      // 指甲框在相机视图中的位置
+      // 相机组件占满全屏，指甲框位于相机中央上方46%（与CSS的nail-cutout位置一致）
       const guideFrameX = (screenWidth - guideFrameWidth) / 2 // 左边距（水平居中）
-      const guideFrameY = windowHeight * 0.4 - guideFrameHeight / 2 // 上边距（垂直40%位置）
+      const guideFrameY = windowHeight * 0.46 - guideFrameHeight / 2 // 上边距（垂直46%位置）
 
       // 计算相机视图与实际拍摄图片的缩放关系
       // 微信小程序camera组件默认会保持图片比例并居中显示

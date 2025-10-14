@@ -21,10 +21,36 @@ page {
   height: 100%;
 }
 
-/* 手指引导框 */
+/* 全屏遮罩层 - 除了指甲区域外其他地方都置灰 */
+.camera-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background: rgba(0, 0, 0, 0.75); */
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* 透明的指甲区域（镂空效果） */
+.nail-cutout {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280rpx;
+  height: 360rpx;
+  /* 使用遮罩混合模式创建镂空效果 */
+  background: transparent;
+  border-radius: 140rpx 140rpx 0rpx 0rpx / 180rpx 180rpx 80rpx 80rpx;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85);
+}
+
+/* 手指甲引导框 */
 .finger-guide {
   position: absolute;
-  top: 40%;
+  top: 16%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -34,31 +60,40 @@ page {
   pointer-events: none;
 }
 
-.finger-outline {
-  width: 300rpx;
-  height: 500rpx;
-  border: 3rpx dashed #4CAF50;
-  border-radius: 100rpx 100rpx 60rpx 60rpx;
+.nail-outline {
   position: relative;
-  margin-bottom: 20rpx;
-  background: rgba(76, 175, 80, 0.1);
-  box-shadow: 0 0 20rpx rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
 }
 
-/* 添加手指的指甲部分 */
-/* .finger-outline::before {
-  content: '';
-  position: absolute;
-  top: -10rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80rpx;
-  height: 20rpx;
-  border: 3rpx dashed #4CAF50;
-  border-bottom: none;
-  border-radius: 40rpx 40rpx 0 0;
-  background: rgba(76, 175, 80, 0.1);
-} */
+.nail-shape {
+  width: 280rpx;
+  height: 360rpx;
+  border: 4rpx dashed #4CAF50;
+  border-radius: 140rpx 140rpx 80rpx 80rpx / 100rpx 100rpx 80rpx 80rpx;
+  position: relative;
+  background: rgba(76, 175, 80, 0.05);
+  box-shadow:
+    0 0 30rpx rgba(76, 175, 80, 0.4),
+    inset 0 0 20rpx rgba(76, 175, 80, 0.1);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* 脉冲发光动画 */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 30rpx rgba(76, 175, 80, 0.4),
+      inset 0 0 20rpx rgba(76, 175, 80, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 50rpx rgba(76, 175, 80, 0.6),
+      inset 0 0 30rpx rgba(76, 175, 80, 0.2);
+  }
+}
 
 .guide-text {
   font-size: 28rpx;
@@ -147,7 +182,7 @@ page {
   align-items: center;
   justify-content: center;
   border: 4rpx solid #fff;
-  margin-bottom: 100rpx;
+  margin-bottom: 300rpx;
 }
 
 .photo-btn-inner {
@@ -173,7 +208,7 @@ page {
 }
 
 .preview-actions {
-  height: 200rpx;
+  height: 400rpx;
   display: flex;
   align-items: center;
   justify-content: space-around;

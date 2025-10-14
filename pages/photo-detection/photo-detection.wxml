@@ -91,11 +91,11 @@
         >拍照</button>
         
         <!-- 临时上传按钮 -->
-        <button 
+        <!-- <button 
           class="btn btn-upload" 
           wx:if="{{!photoTaken}}"
           bindtap="uploadPhoto"
-        >上传图片</button>
+        >上传图片</button> -->
         
         <!-- 拍照后的操作按钮 -->
         <view class="btn-group" wx:if="{{photoTaken}}">

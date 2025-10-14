@@ -148,7 +148,7 @@ const config = {
   },
 
   // 请求超时时间
-  timeout: 15000,
+  timeout: 900000,
 
   // 请求重试次数
   retryCount: 3,
