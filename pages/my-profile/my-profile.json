@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "我的档案",
+  "navigationBarTitleText": "本人档案",
   "usingComponents": {
     "t-search": "../../miniprogram_npm/search/search",
     "t-avatar": "../../miniprogram_npm/avatar/avatar",

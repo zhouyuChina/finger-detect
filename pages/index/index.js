@@ -290,7 +290,7 @@ Page({
   // 获取默认背景色
   getDefaultBackground(index) {
     const backgrounds = [
-      'linear-gradient(135deg, #4CAF50, #45a049)',
+      'linear-gradient(135deg, #00BC7D, #00BC7D)',
       'linear-gradient(135deg, #2196F3, #1976D2)',
       'linear-gradient(135deg, #FF9800, #F57C00)',
       'linear-gradient(135deg, #9C27B0, #7B1FA2)',

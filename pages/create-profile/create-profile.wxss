@@ -1,6 +1,6 @@
 /* create-profile.wxss */
 page {
-  background-color: #f5f5f5;
+  background-color: #f2fef9;
 }
 
 /* 测试按钮 */
@@ -67,8 +67,8 @@ page {
 }
 
 .step-item.active .step-icon {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  background-color: #00BC7D;
+  border-color: #00BC7D;
   color: #ffffff;
 }
 
@@ -80,7 +80,7 @@ page {
 }
 
 .step-item.active .step-title {
-  color: #4CAF50;
+  color: #00BC7D;
   font-weight: 600;
 }
 
@@ -108,7 +108,6 @@ page {
 .section-title {
   font-size: 36rpx;
   color: #333;
-  margin-bottom: 30rpx;
 }
 
 /* 未登录用户欢迎信息 */
@@ -189,6 +188,8 @@ page {
   justify-content: space-between;
   padding: 30rpx;
   transition: background-color 0.3s ease;
+  border: 1px solid #00BC7D;
+  border-radius: 12rpx;
 }
 
 .selection-placeholder:active {
@@ -236,7 +237,7 @@ page {
 
 .selector-confirm {
   font-size: 32rpx;
-  color: #2B81E8;
+  color: #00BC7D;
   font-weight: 500;
   padding: 10rpx;
 }
@@ -282,7 +283,7 @@ page {
 
 .option-check {
   font-size: 32rpx;
-  color: #4CAF50;
+  color: #00BC7D;
   margin-left: 20rpx;
   flex-shrink: 0;
   font-weight: bold;
@@ -300,7 +301,7 @@ page {
 }
 
 .selector-option.selected .option-text {
-  color: #28a745;
+  color: #00BC7D;
   font-weight: 500;
 }
 
@@ -490,7 +491,7 @@ page {
   padding: 30rpx;
   background-color: #ffffff;
   border-radius: 12rpx;
-  border: 2rpx dashed #2B81E8;
+  border: 2rpx dashed #00BC7D;
   transition: all 0.3s ease;
 }
 
@@ -500,7 +501,7 @@ page {
 
 .add-icon {
   font-size: 32rpx;
-  color: #2B81E8;
+  color: #00BC7D;
   margin-right: 10rpx;
   /* 优化移动端emoji显示清晰度 */
   text-rendering: optimizeLegibility;
@@ -516,11 +517,9 @@ page {
 
 .add-text {
   font-size: 32rpx;
-  color: #2B81E8;
+  color: #00BC7D;
   font-weight: 500;
 }
-
-
 
 /* 操作按钮 */
 .action-buttons {
@@ -543,15 +542,16 @@ page {
 .btn-prev {
   background-color: #f5f5f5;
   color: #666;
+  border: 1px solid #00BC7D;
 }
 
 .btn-next, .btn-complete {
-  background-color: #2B81E8;
+  background-color: #00BC7D;
   color: #ffffff;
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #00BC7D;
   color: #ffffff;
   font-weight: 500;
 }
@@ -608,7 +608,7 @@ page {
 }
 
 .form-label {
-  width: 160rpx;
+  width: 130rpx;
   font-size: 32rpx;
   color: #333;
   font-weight: 500;
@@ -636,6 +636,7 @@ page {
   font-size: 32rpx;
   color: #333;
   padding: 0;
+  padding-left: 30rpx;
 }
 
 /* 性别选择器 */
@@ -650,7 +651,7 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20rpx;
+  padding: 40rpx;
   background-color: #f8f9fa;
   border-radius: 12rpx;
   border: 2rpx solid transparent;
@@ -663,18 +664,9 @@ page {
 }
 
 .gender-icon {
-  font-size: 32rpx;
+  width: 90rpx;
+  height: 90rpx;
   margin-bottom: 8rpx;
-  /* 优化移动端emoji显示清晰度 */
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
-  filter: contrast(1.05) saturate(1.05);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .gender-text {
@@ -701,14 +693,250 @@ page {
 .cancel-btn {
   background-color: #f5f5f5;
   color: #666;
+  border: 1px solid #00BC7D;
 }
 
 .confirm-btn {
-  background-color: #2B81E8;
+  background-color: #00BC7D;
   color: #ffffff;
 }
 
-/* 身体部位选择 */
+/* 身体部位选择 - 新设计 */
+.popup-content.new-design {
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+/* 全屏弹窗样式 */
+.popup-content.fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f5;
+  position: relative;
+}
+
+.popup-header.fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.popup-header.fullscreen-header .header-left {
+  width: 60rpx;
+}
+
+.popup-header.fullscreen-header .popup-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.popup-header.fullscreen-header .popup-close {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #999;
+}
+
+.body-part-section {
+  flex: 1;
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+  overflow-y: auto;
+}
+
+/* 手部/脚部选择器 */
+.part-type-selector {
+  display: flex;
+  gap: 20rpx;
+  width: 100%;
+}
+
+.part-type-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  border: 3rpx solid #e0e0e0;
+  transition: all 0.3s ease;
+  margin: 0 10rpx;
+}
+
+.part-type-btn.active {
+  background-color: #00BC7D;
+  border-color: #00BC7D;
+}
+
+.part-type-btn .part-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+  /* 优化移动端emoji显示清晰度 */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+  filter: contrast(1.05) saturate(1.05);
+}
+
+.part-type-btn .part-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.part-type-btn.active .part-text {
+  color: #ffffff;
+}
+
+/* 左右选择器 */
+.left-right-selector {
+  display: flex;
+  gap: 20rpx;
+  width: 100%;
+}
+
+.left-right-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  border: 3rpx solid #e0e0e0;
+  transition: all 0.3s ease;
+  gap: 10rpx;
+  margin: 0 10rpx;
+}
+
+.left-right-btn.active {
+  background-color: #00BC7D;
+  border-color: #00BC7D;
+}
+
+.left-right-btn .lr-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.left-right-btn.active .lr-text {
+  color: #ffffff;
+}
+
+.left-right-btn .arrow-icon {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.left-right-btn.active .arrow-icon {
+  color: #ffffff;
+}
+
+/* 脚趾图示选择区域 */
+.foot-selection-area {
+  /* background: linear-gradient(135deg, #e8f5f1 0%, #d4ede5 100%); */
+  border-radius: 24rpx;
+  /* padding: 40rpx 30rpx; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20rpx;
+  gap: 30rpx;
+  /* border: 2rpx solid #b3ddd0; */
+}
+
+.foot-image-preview {
+  position: relative;
+  width: 100%;
+  max-width: 500rpx;
+  height: 500rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 188, 125, 0.15);
+}
+
+.foot-preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+.toe-highlight {
+  position: absolute;
+  top: 50rpx;
+  right: 80rpx;
+  width: 120rpx;
+  height: 120rpx;
+  background-color: rgba(0, 188, 125, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+.selected-part-btn {
+  width: 100%;
+  background-color: #00BC7D;
+  border-radius: 16rpx;
+  padding: 25rpx 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected-part-btn .selected-text {
+  font-size: 32rpx;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.instruction-text {
+  text-align: center;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 身体部位选择 - 旧设计（保留以防其他页面使用） */
 .body-part-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1188,4 +1416,223 @@ page {
   max-width: 90vw !important;
   max-height: 80vh !important;
   min-height: 60vh !important;
+}
+
+/* 手部SVG容器 */
+.hand-image-container {
+  position: relative;
+  width: 100%;
+  max-width: 80vw;
+  height: 45vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 188, 125, 0.15);
+}
+
+/* 左手时水平翻转 - 不显示过渡动画 */
+.hand-image-container.flip-horizontal {
+  transform: scaleX(-1);
+}
+
+/* 翻转后文字也需要翻转回来 */
+.hand-image-container.flip-horizontal .finger-label {
+  transform: scaleX(-1);
+}
+
+.hand-preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 可点击的手指区域覆盖层 */
+.finger-clickable-areas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.finger-area {
+  position: absolute;
+  pointer-events: auto;
+  /* background-color: rgba(0, 188, 125, 0.1); */
+  /* border: 2rpx solid rgba(0, 188, 125, 0.3); */
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.finger-area:active {
+  background-color: rgba(0, 188, 125, 0.3);
+  transform: scale(1.1);
+}
+
+.finger-label {
+  font-size: 20rpx;
+  color: #00BC7D;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* 各个手指的位置 - 根据右手SVG调整 */
+.thumb-area {
+  top: 17vh;
+  right: 60vw;
+  width: 9vw;
+  height: 9vh;
+  transform: rotate(-25deg);
+}
+
+.index-area {
+  top: 9vh;
+  left: 31vw;
+  width: 8vw;
+  height: 13vh;
+  transform: rotate(-7deg);
+}
+
+.middle-area {
+  top: 6vh;
+  left: 42vw;
+  width: 8vw;
+  height: 15vh;
+}
+
+.ring-area {
+  top: 7vh;
+  left: 54vw;
+  width: 6vw;
+  height: 14vh;
+  transform: rotate(6deg);
+}
+
+.little-area {
+  top: 11vh;
+  left: 63vw;
+  width: 6vw;
+  height: 12vh;
+  transform: rotate(12deg);
+}
+
+.hand-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.finger-path {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.finger-path:active {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+/* 脚部容器 */
+.foot-image-container {
+  position: relative;
+  width: 100%;
+  max-width: 80vw;
+  height: 45vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 188, 125, 0.15);
+}
+
+/* 左脚时水平翻转 */
+.foot-image-container.flip-horizontal {
+  transform: scaleX(-1);
+}
+
+/* 翻转后文字也需要翻转回来 */
+.foot-image-container.flip-horizontal .toe-label {
+  transform: scaleX(-1);
+}
+
+.foot-preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 可点击的脚趾区域覆盖层 */
+.toe-clickable-areas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.toe-area {
+  position: absolute;
+  pointer-events: auto;
+  background-color: rgba(0, 188, 125, 0.1);
+  border: 2rpx solid rgba(0, 188, 125, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.toe-area:active {
+  background-color: rgba(0, 188, 125, 0.3);
+  transform: scale(1.1);
+}
+
+.toe-label {
+  font-size: 18rpx;
+  color: #00BC7D;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* 各个脚趾的位置 - 根据右脚SVG调整 */
+.big-toe-area {
+  top: 7vh;
+  left: 7vw;
+  width: 140rpx;
+  height: 140rpx;
+}
+
+.second-toe-area {
+  top: 4vh;
+  left: 28vw;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.third-toe-area {
+  top: 5vh;
+  left: 44vw;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.fourth-toe-area {
+  top: 9vh;
+  left: 58vw;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.little-toe-area {
+  top: 16vh;
+  left: 64vw;
+  width: 80rpx;
+  height: 80rpx;
 } 

@@ -39,13 +39,13 @@ Page({
         let suggestions = ''
         
         if (finalResult === 'onychomycosis') {
-          description = '检测结果显示存在灰指甲症状'
+          description = '检测结果显示存在灰指甲症状，建议尽早治疗或到医疗机构进一步检测。'
           suggestions = '建议及时就医治疗，保持指甲清洁干燥，避免共用个人用品'
         } else if (finalResult === 'Normal' || finalResult === 'normal') {
           description = '检测结果显示指甲状态正常'
           suggestions = '建议继续保持良好的卫生习惯'
         } else if (finalResult === 'UNKNOWN') {
-          description = `可能照片模糊；可能灰指甲特征不明显；光线不足等其他原因。`
+          description = `可能相片模糊；可能灰指甲特征不明显；可能拍照光线不足；可能背景复杂，拍摄到的指甲偏小等其他原因导致，可尝试重新拍照检测。`
           suggestions = '未能识别'
         } else {
           description = '检测完成'

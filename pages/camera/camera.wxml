@@ -26,11 +26,11 @@
       <!-- 顶部操作栏 -->
       <view class="top-bar">
         <view class="back-btn" bindtap="goBack">
-          <text class="back-icon">←</text>
+          <t-icon name="chevron-left" size="48rpx" color="white" />
         </view>
         <view class="title">拍照检测</view>
         <view class="switch-btn" bindtap="switchCamera">
-          <text class="switch-icon">🔄</text>
+          <t-icon name="refresh" size="40rpx" color="white" />
         </view>
       </view>
       

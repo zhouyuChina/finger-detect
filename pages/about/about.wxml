@@ -13,7 +13,7 @@
         <text class="logo-text">🏥</text>
       </view>
       <image wx:else class="logo-image" src="{{aboutInfo.logo}}" mode="aspectFit" />
-      <text class="platform-name">{{aboutInfo.name}}</text>
+      <text class="platform-name">月牙康AI甲部检测</text>
       <text class="version-text">版本 {{aboutInfo.version}}</text>
     </view>
 

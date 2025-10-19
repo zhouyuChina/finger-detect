@@ -12,3 +12,10 @@ $RECYCLE.BIN/
 
 # Node.js
 node_modules/
+
+# 小程序构建产物
+miniprogram_npm/
+.wxapkg
+
+# 本地配置
+.claude/settings.local.json

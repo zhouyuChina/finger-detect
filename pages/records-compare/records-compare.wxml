@@ -34,7 +34,6 @@
               wx:for="{{filteredRecords}}" 
               wx:key="id"
               title="{{item.name}}"
-              image="{{item.avatar}}"
               hover
               bindtap="onRecordClick"
               data-id="{{item.id}}"
@@ -47,8 +46,9 @@
                 <t-tag 
                   theme="{{item.type === 'mine' ? 'primary' : 'default'}}" 
                   size="small"
+                  style="background-color: #009966; color: #fff; border: none;"
                 >
-                  {{item.type === 'mine' ? '我的' : (item.username || '其他')}}
+                  {{item.type === 'mine' ? '本人' : (item.username || '其他')}}
                 </t-tag>
               </view>
             </t-cell>
@@ -62,7 +62,7 @@
         </view>
       </t-tab-panel>
       
-      <t-tab-panel label="我的档案" value="mine">
+      <t-tab-panel label="本人档案" value="mine">
         <view class="tab-content">
           <!-- 加载状态 -->
           <view class="loading-container" wx:if="{{loading}}">
@@ -74,7 +74,6 @@
               wx:for="{{myRecords}}" 
               wx:key="id"
               title="{{item.name}}"
-              image="{{item.avatar}}"
               hover
               bindtap="onRecordClick"
               data-id="{{item.id}}"
@@ -85,7 +84,7 @@
                 <text class="record-count">检测次数：{{item.recordCount}}</text>
               </view>
               <view slot="note" class="record-meta">
-                <t-tag theme="primary" size="small">我的</t-tag>
+                <t-tag theme="primary" size="small" style="background-color: #009966; color: #fff; border: none;">本人</t-tag>
               </view>
             </t-cell>
           </view>
@@ -119,7 +118,6 @@
                   wx:for="{{subUsers}}" 
                   wx:key="id"
                   title="{{item.username || item.name || '未知用户'}}"
-                  image="{{item.avatarUrl || '/images/profile-avatar.png'}}"
                   hover
                   bindtap="onUserSelect"
                   data-userid="{{item.id}}"
@@ -149,6 +147,7 @@
                 size="small" 
                 bindtap="onBackToUserList"
                 icon="arrow-left"
+                style="color: #00BC7D;"
               >
                 返回用户列表
               </t-button>
@@ -166,7 +165,6 @@
                 wx:for="{{userArchives}}" 
                 wx:key="id"
                 title="{{item.name}}"
-                image="{{item.avatar}}"
                 hover
                 bindtap="onRecordClick"
                 data-id="{{item.id}}"
@@ -177,7 +175,9 @@
                   <text class="record-count">检测次数：{{item.recordCount}}</text>
                 </view>
                 <view slot="note" class="record-meta">
-                  <t-tag theme="default" size="small">{{selectedUserName}}</t-tag>
+                  <t-tag theme="" size="small" style="background-color: #009966; color: #fff; border: none;">
+                    {{selectedUserName}}
+                  </t-tag>
                 </view>
               </t-cell>
             </view>

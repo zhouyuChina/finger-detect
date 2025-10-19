@@ -3,7 +3,7 @@
   <!-- 导航栏 -->
   <view class="nav-bar">
     <view class="nav-left" bindtap="onBack">
-      <text class="nav-icon">←</text>
+      <t-icon name="chevron-left" size="48rpx" color="#fff" />
     </view>
     <view class="nav-title">{{archiveName}} - 检测历史</view>
     <view class="nav-right">
@@ -31,7 +31,7 @@
   <view class="first-detection-section" wx:if="{{detections.length > 0}}">
     <view class="first-detection-header">
       <text class="first-detection-title">首次检测</text>
-      <text class="first-detection-date">{{firstDetectionDate}}</text>
+      <!-- <text class="first-detection-date">{{firstDetectionDate}}</text> -->
     </view>
     <view class="first-detection-image-container">
       <image 
@@ -43,7 +43,9 @@
         bindload="onFirstDetectionLoad"
       />
       <view class="first-detection-overlay">
-        <!-- <text class="first-detection-label">首次检测</text> -->
+        <view class="image-info">
+          <text class="image-date">{{firstDetectionDate}}</text>
+        </view>
       </view>
     </view>
   </view>

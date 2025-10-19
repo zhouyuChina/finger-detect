@@ -54,3 +54,9 @@
   min-height: 50vh !important;
   max-height: 70vh !important;
 } 
+
+.t-tabs__item--active{color:var(--td-tab-item-active-color,var(--td-brand-color,var(--td-primary-color-7,#00BC7D))) !important;}
+
+.t-tabs__badge--active{--td-badge-content-text-color:var(--td-tab-item-active-color, var(--td-brand-color, var(--td-primary-color-7, #00BC7D))) !important;}
+
+.t-tabs__track{background-color:var(--td-tab-track-color,var(--td-brand-color,var(--td-primary-color-7,#00BC7D))) !important;}

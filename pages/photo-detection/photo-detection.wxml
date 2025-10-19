@@ -2,22 +2,28 @@
 <view class="container">
   <!-- 步骤指示器 -->
   <view class="step-indicator">
-    <view 
-      class="step-item {{currentStep >= 1 ? 'active' : ''}}" 
+    <view
+      class="step-item {{currentStep >= 1 ? 'active' : ''}}"
     >
-      <view class="step-icon">✏️</view>
+      <view class="step-icon">
+        <t-icon name="edit" size="40rpx" color="{{currentStep >= 1 ? 'white' : '#999'}}" />
+      </view>
       <text class="step-title">档案信息</text>
     </view>
-    <view 
-      class="step-item {{currentStep >= 2 ? 'active' : ''}}" 
+    <view
+      class="step-item {{currentStep >= 2 ? 'active' : ''}}"
     >
-      <view class="step-icon">📷</view>
+      <view class="step-icon">
+        <t-icon name="camera" size="40rpx" color="{{currentStep >= 2 ? 'white' : '#999'}}" />
+      </view>
       <text class="step-title">拍照操作</text>
     </view>
-    <view 
-      class="step-item {{currentStep >= 3 ? 'active' : ''}}" 
+    <view
+      class="step-item {{currentStep >= 3 ? 'active' : ''}}"
     >
-      <view class="step-icon">✅</view>
+      <view class="step-icon">
+        <t-icon name="check-circle" size="40rpx" color="{{currentStep >= 3 ? 'white' : '#999'}}" />
+      </view>
       <text class="step-title">完成</text>
     </view>
   </view>
@@ -26,13 +32,13 @@
   <view class="content-area">
     <!-- 加载状态 -->
     <view class="loading-state" wx:if="{{loading}}">
-      <view class="loading-icon">⏳</view>
+      <t-loading theme="circular" size="80rpx" />
       <text class="loading-text">检查档案状态中...</text>
     </view>
-    
+
     <!-- 错误状态 -->
     <view class="error-state" wx:elif="{{error}}">
-      <view class="error-icon">❌</view>
+      <t-icon name="close-circle" size="120rpx" color="#ff4757" />
       <text class="error-text">档案信息获取失败</text>
       <button class="retry-btn" bindtap="onRetry">重试</button>
     </view>
@@ -46,7 +52,7 @@
       <!-- 档案信息显示 -->
       <view class="profile-info" wx:if="{{profile}}">
         <text class="profile-name">{{profile.name}}</text>
-        <text class="profile-desc">{{profile.bodyPart}} - {{profile.detailPart}}</text>
+        <!-- <text class="profile-desc">{{profile.bodyPart}} - {{profile.detailPart}}</text> -->
       </view>
       
       <!-- 无档案信息提示 -->
@@ -58,8 +64,8 @@
       
       <!-- 拍照区域 -->
       <view class="photo-area">
-        <view class="photo-placeholder" wx:if="{{!photoTaken}}">
-          <view class="camera-icon">📷</view>
+        <view class="photo-placeholder" wx:if="{{!photoTaken}}" bindtap="takePhoto">
+          <t-icon name="camera" size="100rpx" color="#00BC7D" class="camera-icon" />
           <text class="placeholder-text">点击拍照</text>
         </view>
         
@@ -84,18 +90,22 @@
       <!-- 操作按钮区域 -->
       <view class="photo-actions">
         <!-- 拍照按钮 -->
-        <button 
+        <!-- <button 
           class="btn btn-photo" 
           wx:if="{{!photoTaken}}"
           bindtap="takePhoto"
-        >拍照</button>
+        >
+          拍照
+        </button> -->
         
         <!-- 临时上传按钮 -->
         <!-- <button 
           class="btn btn-upload" 
           wx:if="{{!photoTaken}}"
           bindtap="uploadPhoto"
-        >上传图片</button> -->
+        >
+          上传图片
+        </button> -->
         
         <!-- 拍照后的操作按钮 -->
         <view class="btn-group" wx:if="{{photoTaken}}">

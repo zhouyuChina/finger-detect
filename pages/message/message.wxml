@@ -30,10 +30,7 @@
         <view class="message-header">
           <view class="title-container">
             <text class="message-title">{{item.title}}</text>
-            <!-- 置顶图标 -->
-            <view class="top-icon" wx:if="{{item.isTop}}">
-              <text class="top-icon-text">📌</text>
-            </view>
+ 
           </view>
           <text class="message-time">{{item.time}}</text>
         </view>
@@ -48,7 +45,7 @@
           <!-- 重要标签 -->
           <text class="important-tag" wx:if="{{item.isImportant}}">重要</text>
           <!-- 分类标签 -->
-          <text class="category-tag">{{item.category}}</text>
+          <!-- <text class="category-tag">{{item.category}}</text> -->
           <!-- 阅读数 -->
           <text class="read-count" wx:if="{{item.views > 0}}">{{item.views}}阅读</text>
         </view>

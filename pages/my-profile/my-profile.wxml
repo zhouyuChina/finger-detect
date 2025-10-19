@@ -18,7 +18,6 @@
     />
   </view>
 
-
   <!-- 档案列表 -->
   <view class="profile-list" wx:if="{{filteredProfiles.length > 0}}">
     <t-cell-group>
@@ -28,7 +27,6 @@
         bindtap="onProfileClick"
         data-id="{{item.id}}"
         hover
-        arrow
       >
         <view slot="left-icon" class="cell-avatar">
           <t-avatar 
@@ -40,14 +38,14 @@
         <view slot="title" class="cell-title">
           <view class="profile-name">{{item.name}}</view>
           <view class="profile-details">
-            <text class="detail-item">{{item.gender}} | {{item.age}}岁</text>
+            <text class="detail-item">{{item.gender === '1' ? '男' : '女' }} | {{item.age}}岁</text>
             <text class="detail-item">{{item.relationship}}</text>
           </view>
         </view>
         
         <view slot="description" class="cell-description">
           <view class="profile-meta">
-            <text class="meta-item">档案ID: {{item.profileId}}</text>
+            <!-- <text class="meta-item">档案ID: {{item.profileId}}</text> -->
             <text class="meta-item">更新时间: {{item.updateTime}}</text>
             <text class="meta-item">档案: {{item.archives}} | 照片: {{item.photos}} | 报告: {{item.reports}}</text>
           </view>

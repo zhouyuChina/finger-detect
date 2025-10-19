@@ -62,6 +62,7 @@ Page({
       { value: 'rightFoot', name: '右脚', icon: '🦶' }
     ],
     selectedBodyPart: null,
+    selectedPartType: 'foot', // 'hand' 或 'foot'，默认脚部
     detailParts: [],
     
     // 手指选项
@@ -565,7 +566,12 @@ Page({
 
   // 新增档案
   addNewProfile() {
-    this.setData({ showBodyPartPopup: true });
+    // 设置默认选择为左手
+    this.setData({
+      showBodyPartPopup: true,
+      selectedBodyPart: this.data.bodyParts[0], // 左手
+      selectedPartType: 'hand'
+    });
   },
 
   // 为档案列表加载检测次数
@@ -629,22 +635,26 @@ Page({
   // 选择身体部位
   selectBodyPart(e) {
     const part = e.currentTarget.dataset.part;
+
+    // 判断是手部还是脚部
+    let partType = 'foot';
+    if (part.value.includes('Hand')) {
+      partType = 'hand';
+    }
+
     this.setData({
       selectedBodyPart: part,
-      showBodyPartPopup: false
+      selectedPartType: partType
     });
 
     // 根据身体部位设置详细选项
-    if (part.value.includes('Hand')) {
+    if (partType === 'hand') {
       this.setData({ detailParts: this.data.fingerParts });
     } else {
       this.setData({ detailParts: this.data.toeParts });
     }
 
-    // 显示详细部位选择弹窗
-    setTimeout(() => {
-      this.setData({ showDetailPartPopup: true });
-    }, 300);
+    // 不关闭弹窗，让用户继续在同一弹窗内选择具体部位
   },
 
   // 选择详细部位

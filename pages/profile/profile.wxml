@@ -11,22 +11,22 @@
   <!-- 用户信息区域 -->
   <view class="user-section">
     <view class="user-info">
-      <t-avatar 
-        image="{{userInfo.avatar}}" 
-        size="large"
-        shape="round"
-      />
+      <view class="user-avatar">
+        <t-icon name="user" size="48rpx" color="white" />
+      </view>
       <view class="user-details">
-        <text class="user-name">{{userInfo.name}}</text>
-        <text class="user-phone">{{userInfo.phone}}</text>
+        <text class="user-name">{{userInfo.name || '微信用户'}}</text>
+        <text class="user-type">普通用户</text>
       </view>
     </view>
-    <t-button 
-      theme="primary"
+    <t-button
+      theme=""
       bindtap="onFeedback"
-      size="extra-small"
+      size="small"
+      class="feedback-btn"
+      style="background-color: #009966; width: 160rpx; color: #fff;"
     >
-      留言反馈
+      管理反馈
     </t-button>
   </view>
 
@@ -47,61 +47,58 @@
       </view>
       <view class="stats-item">
         <text class="stats-number">{{stats.unreadMessages}}</text>
-        <text class="stats-label">未读消息</text>
+        <text class="stats-label">未使用数</text>
       </view>
     </view>
   </view>
 
   <!-- 菜单列表 -->
   <view class="menu-section">
-    <t-cell-group theme="card">
-      <t-cell 
-        title="用户中心" 
-        description="管理我的用户"
-        bindtap="onMyProfile"
-      >
-        <text slot="note" class="arrow-icon">›</text>
-      </t-cell>
-      <t-cell 
-        title="我的优惠券" 
-        description="查看详细的优惠券信息"
-        bindtap="onMyCoupons"
-      >
-        <text slot="note" class="arrow-icon">›</text>
-      </t-cell>
-      <t-cell 
-        title="系统消息" 
-        bindtap="onSystemMessages"
-      >
-        <view slot="description" class="description-with-badge">
-          查看系统消息
-          <view wx:if="{{stats.unreadSystemMessages > 0}}" class="red-dot"></view>
+    <view class="menu-list">
+      <view class="menu-item" bindtap="onMyProfile">
+        <view class="menu-icon user-icon">
+          <t-icon name="user" size="44rpx" color="#009966" />
         </view>
-        <text slot="note" class="arrow-icon">›</text>
-      </t-cell>
-      <t-cell 
-        title="关于我们" 
-        description="了解更多产品信息"
-        bindtap="onAboutUs"
-      >
-        <text slot="note" class="arrow-icon">›</text>
-      </t-cell>
-    </t-cell-group>
-  </view>
-
-  <!-- 分享有礼 -->
-  <!-- <view class="share-section">
-    <t-cell 
-      title="分享有礼" 
-      description="邀请好友获得专属优惠"
-      hover
-      bindtap="onShare"
-    >
-      <view slot="note" class="note-container">
-        <t-tag theme="warning" size="small">有奖励</t-tag>
+        <view class="menu-content">
+          <text class="menu-title">用户中心</text>
+          <text class="menu-desc">管理我的用户</text>
+        </view>
+        <t-icon name="chevron-right" size="40rpx" color="#ccc" />
       </view>
-    </t-cell>
-  </view> -->
 
+      <view class="menu-item" bindtap="onMyCoupons">
+        <view class="menu-icon coupon-icon">
+          <t-icon name="discount" size="44rpx" color="#009966" />
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">我的优惠券</text>
+          <text class="menu-desc">查看详细的优惠券信息</text>
+        </view>
+        <t-icon name="chevron-right" size="40rpx" color="#ccc" />
+      </view>
 
+      <view class="menu-item" bindtap="onSystemMessages">
+        <view class="menu-icon message-icon">
+          <t-icon name="notification" size="44rpx" color="#009966" />
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">系统消息</text>
+          <text class="menu-desc">查看系统消息</text>
+        </view>
+        <t-icon name="chevron-right" size="40rpx" color="#ccc" />
+      </view>
+
+      <view class="menu-item" bindtap="onAboutUs">
+        <view class="menu-icon about-icon">
+          <t-icon name="help-circle" size="44rpx" color="#009966" />
+        </view>
+        <view class="menu-content">
+          <text class="menu-title">关于我们</text>
+          <text class="menu-desc">了解更多产品信息</text>
+        </view>
+        <t-icon name="chevron-right" size="40rpx" color="#ccc" />
+      </view>
+    </view>
+  </view>
+  
 </view> 

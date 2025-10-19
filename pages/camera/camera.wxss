@@ -71,7 +71,7 @@ page {
 .nail-shape {
   width: 280rpx;
   height: 360rpx;
-  border: 4rpx dashed #4CAF50;
+  border: 4rpx dashed #00BC7D;
   border-radius: 140rpx 140rpx 80rpx 80rpx / 100rpx 100rpx 80rpx 80rpx;
   position: relative;
   background: rgba(76, 175, 80, 0.05);
@@ -97,7 +97,7 @@ page {
 
 .guide-text {
   font-size: 28rpx;
-  color: #4CAF50;
+  color: #00BC7D;
   font-weight: 600;
   text-align: center;
   background: rgba(0, 0, 0, 0.7);
@@ -105,7 +105,8 @@ page {
   padding: 12rpx 24rpx 11rpx;
   border-radius: 25rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
-  border: 2rpx solid #4CAF50;
+  border: 2rpx solid #00BC7D;
+  width: 400rpx;
 }
 
 /* 顶部操作栏 */
@@ -230,7 +231,7 @@ page {
 }
 
 .confirm-btn {
-  background: #4CAF50;
+  background: #00BC7D;
 }
 
 /* 隐藏的裁剪canvas */
