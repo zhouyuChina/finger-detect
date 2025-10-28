@@ -275,13 +275,12 @@
         <text class="popup-title">{{popupTitle}}</text>
         <text class="popup-close" bindtap="closeAddressPopup">✕</text>
       </view>
-      
+
       <view class="form-content">
         <view class="form-item">
           <text class="form-label">省份</text>
-          <view class="selection-placeholder" bindtap="showProvinceSelector">
-            <text class="placeholder-text">{{userForm.province || '请选择省份'}}</text>
-
+          <view class="selection-placeholder" bindtap="{{locationFailed ? 'showProvinceSelector' : 'autoGetLocation'}}">
+            <text class="placeholder-text">{{userForm.province || (locationFailed ? '请选择省份' : '自动获取当前位置')}}</text>
           </view>
         </view>
         <view class="form-item">
@@ -297,7 +296,7 @@
           </view>
         </view>
       </view>
-      
+
       <view class="popup-actions">
         <button class="popup-btn cancel-btn" bindtap="prevUserStep">上一步</button>
         <button class="popup-btn confirm-btn" bindtap="saveUserInfo">{{isCompleteMode ? '保存' : '确定'}}</button>
@@ -480,7 +479,11 @@
                 bindtap="selectDetailPart"
                 data-part="{{fingerParts[0]}}"
               >
-                <text class="finger-label">大拇指</text>
+                <text class="finger-label">
+                  大
+                  拇
+                  指
+                </text>
               </view>
 
               <!-- 食指点击区域 -->
@@ -489,7 +492,10 @@
                 bindtap="selectDetailPart"
                 data-part="{{fingerParts[1]}}"
               >
-                <text class="finger-label">食指</text>
+                <text class="finger-label">
+                  食
+                  指 
+                </text>
               </view>
 
               <!-- 中指点击区域 -->
@@ -498,7 +504,10 @@
                 bindtap="selectDetailPart"
                 data-part="{{fingerParts[2]}}"
               >
-                <text class="finger-label">中指</text>
+                <text class="finger-label">
+                  中
+                  指
+                </text>
               </view>
 
               <!-- 无名指点击区域 -->
@@ -507,7 +516,11 @@
                 bindtap="selectDetailPart"
                 data-part="{{fingerParts[3]}}"
               >
-                <text class="finger-label">无名指</text>
+                <text class="finger-label">
+                  无
+                  名
+                  指
+                </text>
               </view>
 
               <!-- 小指点击区域 -->
@@ -516,7 +529,10 @@
                 bindtap="selectDetailPart"
                 data-part="{{fingerParts[4]}}"
               >
-                <text class="finger-label">小指</text>
+                <text class="finger-label">
+                  小
+                  指
+                </text>
               </view>
             </view>
           </view>

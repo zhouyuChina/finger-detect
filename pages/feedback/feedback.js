@@ -250,47 +250,5 @@ Page({
       'complaint': 'help-circle'
     }
     return iconMap[type] || 'help-circle'
-  },
-
-
-
-  // 格式化时间
-  formatTime(timeString) {
-    if (!timeString) return ''
-    
-    const date = new Date(timeString)
-    const now = new Date()
-    const diff = now - date
-    
-    // 小于1分钟
-    if (diff < 60 * 1000) {
-      return '刚刚'
-    }
-    
-    // 小于1小时
-    if (diff < 60 * 60 * 1000) {
-      return `${Math.floor(diff / (60 * 1000))}分钟前`
-    }
-    
-    // 小于24小时
-    if (diff < 24 * 60 * 60 * 1000) {
-      return `${Math.floor(diff / (60 * 60 * 1000))}小时前`
-    }
-    
-    // 小于30天
-    if (diff < 30 * 24 * 60 * 60 * 1000) {
-      return `${Math.floor(diff / (24 * 60 * 60 * 1000))}天前`
-    }
-    
-    // 超过30天显示具体日期
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    
-    if (year === now.getFullYear()) {
-      return `${month}-${day}`
-    } else {
-      return `${year}-${month}-${day}`
-    }
   }
 }) 

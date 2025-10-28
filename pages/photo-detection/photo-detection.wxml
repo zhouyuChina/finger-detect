@@ -46,7 +46,7 @@
     <!-- 正常状态 -->
     <view class="photo-section" wx:else>
       <view class="photo-title">
-        <text>请拍照进行检测或记录</text>
+        <text>请拍照进行检测或对比</text>
       </view>
       
       <!-- 档案信息显示 -->
@@ -109,22 +109,23 @@
         
         <!-- 拍照后的操作按钮 -->
         <view class="btn-group" wx:if="{{photoTaken}}">
-          <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照</button> -->
-          <!-- <button class="btn btn-retake" bindtap="retakePhoto">重新拍照/上传</button> -->
-          <!-- 两个选择按钮：任何时候都显示 -->
-          <button 
-            class="btn btn-detect {{isDetecting ? 'btn-disabled' : ''}}" 
+          <!-- 开始检测按钮 -->
+          <button
+            class="btn btn-detect {{isDetecting ? 'btn-disabled' : ''}}"
             bindtap="startDetection"
             disabled="{{isDetecting}}"
           >
-            {{isDetecting ? '检测中...' : '开始检测'}}
+            <t-icon name="camera" size="36rpx" color="white" class="btn-icon" />
+            <text>{{isDetecting ? '检测中...' : '开始检测'}}</text>
           </button>
-          <button 
-            class="btn btn-save {{isDetecting ? 'btn-disabled' : ''}}" 
+
+          <!-- 恢复情况对比按钮 -->
+          <button
+            class="btn btn-save {{isDetecting ? 'btn-disabled' : ''}}"
             bindtap="savePhotoOnly"
             disabled="{{isDetecting}}"
           >
-            仅保存图片
+            恢复情况对比
           </button>
         </view>
       </view>

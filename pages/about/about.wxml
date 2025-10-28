@@ -9,10 +9,7 @@
   <view class="content" wx:else>
     <!-- Logo区域 -->
     <view class="logo-section">
-      <view class="logo-placeholder" wx:if="{{!aboutInfo.logo}}">
-        <text class="logo-text">🏥</text>
-      </view>
-      <image wx:else class="logo-image" src="{{aboutInfo.logo}}" mode="aspectFit" />
+      <image class="logo-image" src="/images/logo.jpg" mode="aspectFit" />
       <text class="platform-name">月牙康AI甲部检测</text>
       <text class="version-text">版本 {{aboutInfo.version}}</text>
     </view>
@@ -22,11 +19,11 @@
       <t-cell-group>
         <t-cell title="平台介绍" hover>
           <view slot="description" class="description-text">
-            {{aboutInfo.description}}
+            旨在构建⼀个⾯向个⼈的以⼩程序服务平台,通过降低检测⻔槛、辅助护理跟踪、提升⽤户体验与信任度。⽤户通过微信⼩程序⾃主上传⼿指甲图像,即可获得AI检测结果作为参考。系统将提供从智能识别、标准建档、图像⽐对到护理跟踪的全流程⽀持,提升检测效率与⾃我健康管理能⼒。
           </view>
         </t-cell>
         
-        <t-cell title="核心功能" hover>
+        <!-- <t-cell title="核心功能" hover>
           <view slot="description" class="feature-list">
             <view class="feature-item">
               <text class="feature-icon">✅</text>
@@ -45,7 +42,8 @@
               <text>历史记录追踪</text>
             </view>
           </view>
-        </t-cell>
+        </t-cell> -->
+
       </t-cell-group>
     </view>
 
@@ -90,13 +88,13 @@
           description="{{aboutInfo.address}}"
           hover
         />
-        <t-cell 
+        <!-- <t-cell 
           title="意见反馈" 
           description="点击提交您的建议"
           hover
           bindtap="onFeedback"
           right-icon="chevron-right"
-        />
+        /> -->
       </t-cell-group>
     </view>
 
@@ -104,7 +102,7 @@
     <view class="version-section">
       <t-cell-group>
         <t-cell title="当前版本" description="{{aboutInfo.version}}" />
-        <t-cell wx:if="{{aboutInfo.copyright}}" title="版权信息" description="{{aboutInfo.copyright}}" />
+        <!-- <t-cell wx:if="{{aboutInfo.copyright}}" title="版权信息" description="{{aboutInfo.copyright}}" /> -->
       </t-cell-group>
     </view>
 

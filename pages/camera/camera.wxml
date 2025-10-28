@@ -1,7 +1,7 @@
 <!--camera.wxml-->
 <view class="container">
-  <!-- 相机预览区域 -->
-  <view class="camera-container" wx:if="{{showCamera}}">
+  <!-- 相机预览区域 - 只在授权后显示 -->
+  <view class="camera-container" wx:if="{{showCamera && cameraAuthorized}}">
     <camera
       device-position="{{devicePosition}}"
       flash="off"
@@ -16,11 +16,25 @@
 
       <!-- 手指甲引导框 -->
       <view class="finger-guide">
-        <!-- <view class="nail-outline"> -->
-          <!-- 指甲轮廓 -->
-          <!-- <view class="nail-shape"></view>
-        </view> -->
-        <text class="guide-text">请把指甲放进框内并尽量铺满框</text>
+        <view class="guide-items">
+          <!-- 第一个引导项 -->
+          <view class="guide-item">
+            <image class="guide-icon" src="/images/nail-position.svg" mode="aspectFit"></image>
+            <text class="guide-text">请把指甲放置于框架内</text>
+          </view>
+
+          <!-- 第二个引导项 -->
+          <view class="guide-item">
+            <image class="guide-icon" src="/images/sunlight.svg" mode="aspectFit"></image>
+            <text class="guide-text">确保自然光充足</text>
+          </view>
+
+          <!-- 第三个引导项 -->
+          <view class="guide-item">
+            <image class="guide-icon" src="/images/clean-background.svg" mode="aspectFit" style="width: 66rpx;"></image>
+            <text class="guide-text">请确保背景没有杂物</text>
+          </view>
+        </view>
       </view>
       
       <!-- 顶部操作栏 -->
@@ -41,6 +55,17 @@
         </view>
       </view>
     </camera>
+  </view>
+
+  <!-- 授权引导页面 -->
+  <view class="auth-guide" wx:if="{{showCamera && !cameraAuthorized}}">
+    <view class="auth-content">
+      <image class="auth-icon" src="/images/logo.jpg" mode="aspectFit"></image>
+      <view class="auth-title">需要使用相机权限</view>
+      <view class="auth-desc">拍照检测需要使用您的相机进行指甲拍摄，点击下方按钮后将弹出授权请求</view>
+      <button class="auth-btn" bindtap="handleCameraAuth">开启相机</button>
+      <view class="auth-cancel" bindtap="goBack">暂不使用</view>
+    </view>
   </view>
 
   <!-- 照片预览区域 -->

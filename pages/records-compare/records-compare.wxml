@@ -2,12 +2,31 @@
 <view class="container">
   <!-- 搜索栏 -->
   <view class="search-section">
-    <t-search 
-      placeholder="搜索档案名称" 
-      bind:submit="onSearch"
-      bind:change="onSearchChange"
-      value="{{searchValue}}"
-    />
+    <view class="search-wrapper">
+      <t-search
+        placeholder="搜索档案名称"
+        bind:submit="onSearch"
+        bind:change="onSearchChange"
+        bind:focus="onSearchFocus"
+        bind:blur="onSearchBlur"
+        value="{{searchValue}}"
+      />
+
+      <!-- 预设选项下拉列表 -->
+      <view class="dropdown-list" wx:if="{{showDropdown && filteredPresetOptions.length > 0}}">
+        <view
+          class="dropdown-item"
+          wx:for="{{filteredPresetOptions}}"
+          wx:key="value"
+          bindtap="onPresetSelect"
+          data-value="{{item.value}}"
+        >
+          <view class="dropdown-item-content">
+            <text class="dropdown-item-label">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 
   <!-- 筛选栏 -->
@@ -160,9 +179,9 @@
             </view>
             
             <!-- 用户档案列表 -->
-            <view class="record-list" wx:if="{{userArchives.length > 0 && !userArchivesLoading}}">
-              <t-cell 
-                wx:for="{{userArchives}}" 
+            <view class="record-list" wx:if="{{filteredUserArchives.length > 0 && !userArchivesLoading}}">
+              <t-cell
+                wx:for="{{filteredUserArchives}}"
                 wx:key="id"
                 title="{{item.name}}"
                 hover
@@ -181,11 +200,11 @@
                 </view>
               </t-cell>
             </view>
-            
+
             <!-- 空状态 -->
-            <t-empty 
-              wx:if="{{userArchives.length === 0 && !userArchivesLoading}}"
-              description="该用户暂无档案"
+            <t-empty
+              wx:if="{{filteredUserArchives.length === 0 && !userArchivesLoading}}"
+              description="{{searchValue ? '未找到匹配的档案' : '该用户暂无档案'}}"
             />
           </view>
         </view>

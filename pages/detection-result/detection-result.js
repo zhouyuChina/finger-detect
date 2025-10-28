@@ -1,4 +1,6 @@
 // detection-result.js
+const common = require('../../utils/common.js')
+
 Page({
   data: {
     currentStep: 3, // 当前在大流程中的步骤
@@ -18,26 +20,47 @@ Page({
   },
 
   onLoad(options) {
-    
+
+    // 从 localStorage 获取当前用户信息
+    const storage = require('../../utils/storage.js')
+    const userInfo = storage.getUserInfo()
+    const currentSubUser = storage.getCurrentSubUser()
+
+    // 获取用户昵称，优先级：currentSubUser > userInfo
+    const userNickname = currentSubUser?.realName || currentSubUser?.nickname ||
+                        userInfo?.nickname || userInfo?.realName || userInfo?.nickName || '未知用户'
+
+    // 获取用户性别，优先级：currentSubUser > userInfo
+    const userGender = currentSubUser?.gender || userInfo?.gender || '0'
+
+    // 保存到页面数据中
+    this.setData({
+      userNickname: userNickname,
+      userGender: userGender
+    })
+
     // 如果有传递的图片路径，使用传递的路径
     if (options.imagePath) {
       this.setData({
         'detectionResult.imagePath': decodeURIComponent(options.imagePath)
       });
     }
-    
+
     // 如果有传递的检测结果，解析并显示
     if (options.detection && options.thirdPartyResult) {
       try {
         const detection = JSON.parse(decodeURIComponent(options.detection))
         const thirdPartyResult = JSON.parse(decodeURIComponent(options.thirdPartyResult))
         const finalResult = options.finalResult ? decodeURIComponent(options.finalResult) : null
-        
-        
+
+        // 格式化检测时间
+        const detectionTime = detection.detectionTime || detection.createdAt || detection.createTime || detection.updatedAt
+        const formattedTime = detectionTime ? common.formatTime(detectionTime, 'YYYY-MM-DD HH:mm:ss') : '—'
+
         // 根据检测结果生成描述和建议
         let description = ''
         let suggestions = ''
-        
+
         if (finalResult === 'onychomycosis') {
           description = '检测结果显示存在灰指甲症状，建议尽早治疗或到医疗机构进一步检测。'
           suggestions = '建议及时就医治疗，保持指甲清洁干燥，避免共用个人用品'
@@ -51,17 +74,18 @@ Page({
           description = '检测完成'
           suggestions = '请查看详细结果'
         }
-        
+
         // 更新检测结果数据
         this.setData({
           detection,
           thirdPartyResult,
           finalResult,
+          detectionTime: formattedTime,
           'detectionResult.description': description,
           'detectionResult.suggestions': suggestions,
           loading: false
         })
-        
+
         // 根据是否为第一次报告显示不同的提示
         if (detection.isFirstReport) {
         } else {

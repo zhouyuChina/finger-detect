@@ -19,33 +19,29 @@
       <view class="article-title">{{articleDetail.title}}</view>
       <view class="article-meta">
         <view class="meta-item">
-          <text class="meta-icon">👤</text>
+          <text class="meta-icon">作者:</text>
           <text class="meta-text">{{articleDetail.author}}</text>
         </view>
         <view class="meta-item">
-          <text class="meta-icon">📅</text>
+          <text class="meta-icon">发布时间:</text>
           <text class="meta-text">{{articleDetail.publishTime}}</text>
         </view>
         <view class="meta-item">
-          <text class="meta-icon">👁️</text>
+          <text class="meta-icon">阅读量:</text>
           <text class="meta-text">{{articleDetail.readCount}}</text>
-        </view>
-        <view class="meta-item" wx:if="{{articleDetail.category}}">
-          <text class="meta-icon">📂</text>
-          <text class="meta-text">{{articleDetail.category}}</text>
         </view>
       </view>
     </view>
 
     <!-- 文章摘要 -->
     <view class="article-summary" wx:if="{{articleDetail.summary}}">
-      <text class="summary-text">{{articleDetail.summary}}</text>
+      <text class="summary-text">简介：{{articleDetail.summary}}</text>
     </view>
 
     <!-- 文章封面图片 -->
-    <view class="article-cover" wx:if="{{articleDetail.coverImage}}">
+    <!-- <view class="article-cover" wx:if="{{articleDetail.coverImage}}">
       <image src="{{articleDetail.coverImage}}" mode="widthFix" />
-    </view>
+    </view> -->
 
     <!-- 文章标签 -->
     <view class="article-tags" wx:if="{{articleDetail.tags.length > 0}}">
@@ -71,10 +67,10 @@
         <text class="info-label">作者：</text>
         <text class="info-value">{{articleDetail.author}}</text>
       </view>
-      <view class="info-item" wx:if="{{articleDetail.category}}">
+      <!-- <view class="info-item" wx:if="{{articleDetail.category}}">
         <text class="info-label">分类：</text>
         <text class="info-value">{{articleDetail.category}}</text>
-      </view>
+      </view> -->
     </view>
   </view>
 </view> 

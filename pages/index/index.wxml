@@ -40,6 +40,11 @@
 
     <view class="message-list">
       <view class="message-item {{item.isRead ? 'read' : 'unread'}} {{item.isTop ? 'top' : ''}} {{item.isImportant ? 'important' : ''}}" wx:for="{{messages}}" wx:key="id" bindtap="onMessageTap" data-index="{{index}}">
+        <!-- 置顶图标 -->
+        <view class="top-badge" wx:if="{{item.isTop}}">
+          置顶
+        </view>
+
         <!-- 消息封面图片 -->
         <view class="message-cover" wx:if="{{item.coverImage}}">
           <image class="cover-image" src="{{item.coverImage}}" mode="aspectFill" />
@@ -60,7 +65,7 @@
           <view class="message-title-row">
             <text class="message-title">{{item.title}}</text>
           </view>
-          <text class="message-summary">{{item.summary}}</text>
+          <!-- <text class="message-summary">{{item.summary}}</text> -->
 
           <!-- 消息标签和元信息 -->
         </view>

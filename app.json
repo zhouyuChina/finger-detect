@@ -44,7 +44,7 @@
       },
       {
         "pagePath": "pages/message/message",
-        "text": "消息中心",
+        "text": "健康资讯",
         "iconPath": "images/message.png",
         "selectedIconPath": "images/message-active.png"
       },
@@ -59,6 +59,15 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
+  "__usePrivacyCheck__": true,
+  "permission": {
+    "scope.camera": {
+      "desc": "用于拍摄指甲照片进行健康检测"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ],
   "usingComponents": {
     "t-button": "miniprogram_npm/button/button",
     "t-cell": "miniprogram_npm/cell/cell",

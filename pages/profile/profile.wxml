@@ -16,7 +16,7 @@
       </view>
       <view class="user-details">
         <text class="user-name">{{userInfo.name || '微信用户'}}</text>
-        <text class="user-type">普通用户</text>
+        <!-- <text class="user-type">普通用户</text> -->
       </view>
     </view>
     <t-button
@@ -26,7 +26,7 @@
       class="feedback-btn"
       style="background-color: #009966; width: 160rpx; color: #fff;"
     >
-      管理反馈
+      留言反馈
     </t-button>
   </view>
 
@@ -45,10 +45,10 @@
         <text class="stats-number">{{stats.familyMembers}}</text>
         <text class="stats-label">检测记录</text>
       </view>
-      <view class="stats-item">
+      <!-- <view class="stats-item">
         <text class="stats-number">{{stats.unreadMessages}}</text>
         <text class="stats-label">未使用数</text>
-      </view>
+      </view> -->
     </view>
   </view>
 
@@ -65,14 +65,15 @@
         </view>
         <t-icon name="chevron-right" size="40rpx" color="#ccc" />
       </view>
-
-      <view class="menu-item" bindtap="onMyCoupons">
+      
+      <!-- bindtap="onMyCoupons" -->
+      <view class="menu-item">
         <view class="menu-icon coupon-icon">
           <t-icon name="discount" size="44rpx" color="#009966" />
         </view>
         <view class="menu-content">
           <text class="menu-title">我的优惠券</text>
-          <text class="menu-desc">查看详细的优惠券信息</text>
+          <text class="menu-desc">暂未开通，敬请期待</text>
         </view>
         <t-icon name="chevron-right" size="40rpx" color="#ccc" />
       </view>

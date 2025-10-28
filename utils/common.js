@@ -1,10 +1,10 @@
 // 通用工具方法
 const config = require('./config.js')
 
-// 格式化时间
+// 格式化时间 - 基础版本（支持自定义格式）
 const formatTime = (date, format = 'YYYY-MM-DD HH:mm:ss') => {
   if (!date) return ''
-  
+
   const d = new Date(date)
   const year = d.getFullYear()
   const month = String(d.getMonth() + 1).padStart(2, '0')
@@ -20,6 +20,149 @@ const formatTime = (date, format = 'YYYY-MM-DD HH:mm:ss') => {
     .replace('HH', hour)
     .replace('mm', minute)
     .replace('ss', second)
+}
+
+// 格式化时间 - 智能相对时间（中文友好）
+// 显示规则：刚刚 -> X分钟前 -> X小时前 -> 今天 HH:mm -> 昨天 HH:mm -> 周X HH:mm -> MM-DD HH:mm -> YYYY-MM-DD
+const formatTimeRelative = (timeStr) => {
+  if (!timeStr) return ''
+
+  try {
+    const date = new Date(timeStr)
+    const now = new Date()
+    const diff = now - date
+
+    // 小于1分钟：刚刚
+    if (diff < 60 * 1000) {
+      return '刚刚'
+    }
+
+    // 小于1小时：X分钟前
+    if (diff < 60 * 60 * 1000) {
+      return `${Math.floor(diff / (60 * 1000))}分钟前`
+    }
+
+    // 小于24小时：X小时前 或 今天 HH:mm
+    if (diff < 24 * 60 * 60 * 1000) {
+      const hours = Math.floor(diff / (60 * 60 * 1000))
+      if (hours < 6) {
+        return `${hours}小时前`
+      } else {
+        return '今天 ' + formatTime(date, 'HH:mm')
+      }
+    }
+
+    // 昨天：昨天 HH:mm
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    if (date.toDateString() === yesterday.toDateString()) {
+      return '昨天 ' + formatTime(date, 'HH:mm')
+    }
+
+    // 一周内：周X HH:mm
+    if (diff < 7 * 24 * 60 * 60 * 1000) {
+      const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      return days[date.getDay()] + ' ' + formatTime(date, 'HH:mm')
+    }
+
+    // 今年：MM-DD HH:mm
+    if (date.getFullYear() === now.getFullYear()) {
+      return formatTime(date, 'MM-DD HH:mm')
+    }
+
+    // 更早：YYYY-MM-DD
+    return formatTime(date, 'YYYY-MM-DD')
+  } catch (error) {
+    console.error('formatTimeRelative error:', error)
+    return timeStr
+  }
+}
+
+// 格式化时间 - 简短相对时间
+// 显示规则：刚刚 -> X分钟前 -> X小时前 -> X天前 -> YYYY-MM-DD
+const formatTimeShort = (timeStr) => {
+  if (!timeStr) return ''
+
+  try {
+    const date = new Date(timeStr)
+    const now = new Date()
+    const diff = now - date
+
+    // 小于1分钟
+    if (diff < 60 * 1000) {
+      return '刚刚'
+    }
+
+    // 小于1小时
+    if (diff < 60 * 60 * 1000) {
+      return `${Math.floor(diff / (60 * 1000))}分钟前`
+    }
+
+    // 小于24小时
+    if (diff < 24 * 60 * 60 * 1000) {
+      return `${Math.floor(diff / (60 * 60 * 1000))}小时前`
+    }
+
+    // 小于30天
+    if (diff < 30 * 24 * 60 * 60 * 1000) {
+      return `${Math.floor(diff / (24 * 60 * 60 * 1000))}天前`
+    }
+
+    // 超过30天显示具体日期
+    return formatTime(date, 'YYYY-MM-DD')
+  } catch (error) {
+    console.error('formatTimeShort error:', error)
+    return timeStr
+  }
+}
+
+// 格式化时间 - 完整中文格式
+// 显示规则：YYYY年MM月DD日 HH:mm:ss
+const formatTimeChinese = (timeStr, includeTime = true) => {
+  if (!timeStr) return ''
+
+  try {
+    const date = new Date(timeStr)
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+
+    let result = `${year}年${month}月${day}日`
+
+    if (includeTime) {
+      const hour = String(date.getHours()).padStart(2, '0')
+      const minute = String(date.getMinutes()).padStart(2, '0')
+      const second = String(date.getSeconds()).padStart(2, '0')
+      result += ` ${hour}:${minute}:${second}`
+    }
+
+    return result
+  } catch (error) {
+    console.error('formatTimeChinese error:', error)
+    return timeStr
+  }
+}
+
+// 格式化时间 - 标准日期格式（使用本地化）
+// 显示规则：使用浏览器本地化设置
+const formatTimeLocale = (timeStr, options = {}) => {
+  if (!timeStr) return ''
+
+  try {
+    const date = new Date(timeStr)
+    const defaultOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      ...options
+    }
+    return date.toLocaleString('zh-CN', defaultOptions)
+  } catch (error) {
+    console.error('formatTimeLocale error:', error)
+    return timeStr
+  }
 }
 
 // 格式化数字
@@ -284,6 +427,10 @@ const compressImage = (src, quality = 0.8) => {
 
 module.exports = {
   formatTime,
+  formatTimeRelative,
+  formatTimeShort,
+  formatTimeChinese,
+  formatTimeLocale,
   formatNumber,
   debounce,
   throttle,

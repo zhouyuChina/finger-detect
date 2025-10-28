@@ -69,6 +69,8 @@
   color: #666;
   line-height: 1.6;
   padding: 20rpx 0;
+  width: 80vw;
+  text-align: center;
 }
 
 .feature-list {

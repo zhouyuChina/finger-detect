@@ -95,7 +95,7 @@
 .article-summary {
   padding: 20rpx 30rpx;
   background-color: #f8f9fa;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: 10rpx solid #eee;
 }
 
 .summary-text {
@@ -138,6 +138,7 @@
 .article-body {
   padding: 30rpx;
   line-height: 1.8;
+  text-align: center;
 }
 
 .article-body rich-text {

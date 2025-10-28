@@ -58,27 +58,13 @@ page {
   font-weight: 600;
 }
 
-.step-line {
-  position: absolute;
-  top: 30rpx;
-  right: -50%;
-  width: 100%;
-  height: 2rpx;
-  background-color: #e0e0e0;
-  z-index: -1;
-}
-
-.step-item.active .step-line {
-  background-color: #00BC7D;
-}
-
 /* 主要内容区域 */
 .content-area {
   flex: 1;
-  padding: 30rpx;
+  padding: 40rpx 30rpx 60rpx;
   display: flex;
   flex-direction: column;
-  gap: 30rpx;
+  overflow-y: auto;
 }
 
 /* 加载状态 */
@@ -107,18 +93,132 @@ page {
   to { transform: rotate(360deg); }
 }
 
-/* 第一部分：照片显示区域 */
-.image-section {
-  width: 100%;
-  margin-bottom: 20rpx;
+.report-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+}
+
+.report-title {
+  text-align: center;
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #1f2f36;
+  letter-spacing: 2rpx;
+}
+
+.report-card {
+  position: relative;
+  background-color: #ffffff;
+  border: 2rpx solid #1f5662;
+  border-radius: 16rpx;
+  padding: 40rpx 36rpx;
+  box-shadow: 14rpx 14rpx 0 rgba(182, 220, 226, 0.6);
+}
+
+.card-corner {
+  position: absolute;
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 4rpx;
+  border: 4rpx solid #8fd3df;
+  background-color: #ffffff;
+  transform: rotate(45deg);
+}
+
+.corner-tl {
+  top: -14rpx;
+  left: 40rpx;
+}
+
+.corner-tr {
+  top: -14rpx;
+  right: 40rpx;
+}
+
+.card-header {
+  margin-bottom: 28rpx;
+}
+
+.card-header-bottom {
+  margin-bottom: 0rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2f36;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #1f2f36;
+  white-space: nowrap;
+  margin-right: 10rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333333;
+  flex: 1;
+}
+
+.result-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.field-label {
+  font-size: 28rpx;
+  color: #1f2f36;
+  margin-right: 20rpx;
+}
+
+.result-badge {
+  padding: 10rpx 28rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.badge-normal {
+  background-color: #1fba72;
+}
+
+.badge-abnormal {
+  background-color: #ff6b6b;
+}
+
+.badge-unknown {
+  background-color: #ffcc4d;
+  color: #433c1c;
+}
+
+.result-image-container {
+  height: 420rpx;
+  border-radius: 16rpx;
+  border: 2rpx dashed #9fd6df;
+  background-color: #f4fbfc;
+  padding: 24rpx;
 }
 
 .image-container {
-  width: 100%;
-  height: 600rpx;
-  background-color: #f5f5f5;
-  border: 2rpx solid #2196F3;
-  border-radius: 12rpx;
+  /* width: 100%; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,89 +231,35 @@ page {
   object-fit: contain;
 }
 
-/* 第二部分：检测结果状态 */
-.result-status-section {
-  width: 100%;
+.advice-content {
+  margin-bottom: 20rpx;
 }
 
-.status-content {
-  background-color: #ffffff;
-  border-radius: 8rpx;
-  padding: 20rpx;
-}
-
-.status-item {
-  display: inline-block;
-  padding: 10rpx 20rpx;
-  border-radius: 6rpx;
+.advice-paragraph {
+  display: block;
   font-size: 28rpx;
-  font-weight: 600;
+  color: #333333;
+  line-height: 1.7;
 }
 
-.status-item.warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1rpx solid #ffeaa7;
-}
-
-.status-item.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1rpx solid #c3e6cb;
-}
-
-.status-item.info {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1rpx solid #bee5eb;
-}
-
-.status-text {
+.advice-item {
   font-size: 28rpx;
-  font-weight: 600;
+  color: #333333;
+  line-height: 1.7;
+  margin-bottom: 12rpx;
 }
 
-/* 第三部分：描述内容 */
-.description-section {
-  width: 100%;
+.advice-item:last-child {
+  margin-bottom: 0;
 }
 
-.section-title {
-  font-size: 32rpx;
-  color: #333;
-  font-weight: 600;
-  /* margin-bottom: 20rpx; */
+.advice-note {
+  color: #1f5662;
+  margin-top: 12rpx;
 }
 
-.description-content {
-  background-color: #ffffff;
-  border-radius: 8rpx;
-  padding: 10rpx;
-}
-
-.description-text {
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
-  text-align: justify;
-}
-
-/* 第三部分：产品使用建议 */
-.suggestions-section {
-  width: 100%;
-}
-
-.suggestions-content {
-  background-color: #ffffff;
-  border-radius: 8rpx;
-  padding: 10rpx;
-}
-
-.suggestions-text {
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
-  text-align: justify;
+.advice-card .advice-content:last-child {
+  margin-bottom: 0;
 }
 
 /* 操作按钮 */
@@ -242,4 +288,9 @@ page {
 .btn-home {
   background-color: #f5f5f5;
   color: #666;
-} 
+}
+
+.nav-btn {
+  width: 100%;
+  display: block;
+}

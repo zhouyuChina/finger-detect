@@ -3,13 +3,18 @@
   <!-- 步骤指示器 -->
   <view class="step-indicator">
     <view 
-      class="step-item {{item.active ? 'active' : ''}}" 
+      class="step-item {{currentStep >= item.id ? 'active' : ''}}" 
       wx:for="{{steps}}" 
       wx:key="id"
     >
-      <view class="step-icon">{{item.icon}}</view>
+      <view class="step-icon">
+        <t-icon 
+          name="{{item.id === 1 ? 'edit' : (item.id === 2 ? 'camera' : 'check-circle')}}"
+          size="40rpx"
+          color="{{currentStep >= item.id ? 'white' : '#999'}}"
+        />
+      </view>
       <text class="step-title">{{item.title}}</text>
-      <view class="step-line" wx:if="{{index < steps.length - 1}}"></view>
     </view>
   </view>
 
@@ -21,11 +26,42 @@
       <text class="loading-text">加载检测结果中...</text>
     </view>
     
-    <!-- 正常状态 -->
-    <view wx:else>
-      <!-- 第一部分：照片显示区域 -->
-      <view class="image-section">
-        <view class="image-container">
+    <!-- 报告内容 -->
+    <view class="report-wrapper" wx:else>
+      <text class="report-title">检测报告</text>
+
+      <!-- 基本信息 -->
+      <view class="report-card info-card">
+        <view class="card-corner corner-tl"></view>
+        <view class="card-corner corner-tr"></view>
+        <view class="info-row">
+          <text class="info-label">用户昵称：</text>
+          <text class="info-value">{{userNickname || '—'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">性别：</text>
+          <text class="info-value">{{userGender === '1' || userGender === 1 ? '男' : (userGender === '2' || userGender === 2 ? '女' : '—')}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">检测时间：</text>
+          <text class="info-value">{{detectionTime || '—'}}</text>
+        </view>
+      </view>
+
+      <!-- 检测结果 -->
+      <view class="report-card result-card">
+        <view class="card-corner corner-tl"></view>
+        <view class="card-corner corner-tr"></view>
+        <view class="card-header">
+          <text class="card-title">您的甲部检测结果：</text>
+        </view>
+        <view class="result-field">
+          <text class="field-label">检测结果：</text>
+          <view class="result-badge {{((finalResult === 'Normal' || finalResult === 'normal' || finalResult === 'NORMAL')) ? 'badge-normal' : ((finalResult === 'onychomycosis' || finalResult === 'ONYCHOMYCOSIS') ? 'badge-abnormal' : 'badge-unknown')}}">
+            {{(finalResult === 'Normal' || finalResult === 'normal' || finalResult === 'NORMAL') ? '正常' : ((finalResult === 'onychomycosis' || finalResult === 'ONYCHOMYCOSIS') ? '疑似灰指甲' : '无法识别')}}
+          </view>
+        </view>
+        <view class="image-container result-image-container">
           <image 
             class="detection-image" 
             src="{{detectionResult.imagePath || '/images/default-avatar.png'}}" 
@@ -35,33 +71,34 @@
         </view>
       </view>
 
-      <!-- 第二部分：检测结果状态 -->
-      <view class="result-status-section" wx:if="{{finalResult}}">
-        <view class="section-title">检测结果:</view>
-        <view class="status-content">
-          <view class="status-item {{finalResult === 'onychomycosis' ? 'warning' : (finalResult === 'Normal' || finalResult === 'normal') ? 'success' : 'info'}}">
-            <text class="status-text" wx:if="{{finalResult === 'onychomycosis'}}">灰指甲</text>
-            <text class="status-text" wx:elif="{{finalResult === 'Normal' || finalResult === 'normal'}}">正常</text>
-            <text class="status-text" wx:elif="{{finalResult === 'UNKNOWN'}}">未能识别</text>
-            <text class="status-text" wx:else>{{finalResult}}</text>
-          </view>
+      <!-- 护理建议 -->
+      <view class="report-card advice-card">
+        <view class="card-corner corner-tl"></view>
+        <view class="card-corner corner-tr"></view>
+        <view class="card-header-bottom">
+          <text class="card-title">护理建议：</text>
         </view>
-      </view>
-
-      <!-- 第三部分：描述内容 -->
-      <view class="description-section">
-        <view class="section-title" wx:if="{{detection.isFirstReport}}">检测报告:</view>
-        <view class="section-title" wx:else>检测结果说明:</view>
-        <view class="description-content">
-          <text class="description-text">{{detectionResult.description}}</text>
+        <view class="advice-content" wx:if="{{finalResult === 'Normal' || finalResult === 'normal' || finalResult === 'NORMAL'}}">
+          <text class="advice-paragraph">
+            恭喜您！该指甲健康状况良好，未见灰指甲迹象，请您继续保持。
+          </text>
         </view>
-      </view>
-
-      <!-- 第三部分：产品使用建议 -->
-      <view class="suggestions-section" wx:if="{{detection.isFirstReport}}">
-        <view class="section-title">产品的使用建议:</view>
-        <view class="suggestions-content">
-          <text class="suggestions-text">{{detectionResult.suggestions}}</text>
+        <view class="advice-content" wx:elif="{{finalResult === 'onychomycosis' || finalResult === 'ONYCHOMYCOSIS'}}">
+          <text class="advice-paragraph">
+            您好，根据检测分析，您的指甲有感染灰指甲的症状，可能存在真菌感染。
+          </text>
+          <view class="advice-item">①．建议您尽早进行治疗或去医院做进一步的确诊。</view>
+          <view class="advice-item">②．避免与他人共用指甲剪、拖鞋等个人物品，防止交叉感染。</view>
+          <view class="advice-item">③．日常注意保持足部干燥清洁，穿透气性好的鞋袜，定期消毒鞋具。</view>
+          <view class="advice-item">④．减少美甲（足浴）频率，避免指甲长期封闭潮湿，有助于控制病情发展并提升治疗效果。</view>
+        </view>
+        <view class="advice-content" wx:else>
+          <text class="advice-paragraph">
+            您好，当前图像或信息不足以完成准确判断，请您重新拍摄清晰的指甲照片，确保光线充足、照片清晰、无遮挡、无美甲修饰，并选择干净的背景。
+          </text>
+          <text class="advice-paragraph advice-note">
+            若多次检测仍无法识别，您可在后台进行留言反馈，我们将竭诚为您服务，谢谢！
+          </text>
         </view>
       </view>
     </view>
@@ -73,6 +110,12 @@
     <!-- <button class="btn btn-save" bindtap="saveToProfile">
       {{detection.isFirstReport ? '保存报告' : '保存记录'}}
     </button> -->
-    <button class="btn btn-home" bindtap="backToHome">返回首页</button>
+    <navigator 
+      class="nav-btn" 
+      url="/pages/records-compare/records-compare" 
+      open-type="switchTab"
+    >
+      <button class="btn btn-home">恢复记录</button>
+    </navigator>
   </view>
 </view> 

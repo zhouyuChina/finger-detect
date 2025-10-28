@@ -8,35 +8,47 @@ Page({
     searchValue: '',
     activeTab: 'all',
     loading: false,
-    
+
     // 分页参数
     page: 1,
     limit: 20,
     filter: 'all',
-    
+
     // 档案数据
     ownArchives: [],
     otherArchives: [],
     subUsers: [],
-    
+
     // 统计数据
     totalOwn: 0,
     totalOthers: 0,
     totalAll: 0,
     ownSubUserId: '',
-    
+
     // 筛选后的数据
     filteredRecords: [],
     myRecords: [],
     otherRecords: [],
-    
+    filteredUserArchives: [],
+
     // 其他档案用户选择相关
     selectedUserId: '', // 当前选中的用户ID
     selectedUserName: '', // 当前选中的用户名
     userArchives: [], // 选中用户的档案列表
     showUserList: true, // 是否显示用户列表（true显示用户列表，false显示用户档案）
     userListLoading: false, // 用户列表加载状态
-    userArchivesLoading: false // 用户档案加载状态
+    userArchivesLoading: false, // 用户档案加载状态
+
+    // 下拉选择相关
+    showDropdown: false, // 是否显示下拉列表
+    presetOptions: [ // 预设的检测部位选项
+      { label: '大拇指', value: '大拇指' },
+      { label: '食指', value: '食指' },
+      { label: '中指', value: '中指' },
+      { label: '无名指', value: '无名指' },
+      { label: '小指', value: '小指' },
+    ],
+    filteredPresetOptions: [] // 过滤后的预设选项
   },
 
   onLoad() {
@@ -137,18 +149,18 @@ Page({
     if (!Array.isArray(archives)) {
       return []
     }
-    
+
     return archives.map(archive => ({
       id: archive.id,
       name: archive.archiveName || archive.name,
       avatar: archive.avatarUrl || "/images/profile-avatar.png",
       type: type,
-      updateTime: this.formatTime(archive.updatedAt || archive.updateTime),
+      updateTime: common.formatTimeRelative(archive.updatedAt || archive.updateTime),
       recordCount: archive.totalDetections || archive.photoCount || archive.recordCount || 0,
       username: archive.username,
       subUserId: archive.subUserId || archive.userId || (type === 'mine' ? ownSubUserId : ''), // 添加subUserId字段
       bodyPart: archive.bodyPart,
-      createdAt: this.formatTime(archive.createdAt),
+      createdAt: common.formatTimeRelative(archive.createdAt),
       originalData: archive
     }))
   },
@@ -165,52 +177,12 @@ Page({
     return counts
   },
 
-  // 格式化时间
-  formatTime(timeStr) {
-    if (!timeStr) return ''
-    
-    try {
-      const date = new Date(timeStr)
-      const now = new Date()
-      const diff = now - date
-      const oneDay = 24 * 60 * 60 * 1000
-      
-      if (diff < oneDay) {
-        // 今天
-        return date.toLocaleTimeString('zh-CN', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        })
-      } else if (diff < 2 * oneDay) {
-        // 昨天
-        return '昨天 ' + date.toLocaleTimeString('zh-CN', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        })
-      } else if (diff < 7 * oneDay) {
-        // 一周内
-        const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-        return days[date.getDay()] + ' ' + date.toLocaleTimeString('zh-CN', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        })
-      } else {
-        // 更早
-        return date.toLocaleDateString('zh-CN', { 
-          month: '2-digit', 
-          day: '2-digit' 
-        })
-      }
-    } catch (error) {
-      return timeStr
-    }
-  },
-
   // 搜索提交
   onSearch(e) {
     const value = e.detail.value
     this.setData({
-      searchValue: value
+      searchValue: value,
+      showDropdown: false
     })
     this.filterRecords()
   },
@@ -220,6 +192,49 @@ Page({
     const value = e.detail.value
     this.setData({
       searchValue: value
+    })
+    this.updatePresetOptions(value)
+    this.filterRecords()
+  },
+
+  // 搜索框聚焦
+  onSearchFocus() {
+    this.updatePresetOptions(this.data.searchValue)
+  },
+
+  // 搜索框失焦
+  onSearchBlur() {
+    // 延迟隐藏下拉列表，以便点击事件能够触发
+    setTimeout(() => {
+      this.setData({ showDropdown: false })
+    }, 200)
+  },
+
+  // 更新预设选项
+  updatePresetOptions(searchValue) {
+    const { presetOptions } = this.data
+
+    let filtered = presetOptions
+
+    // 如果有搜索关键词，则筛选匹配的选项
+    if (searchValue) {
+      filtered = presetOptions.filter(item =>
+        item.label.includes(searchValue)
+      )
+    }
+
+    this.setData({
+      filteredPresetOptions: filtered,
+      showDropdown: filtered.length > 0
+    })
+  },
+
+  // 选择预设选项
+  onPresetSelect(e) {
+    const { value } = e.currentTarget.dataset
+    this.setData({
+      searchValue: value,
+      showDropdown: false
     })
     this.filterRecords()
   },
@@ -240,27 +255,36 @@ Page({
 
   // 筛选记录
   filterRecords() {
-    const { ownArchives, otherArchives, searchValue, activeTab } = this.data
-    
+    const { ownArchives, otherArchives, userArchives, searchValue, activeTab, showUserList } = this.data
+
     // 合并所有档案
     const allRecords = [...ownArchives, ...otherArchives]
-    
+
     // 根据搜索关键词筛选
     let filtered = allRecords
     if (searchValue) {
-      filtered = allRecords.filter(item => 
+      filtered = allRecords.filter(item =>
         item.name.includes(searchValue)
       )
     }
-    
+
     // 根据标签页筛选
     let myRecords = filtered.filter(item => item.type === 'mine')
     let otherRecords = filtered.filter(item => item.type === 'others')
-    
+
+    // 对用户档案也应用搜索筛选
+    let filteredUserArchives = userArchives
+    if (searchValue && !showUserList) {
+      filteredUserArchives = userArchives.filter(item =>
+        item.name.includes(searchValue)
+      )
+    }
+
     this.setData({
       filteredRecords: filtered,
       myRecords: myRecords,
       otherRecords: otherRecords,
+      filteredUserArchives: filteredUserArchives,
       totalCount: filtered.length
     })
   },
@@ -303,19 +327,21 @@ Page({
   async loadUserArchives(userId) {
     try {
       this.setData({ userArchivesLoading: true })
-      
+
       const params = {
         page: 1,
         limit: 50
       }
-      
+
       const response = await api.profile.getArchives(userId, params)
-      
+
       if (response.success && response.data) {
         const formattedArchives = this.formatArchives(response.data.archives || response.data.list || [], 'others', userId)
         this.setData({
           userArchives: formattedArchives
         })
+        // 应用搜索筛选
+        this.filterRecords()
       } else {
         console.warn('获取用户档案失败:', response)
         common.showError(response.message || '获取用户档案失败')

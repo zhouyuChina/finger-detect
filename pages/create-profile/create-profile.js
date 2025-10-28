@@ -8,7 +8,7 @@ const areaData = require('../../utils/area.js')
 Page({
   data: {
     currentStep: 1, // 当前步骤：1-档案信息，2-拍照检测，3-完成
-    
+
     // 用户相关
     wechatUser: null, // 微信用户信息
     subUsers: [], // 子用户列表
@@ -18,6 +18,7 @@ Page({
     loading: false, // 加载状态
     error: false, // 错误状态
     errorMessage: '', // 错误信息
+    locationFailed: false, // 位置获取失败标志
     
     // 完善信息模式相关
     isCompleteMode: false, // 是否是完善信息模式
@@ -185,9 +186,9 @@ Page({
         currentStep: 1 // 从第一步开始
       })
       
-      // 预填充表单数据
+      // 预填充表单数据，优先使用微信昵称
       const userForm = {
-        nickname: userInfo.nickname || userInfo.realName || '新用户',
+        nickname: userInfo.nickname || userInfo.realName || userInfo.nickName || '新用户',
         gender: userInfo.gender || '1',
         birthYear: userInfo.birthYear || '',
         province: userInfo.province || '',
@@ -234,23 +235,38 @@ Page({
       
       if (response.success && response.data) {
         const { wechatUser, subUsers, currentSubUser } = response.data
-        
+
         // 格式化用户数据
         const formattedSubUsers = this.formatSubUsers(subUsers)
-        
-        // 默认选择当前账号下的默认用户（currentSubUser）
+
+        // 优先使用缓存的用户选择，如果没有则使用服务器返回的默认用户
         let selectedUser = null
-        if (currentSubUser && formattedSubUsers.length > 0) {
-          // 找到对应的默认用户
+
+        // 1. 先检查缓存中是否有上次选择的用户
+        const cachedSubUser = storage.getCurrentSubUser()
+        if (cachedSubUser && formattedSubUsers.length > 0) {
+          // 从格式化后的用户列表中查找缓存的用户
+          selectedUser = formattedSubUsers.find(user => user.id === cachedSubUser.id)
+          if (selectedUser) {
+            console.log('使用缓存的用户选择:', selectedUser.nickname)
+          }
+        }
+
+        // 2. 如果缓存中没有，使用服务器返回的默认用户（currentSubUser）
+        if (!selectedUser && currentSubUser && formattedSubUsers.length > 0) {
           selectedUser = formattedSubUsers.find(user => user.id === currentSubUser.id)
           if (selectedUser) {
+            console.log('使用服务器默认用户:', selectedUser.nickname)
           }
-        } else if (formattedSubUsers.length > 0) {
-          // 如果没有找到currentSubUser，选择第一个用户作为默认
-          selectedUser = formattedSubUsers[0]
         }
-        
-        this.setData({ 
+
+        // 3. 如果还是没有，选择第一个用户作为默认
+        if (!selectedUser && formattedSubUsers.length > 0) {
+          selectedUser = formattedSubUsers[0]
+          console.log('使用第一个用户作为默认:', selectedUser.nickname)
+        }
+
+        this.setData({
           wechatUser,
           subUsers: formattedSubUsers, // 使用包含默认用户的完整列表
           currentSubUser,
@@ -997,11 +1013,187 @@ Page({
     }
   },
 
+  // 自动获取位置
+  async autoGetLocation() {
+    try {
+      wx.showLoading({
+        title: '正在获取位置...',
+        mask: true
+      })
+
+      // 1. 先检查用户是否授权了位置权限
+      const settingRes = await new Promise((resolve, reject) => {
+        wx.getSetting({
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      let needAuthorize = !settingRes.authSetting['scope.userLocation']
+
+      if (needAuthorize) {
+        // 需要授权，先调用 wx.authorize 或引导用户授权
+        try {
+          await new Promise((resolve, reject) => {
+            wx.authorize({
+              scope: 'scope.userLocation',
+              success: resolve,
+              fail: reject
+            })
+          })
+        } catch (error) {
+          // 用户拒绝授权，切换为手动选择模式
+          wx.hideLoading()
+          this.setData({ locationFailed: true })
+          wx.showModal({
+            title: '需要位置权限',
+            content: '为了自动获取您的位置信息，需要开启位置权限。您可以选择手动选择省份。',
+            confirmText: '手动选择',
+            cancelText: '去设置',
+            success: (res) => {
+              if (res.cancel) {
+                // 用户选择去设置
+                wx.openSetting({
+                  success: (settingRes) => {
+                    // 如果用户在设置中开启了权限，重置状态
+                    if (settingRes.authSetting['scope.userLocation']) {
+                      this.setData({ locationFailed: false })
+                    }
+                  }
+                })
+              } else {
+                // 用户选择手动选择，打开省份选择器
+                this.showProvinceSelector()
+              }
+            }
+          })
+          return
+        }
+      }
+
+      // 2. 让用户选择位置
+      const chooseRes = await new Promise((resolve, reject) => {
+        wx.chooseLocation({
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      wx.hideLoading()
+
+      // 4. 解析地址信息
+      const address = chooseRes.address || chooseRes.name || ''
+
+      // 尝试从地址中提取省市区
+      const addressParts = this.parseAddress(address)
+
+      if (addressParts.province && addressParts.city) {
+        // 更新表单数据
+        const cityOptions = Object.keys(this.data.regionData[addressParts.province] || {})
+        const districtOptions = addressParts.city && this.data.regionData[addressParts.province]
+          ? (this.data.regionData[addressParts.province][addressParts.city] || [])
+          : []
+
+        this.setData({
+          'userForm.province': addressParts.province,
+          'userForm.city': addressParts.city,
+          'userForm.district': addressParts.district || '',
+          cityOptions: cityOptions,
+          districtOptions: districtOptions,
+          locationFailed: false // 成功获取位置，重置失败标志
+        })
+
+        wx.showToast({
+          title: '位置获取成功',
+          icon: 'success'
+        })
+      } else {
+        // 无法解析位置，切换为手动选择模式
+        this.setData({ locationFailed: true })
+        wx.showToast({
+          title: '无法解析位置信息，请手动选择',
+          icon: 'none'
+        })
+        // 自动打开省份选择器
+        setTimeout(() => {
+          this.showProvinceSelector()
+        }, 1500)
+      }
+
+    } catch (error) {
+      wx.hideLoading()
+      console.error('获取位置失败:', error)
+
+      // 切换为手动选择模式
+      this.setData({ locationFailed: true })
+
+      if (error.errMsg && error.errMsg.includes('cancel')) {
+        // 用户取消选择，直接打开省份选择器
+        this.showProvinceSelector()
+        return
+      }
+
+      wx.showToast({
+        title: '获取位置失败，请手动选择',
+        icon: 'none',
+        duration: 2000
+      })
+
+      // 自动打开省份选择器
+      setTimeout(() => {
+        this.showProvinceSelector()
+      }, 2000)
+    }
+  },
+
+  // 解析地址字符串，提取省市区
+  parseAddress(address) {
+    const result = {
+      province: '',
+      city: '',
+      district: ''
+    }
+
+    if (!address) return result
+
+    // 移除常见的前缀
+    address = address.replace(/^中国/, '')
+
+    // 尝试匹配省份
+    const provinces = Object.keys(this.data.regionData)
+    for (const province of provinces) {
+      // 处理直辖市（北京市、上海市、天津市、重庆市）
+      if (address.includes(province)) {
+        result.province = province
+
+        // 查找城市
+        const cities = Object.keys(this.data.regionData[province] || {})
+        for (const city of cities) {
+          if (address.includes(city)) {
+            result.city = city
+
+            // 查找区县
+            const districts = this.data.regionData[province][city] || []
+            for (const district of districts) {
+              if (address.includes(district)) {
+                result.district = district
+                break
+              }
+            }
+            break
+          }
+        }
+        break
+      }
+    }
+
+    return result
+  },
 
 
   // 关闭弹窗方法
   closeNicknamePopup() {
-    this.setData({ 
+    this.setData({
       showNicknamePopup: false,
       userCreateStep: 1
     });

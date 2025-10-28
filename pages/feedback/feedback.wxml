@@ -6,7 +6,7 @@
     bind:change="onTabChange"
     class="feedback-tabs"
   >
-    <t-tab-panel value="message" label="给系统留言">
+    <t-tab-panel value="message" label="给客服留言">
       <!-- 留言板块 -->
       <view class="message-section">
         <!-- 留言表单 -->
@@ -51,13 +51,10 @@
           </view>
         </view>
 
-
-
-
       </view>
     </t-tab-panel>
 
-    <t-tab-panel value="feedback" label="系统回复">
+    <t-tab-panel value="feedback" label="客服回复">
       <!-- 反馈板块 -->
       <view class="feedback-section">
 
@@ -118,7 +115,7 @@
         <!-- 空状态 -->
         <t-empty 
           wx:if="{{!feedbackLoading && feedbacks.length === 0}}"
-          description="暂无系统回复"
+          description="暂无客服回复"
           icon="help-circle"
         />
 

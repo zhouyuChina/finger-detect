@@ -6,11 +6,12 @@ Page({
     photoPath: '',
     profile: null,
     canvasWidth: 300, // canvas宽度
-    canvasHeight: 500 // canvas高度
+    canvasHeight: 500, // canvas高度
+    cameraAuthorized: false // 相机是否已授权
   },
 
   onLoad(options) {
-    
+
     // 获取传递的档案信息
     if (options.profile) {
       try {
@@ -20,6 +21,40 @@ Page({
         console.error('解析档案信息失败:', error)
       }
     }
+
+    // 检查相机授权
+    this.checkCameraAuth()
+  },
+
+  // 检查相机授权
+  async checkCameraAuth() {
+    try {
+      const setting = await new Promise((resolve, reject) => {
+        wx.getSetting({
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      // 检查是否已授权
+      if (setting.authSetting['scope.camera'] === true) {
+        // 已授权，显示相机
+        this.setData({ cameraAuthorized: true })
+      } else {
+        // 未授权或被拒绝，显示引导页
+        this.setData({ cameraAuthorized: false })
+      }
+    } catch (error) {
+      console.error('检查相机权限失败:', error)
+      this.setData({ cameraAuthorized: false })
+    }
+  },
+
+  // 处理相机授权（用户点击"开启相机"按钮）
+  handleCameraAuth() {
+    // 直接设置为已授权，让 <camera> 组件显示
+    // 微信会自动弹出授权对话框
+    this.setData({ cameraAuthorized: true })
   },
 
   // 拍照
@@ -88,11 +123,62 @@ Page({
 
   // 相机错误处理
   onCameraError(e) {
-    console.error('相机错误:', e.detail)
-    wx.showToast({
-      title: '相机启动失败',
-      icon: 'none'
-    })
+    console.error('相机错误详情:', e.detail)
+    console.error('错误对象:', e)
+
+    // 判断错误类型
+    const errMsg = e.detail.errMsg || e.detail.errCode || ''
+    const errCode = e.detail.errCode || 0
+
+    console.log('错误消息:', errMsg)
+    console.log('错误代码:', errCode)
+
+    // 权限相关错误码：
+    // 10003: 用户拒绝授权
+    // 10004: 相机被占用
+    // 其他授权相关错误
+    if (errMsg.includes('auth') ||
+        errMsg.includes('authorize') ||
+        errMsg.includes('user denied') ||
+        errMsg.includes('privacy') ||
+        errCode === 10003) {
+      // 权限问题 - 用户拒绝了授权或隐私未配置
+      this.setData({ cameraAuthorized: false })
+
+      wx.showModal({
+        title: '相机权限未授权',
+        content: '需要开启相机权限才能进行拍照检测。\n\n如果您已经授权但仍无法使用，可能是小程序隐私设置问题，请联系客服。',
+        confirmText: '去设置',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.openSetting({
+              success: (settingRes) => {
+                if (settingRes.authSetting['scope.camera']) {
+                  // 用户开启了权限，重新显示相机
+                  this.setData({ cameraAuthorized: true })
+                }
+              }
+            })
+          } else {
+            wx.navigateBack()
+          }
+        }
+      })
+    } else {
+      // 其他错误
+      this.setData({ cameraAuthorized: false })
+
+      wx.showModal({
+        title: '相机启动失败',
+        content: `相机暂时无法使用\n\n可能原因：\n1. 设备相机被其他应用占用\n2. 小程序隐私设置未完成\n3. 系统权限限制\n\n错误详情: ${errMsg || errCode}`,
+        confirmText: '返回',
+        showCancel: false,
+        success: () => {
+          wx.navigateBack()
+        }
+      })
+    }
   },
 
   // 裁剪照片

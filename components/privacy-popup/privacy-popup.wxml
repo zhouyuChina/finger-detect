@@ -1,0 +1,25 @@
+<!--components/privacy-popup/privacy-popup.wxml-->
+<view class="privacy-popup" wx:if="{{showPopup}}">
+  <view class="privacy-mask" bindtap="handleDisagree"></view>
+  <view class="privacy-content">
+    <view class="privacy-title">用户隐私保护提示</view>
+    <view class="privacy-desc">
+      感谢您使用我们的小程序。在使用前，请您阅读并同意
+      <text class="privacy-link" bindtap="openPrivacyContract">《用户隐私保护指引》</text>
+    </view>
+    <view class="privacy-desc">
+      为了向您提供指甲健康检测服务，我们需要使用以下权限：
+    </view>
+    <view class="privacy-list">
+      <view class="privacy-item">• 相机权限：用于拍摄指甲照片</view>
+      <view class="privacy-item">• 位置信息：用于自动填充地址（可选）</view>
+    </view>
+    <view class="privacy-desc">
+      点击"同意"即表示您已阅读并同意隐私保护指引的全部内容。
+    </view>
+    <view class="privacy-buttons">
+      <button class="privacy-btn disagree-btn" bindtap="handleDisagree">拒绝</button>
+      <button class="privacy-btn agree-btn" id="agree-btn" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="handleAgree">同意</button>
+    </view>
+  </view>
+</view>

@@ -18,7 +18,12 @@
       "Bash(fi)",
       "Bash(done)",
       "Bash(./scripts/build-npm.sh:*)",
-      "Bash(./build-npm.sh)"
+      "Bash(./build-npm.sh)",
+      "Bash(ln:*)",
+      "Bash(git rm:*)",
+      "Bash(git log:*)",
+      "Bash(cat:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

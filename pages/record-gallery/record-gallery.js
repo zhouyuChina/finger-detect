@@ -139,7 +139,7 @@ Page({
       return {
         id: detection.id,
         imagePath: imagePath,
-        uploadTime: this.formatTime(detection.detectionTime || detection.createdAt),
+        uploadTime: common.formatTime(detection.detectionTime || detection.createdAt, 'YYYY-MM-DD HH:mm:ss'),
         status: detection.result || 'normal',
         confidence: confidence,
         confidencePercent: confidence > 0 ? (confidence * 100).toFixed(1) : '0.0',
@@ -148,24 +148,6 @@ Page({
         originalData: detection
       }
     })
-  },
-
-  // 格式化时间
-  formatTime(timeStr) {
-    if (!timeStr) return ''
-    
-    try {
-      const date = new Date(timeStr)
-      return date.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch (error) {
-      return timeStr
-    }
   },
 
   // 下拉刷新

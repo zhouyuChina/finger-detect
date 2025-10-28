@@ -266,35 +266,6 @@ Page({
     return iconMap[type] || 'notification'
   },
 
-  // 格式化时间
-  formatTime(timeStr) {
-    if (!timeStr) return ''
-    
-    const date = new Date(timeStr)
-    const now = new Date()
-    const diff = now - date
-    
-    // 小于1分钟
-    if (diff < 60 * 1000) {
-      return '刚刚'
-    }
-    // 小于1小时
-    if (diff < 60 * 60 * 1000) {
-      return Math.floor(diff / (60 * 1000)) + '分钟前'
-    }
-    // 小于24小时
-    if (diff < 24 * 60 * 60 * 1000) {
-      return Math.floor(diff / (60 * 60 * 1000)) + '小时前'
-    }
-    // 小于30天
-    if (diff < 30 * 24 * 60 * 60 * 1000) {
-      return Math.floor(diff / (24 * 60 * 60 * 1000)) + '天前'
-    }
-    
-    // 超过30天显示具体日期
-    return date.toLocaleDateString('zh-CN')
-  },
-
   // 跳转到首页
   goToHome() {
     wx.switchTab({

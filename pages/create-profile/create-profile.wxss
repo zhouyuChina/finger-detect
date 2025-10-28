@@ -701,6 +701,33 @@ page {
   color: #ffffff;
 }
 
+/* 自动获取位置按钮 */
+.auto-location-tip {
+  padding: 0 30rpx;
+}
+
+.auto-location-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #00BC7D;
+  color: white;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.auto-location-btn::after {
+  border: none;
+}
+
+.location-icon {
+  font-size: 36rpx;
+}
+
 /* 身体部位选择 - 新设计 */
 .popup-content.new-design {
   height: 100vh !important;
@@ -1195,6 +1222,7 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .foot-emoji {
@@ -1429,8 +1457,10 @@ page {
   justify-content: center;
   background-color: #ffffff;
   border-radius: 20rpx;
-  padding: 30rpx;
+  /* padding: 30rpx; */
+  margin: 30rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 188, 125, 0.15);
+  overflow: hidden;
 }
 
 /* 左手时水平翻转 - 不显示过渡动画 */
@@ -1446,6 +1476,8 @@ page {
 .hand-preview-img {
   width: 100%;
   height: 100%;
+  transform: scale(1.3);
+  margin-top: 160rpx;
 }
 
 /* 可点击的手指区域覆盖层 */
@@ -1461,7 +1493,7 @@ page {
 .finger-area {
   position: absolute;
   pointer-events: auto;
-  /* background-color: rgba(0, 188, 125, 0.1); */
+  /* background-color: rgba(0, 188, 125, 0.6); */
   /* border: 2rpx solid rgba(0, 188, 125, 0.3); */
   border-radius: 0;
   display: flex;
@@ -1484,41 +1516,41 @@ page {
 
 /* 各个手指的位置 - 根据右手SVG调整 */
 .thumb-area {
-  top: 17vh;
-  right: 60vw;
-  width: 9vw;
-  height: 9vh;
+  top: 18vh;
+  right: 61vw;
+  width: 12vw;
+  height: 14vh;
   transform: rotate(-25deg);
 }
 
 .index-area {
-  top: 9vh;
-  left: 31vw;
-  width: 8vw;
-  height: 13vh;
-  transform: rotate(-7deg);
+  top: 6vh;
+  left: 24vw;
+  width: 10vw;
+  height: 18vh;
+  transform: rotate(-10deg);
 }
 
 .middle-area {
-  top: 6vh;
-  left: 42vw;
-  width: 8vw;
-  height: 15vh;
+  top: 1vh;
+  left: 38vw;
+  width: 10vw;
+  height: 21vh;
 }
 
 .ring-area {
-  top: 7vh;
-  left: 54vw;
-  width: 6vw;
-  height: 14vh;
-  transform: rotate(6deg);
+  top: 4vh;
+  left: 52vw;
+  width: 9vw;
+  height: 20vh;
+  transform: rotate(7deg);
 }
 
 .little-area {
-  top: 11vh;
-  left: 63vw;
-  width: 6vw;
-  height: 12vh;
+  top: 9vh;
+  left: 65vw;
+  width: 9vw;
+  height: 17vh;
   transform: rotate(12deg);
 }
 
@@ -1565,6 +1597,8 @@ page {
 .foot-preview-img {
   width: 100%;
   height: 100%;
+  transform: scale(1.5) rotate(-14deg);
+  margin-top: 300rpx;
 }
 
 /* 可点击的脚趾区域覆盖层 */
@@ -1604,35 +1638,35 @@ page {
 /* 各个脚趾的位置 - 根据右脚SVG调整 */
 .big-toe-area {
   top: 7vh;
-  left: 7vw;
-  width: 140rpx;
-  height: 140rpx;
+  left: 4vw;
+  width: 160rpx;
+  height: 160rpx;
 }
 
 .second-toe-area {
-  top: 4vh;
+  top: 6vh;
   left: 28vw;
-  width: 100rpx;
-  height: 100rpx;
+  width: 120rpx;
+  height: 120rpx;
 }
 
 .third-toe-area {
-  top: 5vh;
-  left: 44vw;
-  width: 100rpx;
-  height: 100rpx;
+  top: 8vh;
+  left: 46vw;
+  width: 120rpx;
+  height: 120rpx;
 }
 
 .fourth-toe-area {
-  top: 9vh;
-  left: 58vw;
-  width: 100rpx;
-  height: 100rpx;
+  top: 13vh;
+  left: 62vw;
+  width: 120rpx;
+  height: 120rpx;
 }
 
 .little-toe-area {
-  top: 16vh;
-  left: 64vw;
-  width: 80rpx;
-  height: 80rpx;
+  top: 21vh;
+  left: 72vw;
+  width: 100rpx;
+  height: 100rpx;
 } 

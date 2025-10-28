@@ -38,18 +38,22 @@ Page({
   async loadUserProfiles() {
     try {
       this.setData({ loading: true })
-      
+
       const response = await api.user.getUsers()
-      
+
       if (response.success && response.data && response.data.subUsers) {
         const profiles = this.formatProfiles(response.data.subUsers)
+
+        // 为每个用户加载实际的检测统计数据
+        await this.loadDetectionStats(profiles)
+
         this.setData({ profiles })
-        
+
         // 计算统计数据
         this.calculateStats()
         // 过滤数据
         this.filterProfiles()
-        
+
       } else {
         console.warn('获取用户档案失败:', response)
         common.showError(response.message || '获取用户档案失败')
@@ -64,12 +68,78 @@ Page({
     }
   },
 
+  // 加载每个用户的实际检测统计数据
+  async loadDetectionStats(profiles) {
+    try {
+      // 并行加载所有用户的档案和检测记录
+      const statsPromises = profiles.map(async (profile) => {
+        try {
+          // 1. 获取该用户的所有档案
+          const archivesResponse = await api.profile.getArchives(profile.id, {}, { showError: false })
+
+          let totalDetections = 0
+          let uniqueArchives = 0
+
+          if (archivesResponse.success && archivesResponse.data) {
+            const archives = archivesResponse.data.archives || []
+            uniqueArchives = archives.length
+
+            // 2. 为每个档案获取检测记录数量
+            const detectionPromises = archives.map(async (archive) => {
+              try {
+                const detectionResponse = await api.profile.getArchiveDetections({
+                  subUserId: profile.id,
+                  archiveId: archive.id
+                })
+
+                if (detectionResponse.success && detectionResponse.data) {
+                  const images = detectionResponse.data.images || []
+                  return images.length
+                }
+                return 0
+              } catch (error) {
+                console.error(`获取档案 ${archive.archiveName} 的检测记录失败:`, error)
+                return 0
+              }
+            })
+
+            // 等待所有档案的检测记录加载完成
+            const detectionCounts = await Promise.all(detectionPromises)
+            totalDetections = detectionCounts.reduce((sum, count) => sum + count, 0)
+
+            console.log(`用户 ${profile.name}: 档案数=${uniqueArchives}, 检测记录=${totalDetections}`)
+
+            // 更新统计数据
+            profile.archives = uniqueArchives
+            profile.photos = totalDetections // 检测次数即照片次数
+            profile.reports = totalDetections // 每次检测都会生成报告
+          } else {
+            // 如果获取档案失败，设为0
+            profile.archives = 0
+            profile.photos = 0
+            profile.reports = 0
+          }
+        } catch (error) {
+          console.error(`加载用户 ${profile.name} 的检测统计失败:`, error)
+          // 出错时设为0
+          profile.archives = 0
+          profile.photos = 0
+          profile.reports = 0
+        }
+      })
+
+      await Promise.all(statsPromises)
+    } catch (error) {
+      console.error('加载检测统计数据失败:', error)
+    }
+  },
+
   // 格式化用户档案数据
   formatProfiles(subUsers) {
     if (!Array.isArray(subUsers)) {
       return []
     }
-    
+
     return subUsers.map(user => ({
       id: user.id,
       name: user.username || user.realName || '未知用户', // 优先使用username
@@ -78,7 +148,7 @@ Page({
       relationship: this.getRelationshipFromUser(user),
       avatar: '/images/default-avatar.png',
       profileId: user.id,
-      updateTime: this.formatTime(user.updatedAt || user.createdAt),
+      updateTime: common.formatTime(user.updatedAt || user.createdAt, 'YYYY-MM-DD HH:mm'),
       status: user.status || 'active',
       address: user.address || '未知',
       archives: user.archives || 0,
@@ -92,22 +162,6 @@ Page({
   getRelationshipFromUser(user) {
     // 这里可以根据用户信息推断关系，暂时返回默认值
     return '本人'
-  },
-
-  // 格式化时间
-  formatTime(timeStr) {
-    if (!timeStr) return ''
-    
-    try {
-      const date = new Date(timeStr)
-      return date.toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      })
-    } catch (error) {
-      return timeStr
-    }
   },
 
 
@@ -439,10 +493,10 @@ Page({
         // 更新本地数据
         const profiles = this.data.profiles.map(p => {
           if (p.id === editingProfile.id) {
-            return { 
-              ...p, 
+            return {
+              ...p,
               ...editingProfile,
-              updateTime: this.formatTime(new Date())
+              updateTime: common.formatTime(new Date(), 'YYYY-MM-DD HH:mm')
             };
           }
           return p;

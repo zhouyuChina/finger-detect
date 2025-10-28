@@ -129,9 +129,9 @@ const detectionApi = {
     return request.get(config.api.detection.list, params)
   },
 
-  // 创建检测记录
+  // 创建检测记录（不显示加载提示，因为页面已有扫描动画）
   create(data) {
-    return request.post(config.api.detection.create, data)
+    return request.post(config.api.detection.create, data, { showLoading: false })
   },
 
   // 上传检测图片

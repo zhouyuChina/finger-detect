@@ -599,21 +599,10 @@ Page({
     })
   },
 
-  // 查看全部消息
+  // 查看全部消息（直接执行全部标记已读）
   async onViewAll() {
     try {
-      const tapIndex = await common.showActionSheet(['全部标记已读', '查看全部消息'])
-      
-      switch (tapIndex) {
-        case 0:
-          await this.markAllAsRead()
-          break
-        case 1:
-          wx.navigateTo({
-            url: '/pages/message/message'
-          })
-          break
-      }
+      await this.markAllAsRead()
     } catch (error) {
       console.error('操作失败:', error)
     }
@@ -667,7 +656,10 @@ Page({
       
       if (!userInfo || !openId) {
         // 未登录用户，不执行标记已读操作
-        common.showToast('请先登录')
+        wx.showToast({
+          title: '请先登录',
+          icon: 'none'
+        })
         return
       }
       

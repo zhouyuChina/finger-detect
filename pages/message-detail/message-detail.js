@@ -55,12 +55,31 @@ Page({
 
   // 格式化文章数据
   formatArticleData(data) {
-    
+
+    // 获取静态资源URL
+    const staticUrl = config.getCurrentConfig().staticUrl
+
     // 处理封面图片URL，如果是相对路径则拼接完整URL
     let coverImage = data.coverImage || data.image || ''
     if (coverImage && !coverImage.startsWith('http')) {
-      const staticUrl = config.getCurrentConfig().staticUrl
       coverImage = staticUrl + coverImage
+    }
+
+    // 处理富文本内容中的图片URL
+    let content = data.content || ''
+    if (content) {
+      // 替换 <img> 标签中的相对路径为完整URL
+      content = content.replace(/<img\s+([^>]*?)src=["'](?!http)([^"']+)["']/gi, (match, attrs, src) => {
+        // 如果src不是以http开头，则拼接完整URL
+        const fullUrl = staticUrl + src
+        return `<img ${attrs}src="${fullUrl}"`
+      })
+
+      // 同时处理可能存在的背景图片
+      content = content.replace(/url\(["']?(?!http)([^"')]+)["']?\)/gi, (match, url) => {
+        const fullUrl = staticUrl + url
+        return `url("${fullUrl}")`
+      })
     }
 
     // 处理发布时间
@@ -70,7 +89,7 @@ Page({
     return {
       id: data.id,
       title: data.title || '无标题',
-      content: data.content || '',
+      content: content, // 使用处理后的内容
       summary: data.summary || '',
       coverImage: coverImage,
       author: data.author || '系统',
