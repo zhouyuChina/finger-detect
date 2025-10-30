@@ -167,20 +167,19 @@ App({
       } catch (error) {
       }
 
+      // 如果没有获取到用户信息，不进行注册
+      if (!userInfo) {
+        console.log('用户未授权，跳过自动注册')
+        return
+      }
+
       // 3. 获取系统信息
       const systemInfo = this.globalData.systemInfo || await common.getSystemInfo()
 
       // 4. 构建注册数据
       const registerData = {
         code: loginRes.code,
-        userInfo: userInfo || {
-          nickName: '微信用户',
-          avatarUrl: '/images/default-avatar.png',
-          gender: 0,
-          country: '',
-          province: '',
-          city: ''
-        },
+        userInfo: userInfo ? { ...userInfo, nickName: '' } : null,
         systemInfo: {
           platform: systemInfo.platform,
           system: systemInfo.system,
@@ -433,9 +432,9 @@ App({
         this.clearTabBarBadge()
         return
       }
-      
+
       const api = require('./utils/api.js')
-      
+
       // 获取文章未读数量和系统消息未读数量
       const [articleUnreadRes, systemUnreadRes] = await Promise.all([
         api.message.getUnreadCount().catch(() => ({ data: { count: 0 } })),
@@ -444,17 +443,15 @@ App({
 
       // 文章未读数量
       const articleUnread = articleUnreadRes?.data?.count || articleUnreadRes?.data?.unreadCount || 0
-      
+
       // 系统消息未读数量
       const systemUnread = systemUnreadRes?.data?.unreadCount || systemUnreadRes?.data?.count || 0
-
 
       // 处理消息中心Tab（index: 2）- 对应文章未读
       if (articleUnread > 0) {
         wx.showTabBarRedDot({
           index: 2,
-          success: () => {
-          },
+          success: () => {},
           fail: (err) => {
             console.error('显示消息中心红点失败:', err)
           }
@@ -462,8 +459,7 @@ App({
       } else {
         wx.hideTabBarRedDot({
           index: 2,
-          success: () => {
-          },
+          success: () => {},
           fail: (err) => {
             console.error('隐藏消息中心红点失败:', err)
           }

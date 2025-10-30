@@ -349,11 +349,11 @@ Page({
   // 加载消息列表
   async loadMessages() {
     try {
-      // 从服务器获取消息数据，只获取置顶信息
-      const response = await api.message.getList({ limit: 50, isTop: true })
-      
+      // 从服务器获取消息数据，获取所有消息（不限制置顶）
+      const response = await api.message.getList({ limit: 50 })
+
       let messages = []
-      
+
       if (response.success && response.data && response.data.list) {
         // 处理新的数据结构：{success: true, data: {list: [...], pagination: {...}}}
         messages = this.formatMessageData(response.data.list)
@@ -367,22 +367,19 @@ Page({
         return
       }
 
-      // 过滤出置顶信息，如果没有置顶信息则显示前5条重要信息
-      let topMessages = messages.filter(msg => msg.isTop)
-      if (topMessages.length === 0) {
-        topMessages = messages.filter(msg => msg.isImportant).slice(0, 5)
-      } else {
-      }
+      // 按优先级排序：置顶 > 重要 > 发布时间倒序（formatMessageData中已排序）
+      // 取前10条消息用于首页展示
+      const displayMessages = messages.slice(0, 10)
 
       // 获取阅读状态
       try {
         // 检查用户是否已登录
         const userInfo = storage.getUserInfo()
         const openId = storage.getOpenId()
-        
+
         if (!userInfo || !openId) {
           // 未登录用户，跳过阅读状态获取，并将所有消息标记为已读（不显示未读状态）
-          const messagesWithReadStatus = topMessages.map(message => ({
+          const messagesWithReadStatus = displayMessages.map(message => ({
             ...message,
             isRead: true // 未登录用户不显示未读状态
           }))
@@ -391,32 +388,35 @@ Page({
           storage.setMessages(messagesWithReadStatus)
           return
         }
-        
+
         // 提取文章ID列表
-        const articleIds = topMessages.map(msg => msg.id)
-        
+        const articleIds = displayMessages.map(msg => msg.id)
+
         if (articleIds.length > 0) {
           const readStatusResponse = await api.message.getReadStatus(articleIds)
-          
+
           if (readStatusResponse.success && readStatusResponse.data) {
             // 合并阅读状态到消息数据
-            const messagesWithReadStatus = this.mergeReadStatus(topMessages, readStatusResponse.data)
+            const messagesWithReadStatus = this.mergeReadStatus(displayMessages, readStatusResponse.data)
             this.setData({ messages: messagesWithReadStatus })
           } else {
-            this.setData({ messages: topMessages })
+            this.setData({ messages: displayMessages })
           }
         } else {
-          this.setData({ messages: topMessages })
+          this.setData({ messages: displayMessages })
         }
       } catch (readError) {
         console.warn('获取阅读状态失败，使用默认状态:', readError)
         // 阅读状态获取失败不影响消息显示
-        this.setData({ messages: topMessages })
+        this.setData({ messages: displayMessages })
       }
 
       this.calculateUnreadCount()
       // 缓存数据
-      storage.setMessages(topMessages)
+      storage.setMessages(displayMessages)
+
+      // 更新 TabBar 红点
+      this.updateTabBarBadgeWithLocalCount(displayMessages)
     } catch (error) {
       console.error('加载消息失败:', error)
       this.setData({ messages: [] })
@@ -788,6 +788,45 @@ Page({
     const app = getApp()
     if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
       app.checkAndUpdateTabBarBadge()
+    }
+  },
+
+  // 使用本地消息列表计算未读数并更新红点
+  updateTabBarBadgeWithLocalCount(messageList) {
+    try {
+      // 检查用户是否已登录
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+
+      if (!userInfo || !openId) {
+        // 未登录用户不显示红点
+        wx.hideTabBarRedDot({ index: 2 })
+        return
+      }
+
+      // 计算本地未读数量
+      const unreadCount = messageList.filter(msg => !msg.isRead).length
+
+      // 直接更新红点
+      if (unreadCount > 0) {
+        wx.showTabBarRedDot({
+          index: 2,
+          success: () => {},
+          fail: (err) => {
+            console.error('显示红点失败:', err)
+          }
+        })
+      } else {
+        wx.hideTabBarRedDot({
+          index: 2,
+          success: () => {},
+          fail: (err) => {
+            console.error('隐藏红点失败:', err)
+          }
+        })
+      }
+    } catch (error) {
+      console.error('更新红点失败:', error)
     }
   }
 }) 

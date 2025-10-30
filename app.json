@@ -60,11 +60,6 @@
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
   "__usePrivacyCheck__": true,
-  "permission": {
-    "scope.camera": {
-      "desc": "用于拍摄指甲照片进行健康检测"
-    }
-  },
   "requiredPrivateInfos": [
     "chooseLocation"
   ],

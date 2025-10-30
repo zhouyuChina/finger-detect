@@ -58,7 +58,7 @@
         <view class="result-field">
           <text class="field-label">检测结果：</text>
           <view class="result-badge {{((finalResult === 'Normal' || finalResult === 'normal' || finalResult === 'NORMAL')) ? 'badge-normal' : ((finalResult === 'onychomycosis' || finalResult === 'ONYCHOMYCOSIS') ? 'badge-abnormal' : 'badge-unknown')}}">
-            {{(finalResult === 'Normal' || finalResult === 'normal' || finalResult === 'NORMAL') ? '正常' : ((finalResult === 'onychomycosis' || finalResult === 'ONYCHOMYCOSIS') ? '疑似灰指甲' : '无法识别')}}
+            {{(finalResult === 'Normal' || finalResult === 'normal' || finalResult === 'NORMAL') ? '正常' : ((finalResult === 'onychomycosis' || finalResult === 'ONYCHOMYCOSIS') ? '异常' : '无法识别')}}
           </view>
         </view>
         <view class="image-container result-image-container">

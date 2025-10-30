@@ -27,8 +27,33 @@ Page({
     const currentSubUser = storage.getCurrentSubUser()
 
     // 获取用户昵称，优先级：currentSubUser > userInfo
-    const userNickname = currentSubUser?.realName || currentSubUser?.nickname ||
-                        userInfo?.nickname || userInfo?.realName || userInfo?.nickName || '未知用户'
+    // 同时过滤掉"微信用户"这个默认值
+    let userNickname = ''
+
+    // 尝试从 currentSubUser 获取
+    if (currentSubUser?.realName && currentSubUser.realName !== '微信用户' && currentSubUser.realName.trim() !== '') {
+      userNickname = currentSubUser.realName
+    } else if (currentSubUser?.nickname && currentSubUser.nickname !== '微信用户' && currentSubUser.nickname.trim() !== '') {
+      userNickname = currentSubUser.nickname
+    } else if (currentSubUser?.username && currentSubUser.username !== '微信用户' && currentSubUser.username.trim() !== '') {
+      userNickname = currentSubUser.username
+    }
+
+    // 如果还是空的，尝试从 userInfo 获取
+    if (!userNickname) {
+      if (userInfo?.nickname && userInfo.nickname !== '微信用户' && userInfo.nickname.trim() !== '') {
+        userNickname = userInfo.nickname
+      } else if (userInfo?.realName && userInfo.realName !== '微信用户' && userInfo.realName.trim() !== '') {
+        userNickname = userInfo.realName
+      } else if (userInfo?.nickName && userInfo.nickName !== '微信用户' && userInfo.nickName.trim() !== '') {
+        userNickname = userInfo.nickName
+      }
+    }
+
+    // 如果还是空的，使用默认值
+    if (!userNickname) {
+      userNickname = '用户'
+    }
 
     // 获取用户性别，优先级：currentSubUser > userInfo
     const userGender = currentSubUser?.gender || userInfo?.gender || '0'

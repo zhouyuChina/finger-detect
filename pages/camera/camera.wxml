@@ -58,13 +58,21 @@
   </view>
 
   <!-- 授权引导页面 -->
-  <view class="auth-guide" wx:if="{{showCamera && !cameraAuthorized}}">
+  <view class="auth-guide" wx:if="{{showCamera && !cameraAuthorized && !isAuthorizing}}">
     <view class="auth-content">
       <image class="auth-icon" src="/images/logo.jpg" mode="aspectFit"></image>
       <view class="auth-title">需要使用相机权限</view>
       <view class="auth-desc">拍照检测需要使用您的相机进行指甲拍摄，点击下方按钮后将弹出授权请求</view>
       <button class="auth-btn" bindtap="handleCameraAuth">开启相机</button>
       <view class="auth-cancel" bindtap="goBack">暂不使用</view>
+    </view>
+  </view>
+
+  <!-- 授权中加载状态 -->
+  <view class="auth-loading" wx:if="{{isAuthorizing}}">
+    <view class="loading-content">
+      <view class="loading-icon"></view>
+      <view class="loading-text">正在启动相机...</view>
     </view>
   </view>
 

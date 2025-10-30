@@ -13,31 +13,23 @@
       <!-- 授权说明 -->
       <view class="auth-section">
         <view class="auth-title">
-          <text class="title-text">需要获取您的信息</text>
+          <text class="title-text">欢迎使用</text>
         </view>
-        
+
         <view class="auth-desc">
-          <text class="desc-text">为了更好地为您提供个性化服务，我们需要获取您的基本信息</text>
+          <text class="desc-text">点击开始使用，后续将完善您的个人信息</text>
         </view>
       </view>
 
       <!-- 授权按钮 -->
       <view class="auth-buttons">
-        <button 
+        <button
           class="auth-btn primary"
           bindtap="getUserProfile"
           loading="{{loading}}"
           disabled="{{loading}}"
         >
-          {{loading ? '授权中...' : '立即授权'}}
-        </button>
-        
-        <button 
-          class="auth-btn secondary"
-          bindtap="skipAuth"
-          disabled="{{loading}}"
-        >
-          暂不授权
+          {{loading ? '注册中...' : '开始使用'}}
         </button>
       </view>
 
@@ -57,8 +49,8 @@
   <view class="success-page" wx:if="{{!showAuth}}">
     <view class="success-content">
       <view class="success-icon">✅</view>
-      <text class="success-title">授权成功</text>
-      <text class="success-desc">正在为您跳转到首页...</text>
+      <text class="success-title">注册成功</text>
+      <text class="success-desc">正在跳转到完善信息页面...</text>
     </view>
   </view>
 </view> 

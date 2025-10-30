@@ -15,7 +15,7 @@
         <t-icon name="user" size="48rpx" color="white" />
       </view>
       <view class="user-details">
-        <text class="user-name">{{userInfo.name || '微信用户'}}</text>
+        <text class="user-name">{{ userInfo.name }}</text>
         <!-- <text class="user-type">普通用户</text> -->
       </view>
     </view>

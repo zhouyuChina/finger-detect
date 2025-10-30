@@ -38,7 +38,7 @@ Page({
   },
 
   // 获取用户信息按钮点击事件
-  getUserProfile() {
+  async getUserProfile() {
     if (!this.data.code) {
       common.showError('请先获取登录凭证')
       return
@@ -46,45 +46,28 @@ Page({
 
     this.setData({ loading: true })
 
-    wx.getUserProfile({
-      desc: '用于完善用户资料和个性化服务', // 声明获取用户个人信息后的用途
-      success: (res) => {
-        this.setData({ 
-          userInfo: res.userInfo,
-          loading: false 
-        })
-        
-        // 将真实的用户信息传递给后端
-        this.registerUser(res.userInfo)
-      },
-      fail: (err) => {
-        this.setData({ loading: false })
-        
-        // 用户拒绝授权，使用默认信息
-        this.registerUser({
-          nickName: '微信用户',
-          avatarUrl: '/images/default-avatar.png',
-          gender: 0,
-          country: '',
-          province: '',
-          city: ''
-        })
-      }
-    })
+    try {
+      // 调用注册接口，不传用户信息（让后端创建空白账户）
+      await this.registerUser(null)
+    } catch (error) {
+      this.setData({ loading: false })
+      console.error('注册失败:', error)
+      common.showError('注册失败，请重试')
+    }
   },
 
   // 注册用户
   async registerUser(userInfo) {
     try {
       this.setData({ loading: true })
-      
+
       // 获取系统信息
       const systemInfo = wx.getSystemInfoSync()
-      
-      // 构建注册数据
+
+      // 不传用户信息给后端，让后端知道这是个新用户需要完善信息
       const registerData = {
         code: this.data.code,
-        userInfo: userInfo,
+        userInfo: null, // 不传昵称等信息，让用户后续自己填写
         systemInfo: {
           platform: systemInfo.platform,
           system: systemInfo.system,
@@ -143,37 +126,34 @@ Page({
         const savedOpenId = storage.getOpenId()
         const savedSubUsers = storage.getSubUsers()
         const savedCurrentSubUser = storage.getCurrentSubUser()
-        
-        // 如果用户提供了真实信息，调用同步接口
-        if (userInfo && userInfo.nickName !== '微信用户') {
-          try {
-            const syncResponse = await api.user.syncProfile(userInfo)
-          } catch (syncError) {
-            console.warn('同步用户信息失败，但不影响使用:', syncError)
-          }
-        }
-        
+
         // 隐藏授权页面
         this.setData({ showAuth: false })
-        
+
         // 显示欢迎信息
         wx.showToast({
-          title: '欢迎使用健康检测',
+          title: '注册成功',
           icon: 'success',
-          duration: 2000
+          duration: 1500
         })
 
-        // 验证数据完整性后再跳转（新接口格式）
+        // 验证数据完整性后再跳转
         const finalUserInfo = storage.getUserInfo()
         const finalOpenId = storage.getOpenId()
-        
+
         if (finalUserInfo && finalOpenId) {
-          // 延迟跳转到首页
+          // 延迟跳转到完善信息页面
           setTimeout(() => {
-            wx.switchTab({
-              url: '/pages/index/index'
+            wx.redirectTo({
+              url: '/pages/create-profile/create-profile?mode=complete',
+              fail: () => {
+                // 如果跳转失败，回到首页
+                wx.switchTab({
+                  url: '/pages/index/index'
+                })
+              }
             })
-          }, 2000)
+          }, 1500)
         } else {
           console.error('数据保存不完整，无法跳转:', {
             userInfo: !!finalUserInfo,
@@ -181,7 +161,7 @@ Page({
           })
           common.showError('登录数据保存失败，请重试')
         }
-        
+
       } else {
         console.error('用户注册失败:', response.message)
         common.showError('注册失败，请重试')
@@ -192,18 +172,6 @@ Page({
     } finally {
       this.setData({ loading: false })
     }
-  },
-
-  // 跳过授权（使用默认信息）
-  skipAuth() {
-    this.registerUser({
-      nickName: '微信用户',
-      avatarUrl: '/images/default-avatar.png',
-      gender: 0,
-      country: '',
-      province: '',
-      city: ''
-    })
   },
 
   // 分享

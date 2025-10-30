@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "mp-html": "^2.5.1",
     "tdesign-miniprogram": "^1.9.7"
   }
 }

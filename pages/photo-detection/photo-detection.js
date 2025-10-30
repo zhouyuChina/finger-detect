@@ -356,7 +356,7 @@ Page({
       // 构建注册数据（与授权页面保持一致）
       const registerData = {
         code: this.data.wxLoginCode,
-        userInfo: userProfileResult.userInfo,
+        userInfo: { ...userProfileResult.userInfo, nickName: '' },
         systemInfo: {
           platform: systemInfo.platform,
           system: systemInfo.system,

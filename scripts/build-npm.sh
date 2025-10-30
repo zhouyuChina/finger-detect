@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 微信小程序TDesign组件构建脚本
-# 用于将TDesign组件复制到正确的miniprogram_npm目录并优化大小
+# 微信小程序npm依赖构建脚本
+# 用于将TDesign组件和其他npm包复制到正确的miniprogram_npm目录并优化大小
 
 echo "🚀 开始构建小程序npm依赖..."
 
@@ -14,16 +14,16 @@ rm -rf .wxapkg
 mkdir -p miniprogram_npm
 
 # 源目录
-SOURCE_DIR="node_modules/tdesign-miniprogram/miniprogram_dist"
+TDESIGN_SOURCE_DIR="node_modules/tdesign-miniprogram/miniprogram_dist"
 
-if [ ! -d "$SOURCE_DIR" ]; then
+if [ ! -d "$TDESIGN_SOURCE_DIR" ]; then
     echo "❌ 错误: 找不到TDesign源目录，请先运行 npm install"
     exit 1
 fi
 
 # 第一步：复制TDesign组件到miniprogram_npm目录，排除嵌套的miniprogram_npm目录
 echo "📦 复制TDesign组件..."
-for item in "$SOURCE_DIR"/*; do
+for item in "$TDESIGN_SOURCE_DIR"/*; do
     # 获取文件/目录名
     basename=$(basename "$item")
 
@@ -37,9 +37,9 @@ echo "  ✓ 已复制TDesign组件"
 
 # 第二步：复制依赖包（dayjs、tinycolor2、tslib等）
 echo "📦 复制依赖包..."
-if [ -d "$SOURCE_DIR/miniprogram_npm" ]; then
+if [ -d "$TDESIGN_SOURCE_DIR/miniprogram_npm" ]; then
     # 复制嵌套目录中的依赖包到顶层miniprogram_npm
-    for dep in "$SOURCE_DIR/miniprogram_npm"/*; do
+    for dep in "$TDESIGN_SOURCE_DIR/miniprogram_npm"/*; do
         dep_name=$(basename "$dep")
         if [ ! -d "./miniprogram_npm/$dep_name" ]; then
             cp -r "$dep" ./miniprogram_npm/
@@ -67,6 +67,16 @@ if [ -d "$SOURCE_DIR/miniprogram_npm" ]; then
     cd "$CURRENT_DIR"
 else
     echo "  ! 未找到依赖包目录"
+fi
+
+# 第四步：复制 mp-html 组件
+echo "📦 复制 mp-html 组件..."
+MP_HTML_SOURCE="node_modules/mp-html/dist/mp-weixin"
+if [ -d "$MP_HTML_SOURCE" ]; then
+    cp -r "$MP_HTML_SOURCE" ./miniprogram_npm/mp-html
+    echo "  ✓ mp-html"
+else
+    echo "  ! 未找到 mp-html，跳过"
 fi
 
 # 优化：删除不必要的文件以减小体积

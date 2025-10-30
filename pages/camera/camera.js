@@ -7,7 +7,8 @@ Page({
     profile: null,
     canvasWidth: 300, // canvas宽度
     canvasHeight: 500, // canvas高度
-    cameraAuthorized: false // 相机是否已授权
+    cameraAuthorized: false, // 相机是否已授权
+    isAuthorizing: false // 是否正在授权中
   },
 
   onLoad(options) {
@@ -52,9 +53,23 @@ Page({
 
   // 处理相机授权（用户点击"开启相机"按钮）
   handleCameraAuth() {
-    // 直接设置为已授权，让 <camera> 组件显示
-    // 微信会自动弹出授权对话框
-    this.setData({ cameraAuthorized: true })
+    // 设置授权中状态，避免闪现引导页
+    this.setData({
+      isAuthorizing: true,
+      cameraAuthorized: false
+    })
+
+    // 使用 nextTick 确保状态更新后再显示相机
+    // 这样可以避免从引导页到相机的闪烁
+    wx.nextTick(() => {
+      // 短暂延迟后设置为已授权，让微信弹出授权对话框
+      setTimeout(() => {
+        this.setData({
+          cameraAuthorized: true,
+          isAuthorizing: false
+        })
+      }, 100)
+    })
   },
 
   // 拍照

@@ -147,6 +147,65 @@
   line-height: 1.8;
 }
 
+/* 文章链接列表 */
+.article-links {
+  margin: 30rpx;
+  padding: 30rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  border: 1rpx solid #e0e0e0;
+}
+
+.links-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #e0e0e0;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  border: 1rpx solid #e0e0e0;
+  transition: all 0.3s;
+}
+
+.link-item:active {
+  background-color: #f0f0f0;
+  transform: scale(0.98);
+}
+
+.link-item:last-child {
+  margin-bottom: 0;
+}
+
+.link-icon {
+  font-size: 32rpx;
+  margin-right: 15rpx;
+  flex-shrink: 0;
+}
+
+.link-url {
+  flex: 1;
+  font-size: 26rpx;
+  color: #576B95;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.link-arrow {
+  font-size: 40rpx;
+  color: #999;
+  margin-left: 10rpx;
+  flex-shrink: 0;
+}
+
 /* 文章信息 */
 .article-info {
   padding: 20rpx 30rpx;

@@ -50,8 +50,27 @@
 
     <!-- 文章正文 -->
     <view class="article-body">
-      <rich-text nodes="{{articleDetail.content}}"></rich-text>
+      <!-- 使用 mp-html 替代 rich-text，支持链接直接点击和视频播放 -->
+      <mp-html
+        content="{{articleDetail.content}}"
+        bindlinkTap="onLinkTap"
+        bindplay="onVideoPlay"
+        lazy-load="{{true}}"
+        show-img-menu="{{true}}"
+      />
     </view>
+
+    <!-- 文章链接列表（备用方案，如果用户不想直接点击富文本中的链接） -->
+    <!--
+    <view class="article-links" wx:if="{{richTextLinks.length > 0}}">
+      <view class="links-title">📎 文章相关链接</view>
+      <view class="link-item" wx:for="{{richTextLinks}}" wx:key="index" bindtap="openLink" data-index="{{index}}">
+        <view class="link-icon">🔗</view>
+        <view class="link-url">{{item}}</view>
+        <view class="link-arrow">›</view>
+      </view>
+    </view>
+    -->
 
     <!-- 文章信息 -->
     <view class="article-info">

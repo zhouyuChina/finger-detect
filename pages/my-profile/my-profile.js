@@ -140,22 +140,32 @@ Page({
       return []
     }
 
-    return subUsers.map(user => ({
-      id: user.id,
-      name: user.username || user.realName || '未知用户', // 优先使用username
-      gender: user.gender || '未知',
-      age: user.age || '未知',
-      relationship: this.getRelationshipFromUser(user),
-      avatar: '/images/default-avatar.png',
-      profileId: user.id,
-      updateTime: common.formatTime(user.updatedAt || user.createdAt, 'YYYY-MM-DD HH:mm'),
-      status: user.status || 'active',
-      address: user.address || '未知',
-      archives: user.archives || 0,
-      photos: user.photos || 0,
-      reports: user.reports || 0,
-      originalData: user
-    }))
+    return subUsers.map(user => {
+      // 过滤掉"微信用户"这个默认昵称
+      let name = '未知用户'
+      if (user.username && user.username !== '微信用户' && user.username.trim() !== '') {
+        name = user.username
+      } else if (user.realName && user.realName !== '微信用户' && user.realName.trim() !== '') {
+        name = user.realName
+      }
+
+      return {
+        id: user.id,
+        name: name,
+        gender: user.gender || '未知',
+        age: user.age || '未知',
+        relationship: this.getRelationshipFromUser(user),
+        avatar: '/images/default-avatar.png',
+        profileId: user.id,
+        updateTime: common.formatTime(user.updatedAt || user.createdAt, 'YYYY-MM-DD HH:mm'),
+        status: user.status || 'active',
+        address: user.address || '未知',
+        archives: user.archives || 0,
+        photos: user.photos || 0,
+        reports: user.reports || 0,
+        originalData: user
+      }
+    })
   },
 
   // 根据用户信息推断关系
@@ -266,11 +276,20 @@ Page({
       
       if (response.success && response.data) {
         const userData = response.data
+
+        // 过滤掉"微信用户"这个默认昵称
+        let name = ''
+        if (userData.username && userData.username !== '微信用户' && userData.username.trim() !== '') {
+          name = userData.username
+        } else if (userData.realName && userData.realName !== '微信用户' && userData.realName.trim() !== '') {
+          name = userData.realName
+        }
+
         // 设置编辑的档案信息
         this.setData({
           editingProfile: {
             id: userData.id,
-            name: userData.username || userData.realName || '', // 优先使用username
+            name: name,
             gender: userData.gender || '',
             age: userData.age || '',
             address: userData.address || '',
@@ -501,15 +520,35 @@ Page({
           }
           return p;
         });
-        
-        this.setData({ 
+
+        this.setData({
           profiles,
-          showEditPopup: false 
+          showEditPopup: false
         });
-        
+
         this.calculateStats();
         this.filterProfiles();
-        
+
+        // 同步更新全局用户信息和storage
+        const userInfo = storage.getUserInfo()
+        if (userInfo && userInfo.currentSubUser && userInfo.currentSubUser.id === editingProfile.id) {
+          // 如果更新的是当前子用户，需要同步更新全局存储
+          userInfo.currentSubUser.username = editingProfile.name
+          userInfo.currentSubUser.realName = editingProfile.name
+          userInfo.currentSubUser.age = parseInt(editingProfile.age)
+          userInfo.currentSubUser.gender = editingProfile.gender
+          userInfo.currentSubUser.address = editingProfile.address
+
+          storage.setUserInfo(userInfo)
+          storage.setCurrentSubUser(userInfo.currentSubUser)
+
+          // 同步更新app.js中的全局数据
+          const app = getApp()
+          if (app) {
+            app.setUserInfo(userInfo)
+          }
+        }
+
         wx.showToast({
           title: '保存成功',
           icon: 'success'

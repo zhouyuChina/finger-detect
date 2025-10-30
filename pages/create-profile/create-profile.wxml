@@ -591,7 +591,7 @@
           </view>
         </view>
 
-        <view class="instruction-text">点击图片中的任意{{selectedPartType === 'hand' ? '手指' : '脚趾'}}进行选择</view>
+        <view class="instruction-text">为照片选择对应的{{selectedPartType === 'hand' ? '手指' : '脚趾'}}</view>
       </view>
     </view>
   </t-popup>

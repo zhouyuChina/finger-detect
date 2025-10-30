@@ -34,7 +34,7 @@
     <view class="section-header">
       <text class="section-title">健康资讯</text>
       <view class="header-actions">
-        <text class="view-all" bindtap="onViewAll">查看全部</text>
+        <text class="view-all" bindtap="onViewAll">全部已读</text>
       </view>
     </view>
 

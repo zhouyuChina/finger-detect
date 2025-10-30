@@ -47,7 +47,7 @@ Page({
     
     // 表单数据
     userForm: {
-      nickname: '新用户',
+      nickname: '',
       gender: '1', // 默认男性
       birthYear: '',
       province: '',
@@ -186,9 +186,18 @@ Page({
         currentStep: 1 // 从第一步开始
       })
       
-      // 预填充表单数据，优先使用微信昵称
+      // 预填充表单数据，优先使用微信昵称（但排除默认的"微信用户"）
+      let defaultNickname = ''
+      if (userInfo.nickName && userInfo.nickName !== '微信用户' && userInfo.nickName.trim() !== '') {
+        defaultNickname = userInfo.nickName
+      } else if (userInfo.nickname && userInfo.nickname !== '微信用户' && userInfo.nickname.trim() !== '') {
+        defaultNickname = userInfo.nickname
+      } else if (userInfo.realName && userInfo.realName !== '微信用户' && userInfo.realName.trim() !== '') {
+        defaultNickname = userInfo.realName
+      }
+
       const userForm = {
-        nickname: userInfo.nickname || userInfo.realName || userInfo.nickName || '新用户',
+        nickname: defaultNickname,
         gender: userInfo.gender || '1',
         birthYear: userInfo.birthYear || '',
         province: userInfo.province || '',
@@ -296,23 +305,33 @@ Page({
       return []
     }
 
-    return subUsers.map(user => ({
-      id: user.id,
-      nickname: user.realName || user.username || '未知用户',
-      username: user.username,
-      age: user.age || 0,
-      address: user.address || '未知地址',
-      phone: user.phone || '',
-      email: user.email || '',
-      gender: user.gender || '0',
-      archives: user.archives || 0,
-      photos: user.photos || 0,
-      reports: user.reports || 0,
-      remark: user.remark || '',
-      status: user.status || 'active',
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    }))
+    return subUsers.map(user => {
+      // 过滤掉"微信用户"这个默认昵称
+      let nickname = '未知用户'
+      if (user.realName && user.realName !== '微信用户' && user.realName.trim() !== '') {
+        nickname = user.realName
+      } else if (user.username && user.username !== '微信用户' && user.username.trim() !== '') {
+        nickname = user.username
+      }
+
+      return {
+        id: user.id,
+        nickname: nickname,
+        username: user.username,
+        age: user.age || 0,
+        address: user.address || '未知地址',
+        phone: user.phone || '',
+        email: user.email || '',
+        gender: user.gender || '0',
+        archives: user.archives || 0,
+        photos: user.photos || 0,
+        reports: user.reports || 0,
+        remark: user.remark || '',
+        status: user.status || 'active',
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    })
   },
 
   // 开始拍照检测（未登录用户）
@@ -539,15 +558,51 @@ Page({
         await this.loadDetectionCounts(formattedProfiles)
         
         this.setData({ selectedUserProfiles: formattedProfiles });
+        
+        // 检查是否有档案，如果没有且当前是第一步，自动跳转到部位选择
+        if (formattedProfiles.length === 0 && this.data.currentStep === 1) {
+          // 延迟一下确保界面更新完成
+          setTimeout(() => {
+            this.setData({
+              showBodyPartPopup: true,
+              selectedBodyPart: this.data.bodyParts[0], // 默认左手
+              selectedPartType: 'hand'
+            });
+          }, 100);
+        }
       } else {
         console.warn('档案列表接口返回错误:', response)
         // 如果接口失败，显示空状态
         this.setData({ selectedUserProfiles: [] });
+        
+        // 检查是否有档案，如果没有且当前是第一步，自动跳转到部位选择
+        if (this.data.currentStep === 1) {
+          // 延迟一下确保界面更新完成
+          setTimeout(() => {
+            this.setData({
+              showBodyPartPopup: true,
+              selectedBodyPart: this.data.bodyParts[0], // 默认左手
+              selectedPartType: 'hand'
+            });
+          }, 100);
+        }
       }
     } catch (error) {
       console.error('加载用户档案失败:', error)
       // 如果接口失败，显示空状态
       this.setData({ selectedUserProfiles: [] });
+      
+      // 检查是否有档案，如果没有且当前是第一步，自动跳转到部位选择
+      if (this.data.currentStep === 1) {
+        // 延迟一下确保界面更新完成
+        setTimeout(() => {
+          this.setData({
+            showBodyPartPopup: true,
+            selectedBodyPart: this.data.bodyParts[0], // 默认左手
+            selectedPartType: 'hand'
+          });
+        }, 100);
+      }
     }
   },
 
@@ -1398,7 +1453,18 @@ Page({
   // 步骤控制
   nextStep() {
     if (this.data.currentStep === 1 && this.data.selectedUser) {
-      this.setData({ currentStep: 2 });
+      // 检查是否有档案
+      if (this.data.selectedUserProfiles.length === 0) {
+        // 没有档案，直接跳转到部位选择页面
+        this.setData({
+          showBodyPartPopup: true,
+          selectedBodyPart: this.data.bodyParts[0], // 默认左手
+          selectedPartType: 'hand'
+        });
+      } else {
+        // 有档案，进入档案选择步骤
+        this.setData({ currentStep: 2 });
+      }
     }
   },
 

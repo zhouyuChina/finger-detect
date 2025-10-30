@@ -15,8 +15,8 @@ Page({
   },
 
   onShow() {
-    // 页面显示时检查并更新Tab栏红点
-    this.checkTabBarBadge()
+    // 页面显示时重新加载消息并更新红点
+    this.loadMessages()
   },
 
   // 加载消息数据
@@ -54,9 +54,12 @@ Page({
       const messageListWithReadStatus = await this.fetchReadStatus(messageList)
       
       this.setData({ messageList: messageListWithReadStatus })
-      
+
       // 缓存数据
       storage.setMessages(messageListWithReadStatus)
+
+      // 计算本地未读数并更新红点
+      this.updateTabBarBadgeWithLocalCount(messageListWithReadStatus)
     } catch (error) {
       console.error('Message页面加载消息失败:', error)
       this.setData({ messageList: [] })
@@ -250,6 +253,45 @@ Page({
     const app = getApp()
     if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
       app.checkAndUpdateTabBarBadge()
+    }
+  },
+
+  // 使用本地消息列表计算未读数并更新红点
+  updateTabBarBadgeWithLocalCount(messageList) {
+    try {
+      // 检查用户是否已登录
+      const userInfo = storage.getUserInfo()
+      const openId = storage.getOpenId()
+
+      if (!userInfo || !openId) {
+        // 未登录用户不显示红点
+        wx.hideTabBarRedDot({ index: 2 })
+        return
+      }
+
+      // 计算本地未读数量
+      const unreadCount = messageList.filter(msg => !msg.isRead).length
+
+      // 直接更新红点
+      if (unreadCount > 0) {
+        wx.showTabBarRedDot({
+          index: 2,
+          success: () => {},
+          fail: (err) => {
+            console.error('显示红点失败:', err)
+          }
+        })
+      } else {
+        wx.hideTabBarRedDot({
+          index: 2,
+          success: () => {},
+          fail: (err) => {
+            console.error('隐藏红点失败:', err)
+          }
+        })
+      }
+    } catch (error) {
+      console.error('更新红点失败:', error)
     }
   }
 
