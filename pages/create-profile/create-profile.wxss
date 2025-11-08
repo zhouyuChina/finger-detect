@@ -421,18 +421,21 @@ page {
   padding: 20rpx;
   border-bottom: 1rpx solid #f0f0f0;
   transition: background-color 0.3s ease;
+  gap: 20rpx;
 }
 
 .profile-item:last-child {
   border-bottom: none;
 }
 
-.profile-item:active {
-  background-color: #f8f9fa;
-}
-
 .profile-info {
   flex: 1;
+  cursor: pointer;
+  padding: 10rpx 0;
+}
+
+.profile-info:active {
+  opacity: 0.7;
 }
 
 .profile-name {
@@ -464,6 +467,15 @@ page {
 .profile-arrow {
   font-size: 28rpx;
   color: #999;
+}
+
+/* 档案操作按钮区域 */
+.profile-actions {
+  display: flex;
+  gap: 10rpx;
+  flex-shrink: 0;
+  align-items: center;
+  width: 240rpx;
 }
 
 /* 空状态 */

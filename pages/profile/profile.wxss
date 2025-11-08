@@ -72,6 +72,12 @@
   display: block;
 }
 
+/* 管理反馈按钮包装器 */
+.feedback-btn-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 /* 管理反馈按钮样式 */
 .feedback-btn {
   font-size: 26rpx !important;
@@ -80,6 +86,18 @@
   /* height: auto !important; */
   border-radius: 32rpx !important;
   width: 120rpx;
+}
+
+/* 留言反馈红点 */
+.feedback-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16rpx;
+  height: 16rpx;
+  background-color: #ff4757;
+  border-radius: 50%;
+  border: 2rpx solid #fff;
 }
 
 /* 统计信息区域 */

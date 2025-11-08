@@ -1,6 +1,7 @@
 // my-profile.js
 const api = require('../../utils/api.js')
 const common = require('../../utils/common.js')
+const storage = require('../../utils/storage.js')
 
 Page({
   data: {
@@ -22,7 +23,8 @@ Page({
     genderOptions: ['男', '女'],
     relationshipOptions: ['本人', '配偶', '子女', '父母', '其他'],
     profiles: [],
-    filteredProfiles: []
+    filteredProfiles: [],
+    ownSubUserId: '' // 本人的subUserId
   },
 
   onLoad() {
@@ -42,12 +44,18 @@ Page({
       const response = await api.user.getUsers()
 
       if (response.success && response.data && response.data.subUsers) {
-        const profiles = this.formatProfiles(response.data.subUsers)
+        // 获取本人的subUserId
+        const ownSubUserId = response.data.currentSubUser?.id || ''
+
+        const profiles = this.formatProfiles(response.data.subUsers, ownSubUserId)
 
         // 为每个用户加载实际的检测统计数据
         await this.loadDetectionStats(profiles)
 
-        this.setData({ profiles })
+        this.setData({
+          profiles,
+          ownSubUserId
+        })
 
         // 计算统计数据
         this.calculateStats()
@@ -135,7 +143,7 @@ Page({
   },
 
   // 格式化用户档案数据
-  formatProfiles(subUsers) {
+  formatProfiles(subUsers, ownSubUserId) {
     if (!Array.isArray(subUsers)) {
       return []
     }
@@ -149,12 +157,16 @@ Page({
         name = user.realName
       }
 
+      // 根据是否是本人档案来设置关系
+      const isOwnProfile = ownSubUserId && user.id === ownSubUserId
+      const relationship = isOwnProfile ? '本人' : (user.relationship || '其他')
+
       return {
         id: user.id,
         name: name,
         gender: user.gender || '未知',
         age: user.age || '未知',
-        relationship: this.getRelationshipFromUser(user),
+        relationship: relationship,
         avatar: '/images/default-avatar.png',
         profileId: user.id,
         updateTime: common.formatTime(user.updatedAt || user.createdAt, 'YYYY-MM-DD HH:mm'),
@@ -233,7 +245,7 @@ Page({
   onProfileClick(e) {
     const id = e.currentTarget.dataset.id;
     const profile = this.data.profiles.find(p => p.id === id);
-    
+
     if (!profile) {
       wx.showToast({
         title: '档案信息获取失败',
@@ -241,20 +253,59 @@ Page({
       });
       return;
     }
-    
+
+    // 格式化性别显示
+    const genderText = profile.gender === '1' ? '男' : profile.gender === '2' ? '女' : '未知';
+
+    // 格式化年龄显示
+    const ageText = profile.age && profile.age !== '未知' ? `${profile.age}岁` : '未知';
+
+    // 格式化地址显示
+    const addressText = profile.address && profile.address !== '未知' ? profile.address : '暂无';
+
+    // 构建详情内容
+    const content = `【基本信息】
+
+姓名：${profile.name}
+性别：${genderText}
+年龄：${ageText}
+关系：${profile.relationship}
+地址：${addressText}
+
+【统计数据】
+
+档案数量：${profile.archives}
+检测照片：${profile.photos}
+检测报告：${profile.reports}
+
+更新时间：
+${profile.updateTime}`;
+
     wx.showModal({
       title: '档案详情',
-      content: `姓名：${profile.name}\n性别：${profile.gender}\n年龄：${profile.age}岁\n关系：${profile.relationship}\n档案ID：${profile.profileId}\n状态：${profile.status === 'active' ? '活跃' : '非活跃'}\n档案数量：${profile.archives}\n照片数量：${profile.photos}\n报告数量：${profile.reports}`,
+      content: content,
       showCancel: false,
       confirmText: '确定'
     });
+  },
+
+  // 转换性别数字为文字
+  formatGenderText(gender) {
+    if (gender === '1' || gender === 1) {
+      return '男'
+    } else if (gender === '2' || gender === 2) {
+      return '女'
+    } else if (gender === '男' || gender === '女') {
+      return gender
+    }
+    return ''
   },
 
   // 编辑档案
   async onEditProfile(e) {
     const id = e.currentTarget.dataset.id;
     const profile = this.data.profiles.find(p => p.id === id);
-    
+
     if (!profile) {
       wx.showToast({
         title: '档案信息获取失败',
@@ -290,7 +341,7 @@ Page({
           editingProfile: {
             id: userData.id,
             name: name,
-            gender: userData.gender || '',
+            gender: this.formatGenderText(userData.gender),
             age: userData.age || '',
             address: userData.address || '',
             relationship: this.getRelationshipFromUser(userData)
@@ -299,9 +350,12 @@ Page({
         });
       } else {
         console.warn('获取用户详情失败:', response)
-        // 使用本地数据作为备选
+        // 使用本地数据作为备选，并转换性别显示
         this.setData({
-          editingProfile: { ...profile },
+          editingProfile: {
+            ...profile,
+            gender: this.formatGenderText(profile.gender)
+          },
           showEditPopup: true
         });
         wx.showToast({
@@ -312,9 +366,12 @@ Page({
     } catch (error) {
       wx.hideLoading()
       console.error('获取用户详情失败:', error)
-      // 使用本地数据作为备选
+      // 使用本地数据作为备选，并转换性别显示
       this.setData({
-        editingProfile: { ...profile },
+        editingProfile: {
+          ...profile,
+          gender: this.formatGenderText(profile.gender)
+        },
         showEditPopup: true
       });
       wx.showToast({
@@ -493,50 +550,59 @@ Page({
     });
 
     try {
+      // 将性别文字转换回数字格式
+      let genderValue = editingProfile.gender
+      if (editingProfile.gender === '男') {
+        genderValue = '1'
+      } else if (editingProfile.gender === '女') {
+        genderValue = '2'
+      }
+
       // 准备更新数据
       const updateData = {
         username: editingProfile.name, // 使用username而不是realName
         realName: editingProfile.name, // 同时保留realName作为真实姓名
         age: parseInt(editingProfile.age),
-        gender: editingProfile.gender,
+        gender: genderValue, // 使用转换后的数字格式
         address: editingProfile.address
       }
 
-      
+      console.log('保存档案数据:', updateData)
+
       // 调用更新接口
       const response = await api.user.updateSubUser(editingProfile.id, updateData)
-      
+
+      console.log('保存档案响应:', response)
+      console.log('响应类型检查:', {
+        success: response.success,
+        successType: typeof response.success,
+        code: response.code,
+        codeType: typeof response.code,
+        data: response.data
+      })
+
       wx.hideLoading()
-      
-      if (response.success || response.code === 200) {
-        // 更新本地数据
-        const profiles = this.data.profiles.map(p => {
-          if (p.id === editingProfile.id) {
-            return {
-              ...p,
-              ...editingProfile,
-              updateTime: common.formatTime(new Date(), 'YYYY-MM-DD HH:mm')
-            };
-          }
-          return p;
-        });
 
-        this.setData({
-          profiles,
-          showEditPopup: false
-        });
+      // 判断保存是否成功 - 支持多种响应格式
+      const isSuccess = response.success === true ||
+                       response.code === 200 ||
+                       response.code === '200' ||
+                       (response.data && response.data.success === true)
 
-        this.calculateStats();
-        this.filterProfiles();
+      console.log('是否成功:', isSuccess)
 
+      if (isSuccess) {
         // 同步更新全局用户信息和storage
         const userInfo = storage.getUserInfo()
         if (userInfo && userInfo.currentSubUser && userInfo.currentSubUser.id === editingProfile.id) {
           // 如果更新的是当前子用户，需要同步更新全局存储
+          // 使用转换后的数字格式保存
+          const genderForStorage = genderValue
+
           userInfo.currentSubUser.username = editingProfile.name
           userInfo.currentSubUser.realName = editingProfile.name
           userInfo.currentSubUser.age = parseInt(editingProfile.age)
-          userInfo.currentSubUser.gender = editingProfile.gender
+          userInfo.currentSubUser.gender = genderForStorage
           userInfo.currentSubUser.address = editingProfile.address
 
           storage.setUserInfo(userInfo)
@@ -549,10 +615,23 @@ Page({
           }
         }
 
+        // 关闭编辑弹窗
+        this.setData({
+          showEditPopup: false
+        });
+
+        // 显示成功提示
         wx.showToast({
           title: '保存成功',
           icon: 'success'
         });
+
+        // 重新加载档案列表以获取最新数据（放在 try-catch 外部，避免加载失败影响成功提示）
+        this.loadUserProfiles().catch(err => {
+          console.error('刷新档案列表失败:', err)
+          // 刷新失败不影响用户体验，静默处理
+        });
+
       } else {
         console.warn('更新用户失败:', response)
         wx.showToast({
@@ -571,10 +650,10 @@ Page({
   },
 
   // 删除档案
-  onDeleteProfile(e) {
+  async onDeleteProfile(e) {
     const id = e.currentTarget.dataset.id;
     const profile = this.data.profiles.find(p => p.id === id);
-    
+
     if (!profile) {
       wx.showToast({
         title: '档案信息获取失败',
@@ -582,24 +661,54 @@ Page({
       });
       return;
     }
-    
+
+    // 检查是否是本人档案
+    const ownSubUserId = this.data.ownSubUserId;
+    if (ownSubUserId && id === ownSubUserId) {
+      wx.showModal({
+        title: '无法删除',
+        content: '本人档案无法删除',
+        showCancel: false,
+        confirmText: '知道了'
+      });
+      return;
+    }
+
     wx.showModal({
       title: '确认删除',
       content: `确定要删除 ${profile.name} 的档案吗？\n\n此操作不可恢复，请谨慎操作。`,
       confirmText: '删除',
       confirmColor: '#e34d59',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          // 从列表中移除
-          const profiles = this.data.profiles.filter(p => p.id !== id);
-          this.setData({ profiles });
-          this.calculateStats();
-          this.filterProfiles();
-          
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success'
-          });
+          try {
+            // 调用后端API删除档案
+            const response = await api.user.deleteSubUser(id);
+
+            if (response.success) {
+              // 从列表中移除
+              const profiles = this.data.profiles.filter(p => p.id !== id);
+              this.setData({ profiles });
+              this.calculateStats();
+              this.filterProfiles();
+
+              wx.showToast({
+                title: '删除成功',
+                icon: 'success'
+              });
+            } else {
+              wx.showToast({
+                title: response.message || '删除失败',
+                icon: 'error'
+              });
+            }
+          } catch (error) {
+            console.error('删除档案失败:', error);
+            wx.showToast({
+              title: '删除失败，请重试',
+              icon: 'error'
+            });
+          }
         }
       }
     });

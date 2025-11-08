@@ -101,18 +101,20 @@ Page({
           // 保存openId（从user.openid获取）
           if (user.openid) {
             storage.setOpenId(user.openid)
+            // 确保userInfo对象中也包含openid
+            user.openid = user.openid
           } else {
             console.warn('响应中没有openid')
           }
-          
-          // 保存用户信息（使用user对象）
+
+          // 保存用户信息（使用user对象，确保包含openid）
           storage.setUserInfo(user)
-          
+
           // 保存子用户列表
           if (user.subUsers) {
             storage.setSubUsers(user.subUsers)
           }
-          
+
           // 保存当前子用户
           if (user.currentSubUser) {
             storage.setCurrentSubUser(user.currentSubUser)
@@ -130,30 +132,73 @@ Page({
         // 隐藏授权页面
         this.setData({ showAuth: false })
 
-        // 显示欢迎信息
-        wx.showToast({
-          title: '注册成功',
-          icon: 'success',
-          duration: 1500
-        })
-
         // 验证数据完整性后再跳转
         const finalUserInfo = storage.getUserInfo()
         const finalOpenId = storage.getOpenId()
 
         if (finalUserInfo && finalOpenId) {
-          // 延迟跳转到完善信息页面
-          setTimeout(() => {
-            wx.redirectTo({
-              url: '/pages/create-profile/create-profile?mode=complete',
-              fail: () => {
-                // 如果跳转失败，回到首页
-                wx.switchTab({
-                  url: '/pages/index/index'
-                })
-              }
+          // 获取子用户列表和当前子用户
+          const subUsers = storage.getSubUsers()
+          const currentSubUser = storage.getCurrentSubUser()
+
+          // 打印用户信息，用于调试
+          console.log('用户信息:', finalUserInfo)
+          console.log('子用户列表:', subUsers)
+          console.log('当前子用户:', currentSubUser)
+
+          // 判断用户是否已完善信息
+          // 如果用户有子用户，并且子用户有姓名、性别等信息，说明是老用户，直接跳转首页
+          // 否则是新用户，需要跳转到完善信息页面
+          const hasSubUsers = subUsers && subUsers.length > 0
+          const hasCurrentSubUser = currentSubUser &&
+                                   (currentSubUser.realName || currentSubUser.name) &&
+                                   currentSubUser.gender
+
+          const isProfileComplete = hasSubUsers && hasCurrentSubUser
+
+          console.log('用户信息是否完整:', isProfileComplete, {
+            hasSubUsers,
+            hasCurrentSubUser,
+            realName: currentSubUser?.realName,
+            name: currentSubUser?.name,
+            gender: currentSubUser?.gender
+          })
+
+          if (isProfileComplete) {
+            // 老用户，显示欢迎回来提示
+            wx.showToast({
+              title: '欢迎回来',
+              icon: 'success',
+              duration: 1500
             })
-          }, 1500)
+
+            // 跳转到首页
+            setTimeout(() => {
+              wx.switchTab({
+                url: '/pages/index/index'
+              })
+            }, 1500)
+          } else {
+            // 新用户，显示注册成功提示
+            wx.showToast({
+              title: '注册成功',
+              icon: 'success',
+              duration: 1500
+            })
+
+            // 延迟跳转到完善信息页面
+            setTimeout(() => {
+              wx.redirectTo({
+                url: '/pages/create-profile/create-profile?mode=complete',
+                fail: () => {
+                  // 如果跳转失败，回到首页
+                  wx.switchTab({
+                    url: '/pages/index/index'
+                  })
+                }
+              })
+            }, 1500)
+          }
         } else {
           console.error('数据保存不完整，无法跳转:', {
             userInfo: !!finalUserInfo,

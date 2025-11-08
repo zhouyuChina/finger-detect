@@ -32,19 +32,19 @@
         </view>
         
         <view slot="title" class="record-title">
-          <text class="title-text">检测报告 #{{item.id}}</text>
+          <text class="title-text">{{item.subUserName || '未知用户'}} - {{item.archiveName || '未知档案'}}</text>
         </view>
-        
+
         <view slot="description" class="record-preview">
           <text class="preview-text">{{item.description}}</text>
         </view>
-        
+
         <view slot="note" class="record-meta">
           <text class="time-text">{{item.createTime}}</text>
           <view class="record-actions">
-            <t-button 
-              size="small" 
-              theme="danger" 
+            <t-button
+              size="small"
+              theme="danger"
               variant="outline"
               bindtap="deleteRecord"
               data-id="{{item.id}}"
@@ -120,6 +120,14 @@
 
         <!-- 报告信息 -->
         <view class="report-info">
+          <view class="info-item">
+            <text class="info-label">用户:</text>
+            <text class="info-value">{{currentRecord.subUserName || '未知用户'}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">档案:</text>
+            <text class="info-value">{{currentRecord.archiveName || '未知档案'}}</text>
+          </view>
           <view class="info-item">
             <text class="info-label">检测时间:</text>
             <text class="info-value">{{currentRecord.createTime}}</text>

@@ -14,7 +14,10 @@ Page({
     },
     unreadCount: 0, // 未读消息数量
     messages: [], // 消息列表
-    loading: false // 加载状态
+    loading: false, // 加载状态
+    showAuthPopup: false, // 是否显示授权弹窗
+    authLoading: false, // 授权加载状态
+    wxLoginCode: '' // 微信登录code
   },
 
   // 页面加载时
@@ -565,25 +568,21 @@ Page({
     // 检查用户是否已登录
     const userInfo = storage.getUserInfo()
     const openId = storage.getOpenId()
-    
+
     if (!userInfo || !openId) {
-      // 未登录用户，跳转到拍照检测页面，由该页面处理授权
-      wx.navigateTo({
-        url: '/pages/photo-detection/photo-detection'
-      })
+      // 未登录用户，显示授权弹窗
+      await this.showAuthPopupAndGetCode()
       return
     }
 
     // 已登录用户，检查用户信息是否完整
     if (!storage.isUserInfoComplete()) {
-      const missingFields = storage.getMissingUserInfoFields()
-      
       // 显示提示信息
       const result = await common.showConfirm(
-        '完善个人信息', 
+        '完善个人信息',
         '检测到您的个人信息不完整（性别、年龄、地址），需要先完善信息才能进行检测。是否现在完善？'
       )
-      
+
       if (result) {
         // 跳转到完善信息页面
         wx.navigateTo({
@@ -597,6 +596,175 @@ Page({
     wx.navigateTo({
       url: '/pages/create-profile/create-profile'
     })
+  },
+
+  // 显示授权弹窗并获取微信登录code
+  async showAuthPopupAndGetCode() {
+    try {
+      // 获取微信登录code
+      const loginRes = await new Promise((resolve, reject) => {
+        wx.login({
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      if (loginRes.code) {
+        this.setData({
+          wxLoginCode: loginRes.code,
+          showAuthPopup: true
+        })
+      } else {
+        console.error('获取微信登录code失败')
+        common.showError('获取登录凭证失败')
+      }
+    } catch (error) {
+      console.error('微信登录失败:', error)
+      common.showError('微信登录失败')
+    }
+  },
+
+  // 处理用户授权
+  async handleAuth() {
+    if (!this.data.wxLoginCode) {
+      common.showError('请先获取登录凭证')
+      return
+    }
+
+    this.setData({ authLoading: true })
+
+    try {
+      // 调用注册接口
+      await this.registerUser()
+    } catch (error) {
+      this.setData({ authLoading: false })
+      console.error('注册失败:', error)
+      common.showError('注册失败，请重试')
+    }
+  },
+
+  // 注册用户
+  async registerUser() {
+    try {
+      // 获取系统信息
+      const systemInfo = wx.getSystemInfoSync()
+
+      // 不传用户信息给后端，让后端知道这是个新用户需要完善信息
+      const registerData = {
+        code: this.data.wxLoginCode,
+        userInfo: null, // 不传昵称等信息，让用户后续自己填写
+        systemInfo: {
+          platform: systemInfo.platform,
+          system: systemInfo.system,
+          version: systemInfo.version,
+          SDKVersion: systemInfo.SDKVersion,
+          brand: systemInfo.brand,
+          model: systemInfo.model,
+          screenWidth: systemInfo.screenWidth,
+          screenHeight: systemInfo.screenHeight,
+          windowWidth: systemInfo.windowWidth,
+          windowHeight: systemInfo.windowHeight,
+          pixelRatio: systemInfo.pixelRatio,
+          language: systemInfo.language
+        },
+        registerTime: new Date().toISOString(),
+        appVersion: '1.0.0'
+      }
+
+      const response = await api.user.miniProgramRegister(registerData)
+
+      if (response.success || response.code === 200) {
+        // 保存用户信息
+        const responseData = response.data || response
+        const user = responseData.user
+
+        if (user) {
+          // 保存openId
+          if (user.openid) {
+            storage.setOpenId(user.openid)
+            user.openid = user.openid
+          }
+
+          // 保存用户信息
+          storage.setUserInfo(user)
+
+          // 保存子用户列表
+          if (user.subUsers) {
+            storage.setSubUsers(user.subUsers)
+          }
+
+          // 保存当前子用户
+          if (user.currentSubUser) {
+            storage.setCurrentSubUser(user.currentSubUser)
+          }
+        }
+
+        // 隐藏授权弹窗
+        this.setData({
+          showAuthPopup: false,
+          authLoading: false
+        })
+
+        // 验证数据完整性后再跳转
+        const finalUserInfo = storage.getUserInfo()
+        const finalOpenId = storage.getOpenId()
+
+        if (finalUserInfo && finalOpenId) {
+          // 获取子用户列表和当前子用户
+          const subUsers = storage.getSubUsers()
+          const currentSubUser = storage.getCurrentSubUser()
+
+          // 判断用户是否已完善信息
+          const hasSubUsers = subUsers && subUsers.length > 0
+          const hasCurrentSubUser = currentSubUser &&
+                                   (currentSubUser.realName || currentSubUser.name) &&
+                                   currentSubUser.gender
+
+          const isProfileComplete = hasSubUsers && hasCurrentSubUser
+
+          if (isProfileComplete) {
+            // 老用户，显示欢迎回来提示
+            wx.showToast({
+              title: '欢迎回来',
+              icon: 'success',
+              duration: 1500
+            })
+
+            // 跳转到档案选择页面
+            setTimeout(() => {
+              wx.navigateTo({
+                url: '/pages/create-profile/create-profile'
+              })
+            }, 1500)
+          } else {
+            // 新用户，显示注册成功提示
+            wx.showToast({
+              title: '注册成功',
+              icon: 'success',
+              duration: 1500
+            })
+
+            // 延迟跳转到完善信息页面
+            setTimeout(() => {
+              wx.navigateTo({
+                url: '/pages/create-profile/create-profile?mode=complete'
+              })
+            }, 1500)
+          }
+        } else {
+          console.error('数据保存不完整')
+          common.showError('登录数据保存失败，请重试')
+        }
+      } else {
+        console.error('用户注册失败:', response.message)
+        common.showError('注册失败，请重试')
+        this.setData({ authLoading: false })
+      }
+    } catch (error) {
+      console.error('注册失败:', error.message || error)
+      common.showError('注册失败，请重试')
+      this.setData({ authLoading: false })
+    }
   },
 
   // 查看全部消息（直接执行全部标记已读）

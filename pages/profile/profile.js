@@ -18,10 +18,14 @@ Page({
       familyMembers: 0,
       totalDetections: 0,
       unreadMessages: 0,
-      unreadSystemMessages: 0
+      unreadSystemMessages: 0,
+      unreadFeedback: 0
     },
 
-    loading: false // 加载状态
+    loading: false, // 加载状态
+    showPermissionPopup: false, // 权限设置弹窗
+    cameraPermission: false, // 摄像头权限状态
+    locationPermission: false // 地理位置权限状态
   },
 
   onLoad() {
@@ -59,15 +63,16 @@ Page({
             familyMembers: 0,
             totalDetections: 0,
             unreadMessages: 0,
-            unreadSystemMessages: 0
+            unreadSystemMessages: 0,
+            unreadFeedback: 0
           }
         })
         return
       }
       
       
-      // 并行加载用户信息、统计信息、子用户信息、档案信息、未读消息数量和系统消息未读数量
-      const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes, unreadSystemMessagesRes] = await Promise.all([
+      // 并行加载用户信息、统计信息、子用户信息、档案信息、未读消息数量和系统消息未读数量（留言反馈未读数量暂时注释）
+      const [userInfoRes, statsRes, subUsersRes, archivesRes, unreadMessagesRes, unreadSystemMessagesRes/*, unreadFeedbackRes*/] = await Promise.all([
         api.user.getProfile().catch(error => {
           console.warn('获取用户信息失败:', error)
           return null
@@ -92,6 +97,10 @@ Page({
           console.warn('获取系统消息未读数量失败:', error)
           return null
         })
+        // api.feedback.getUnreadCount().catch(error => {
+        //   console.warn('获取留言反馈未读数量失败:', error)
+        //   return null
+        // })
       ])
 
       // 处理用户信息
@@ -115,7 +124,8 @@ Page({
         totalArchives: archivesRes?.data?.totalAll || 0,
         totalDetections: archivesRes?.data?.totalDetections || 0,
         unreadMessages: unreadMessagesRes?.data?.count || unreadMessagesRes?.data || 0,
-        unreadSystemMessages: unreadSystemMessagesRes?.data?.unreadCount || 0
+        unreadSystemMessages: unreadSystemMessagesRes?.data?.unreadCount || 0,
+        unreadFeedback: 0 // unreadFeedbackRes?.data?.unreadCount || unreadFeedbackRes?.data?.count || 0
       })
       this.setData({ stats })
 
@@ -144,7 +154,8 @@ Page({
       familyMembers: this.ensureNumber(data.totalDetections || data.detectionCount || data.familyMembers) || 0, // 检测记录（检测数量）
       totalDetections: this.ensureNumber(data.totalDetections || data.detectionCount) || 0, // 保留原有字段，用于其他功能
       unreadMessages: this.ensureNumber(data.unreadMessages || data.unreadCount) || 0, // 未读消息数量
-      unreadSystemMessages: this.ensureNumber(data.unreadSystemMessages) || 0 // 系统消息未读数量
+      unreadSystemMessages: this.ensureNumber(data.unreadSystemMessages) || 0, // 系统消息未读数量
+      unreadFeedback: this.ensureNumber(data.unreadFeedback) || 0 // 留言反馈未读数量
     }
   },
 
@@ -287,5 +298,110 @@ Page({
     if (app && typeof app.checkAndUpdateTabBarBadge === 'function') {
       app.checkAndUpdateTabBarBadge()
     }
+  },
+
+  // 打开权限设置弹窗
+  onPermissionSettings() {
+    // 先检查当前权限状态
+    this.checkPermissions()
+    this.setData({
+      showPermissionPopup: true
+    })
+  },
+
+  // 检查所有权限状态
+  async checkPermissions() {
+    try {
+      const setting = await new Promise((resolve, reject) => {
+        wx.getSetting({
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      this.setData({
+        cameraPermission: setting.authSetting['scope.camera'] === true,
+        locationPermission: setting.authSetting['scope.userLocation'] === true
+      })
+
+      console.log('权限状态:', {
+        camera: this.data.cameraPermission,
+        location: this.data.locationPermission
+      })
+    } catch (error) {
+      console.error('检查权限失败:', error)
+      wx.showToast({
+        title: '检查权限失败',
+        icon: 'error'
+      })
+    }
+  },
+
+  // 打开系统设置或请求权限
+  async openSystemSettings() {
+    // 如果地理位置权限未授权，先尝试触发一次授权请求
+    // 这样权限选项才会出现在系统设置中
+    if (!this.data.locationPermission) {
+      try {
+        await new Promise((resolve, reject) => {
+          wx.authorize({
+            scope: 'scope.userLocation',
+            success: resolve,
+            fail: reject
+          })
+        })
+        // 如果授权成功，直接更新状态
+        this.setData({ locationPermission: true })
+        wx.showToast({
+          title: '位置权限已开启',
+          icon: 'success'
+        })
+        return
+      } catch (error) {
+        // 用户拒绝授权，权限选项会出现在设置页面
+        console.log('用户拒绝位置授权，引导去设置页面')
+      }
+    }
+
+    // 打开系统设置页面
+    wx.openSetting({
+      success: (res) => {
+        console.log('打开设置成功:', res.authSetting)
+        // 重新检查权限状态
+        this.checkPermissions()
+
+        // 检查是否有权限变化
+        const hasLocationChanged = res.authSetting['scope.userLocation'] !== this.data.locationPermission
+        const hasCameraChanged = res.authSetting['scope.camera'] !== this.data.cameraPermission
+
+        if (hasLocationChanged || hasCameraChanged) {
+          wx.showToast({
+            title: '权限已更新',
+            icon: 'success'
+          })
+        }
+      },
+      fail: (error) => {
+        console.error('打开设置失败:', error)
+        wx.showToast({
+          title: '打开设置失败',
+          icon: 'error'
+        })
+      }
+    })
+  },
+
+  // 关闭权限设置弹窗
+  closePermissionPopup() {
+    this.setData({
+      showPermissionPopup: false
+    })
+  },
+
+  // 权限弹窗显示状态变化
+  onPermissionPopupChange(e) {
+    this.setData({
+      showPermissionPopup: e.detail.visible
+    })
   }
 }) 

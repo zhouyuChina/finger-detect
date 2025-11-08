@@ -32,7 +32,7 @@ Page({
     
     // 档案相关
     selectedProfile: null, // 当前选择的档案
-    
+
     // 弹窗控制
     showUserSelector: false,
     showNicknamePopup: false,
@@ -550,59 +550,23 @@ Page({
       
       if (response.success && response.data) {
         const archives = response.data.archives || []
-        
+
         // 格式化档案数据
         const formattedProfiles = this.formatArchives(archives)
-        
+
         // 为每个档案获取检测次数
         await this.loadDetectionCounts(formattedProfiles)
-        
+
         this.setData({ selectedUserProfiles: formattedProfiles });
-        
-        // 检查是否有档案，如果没有且当前是第一步，自动跳转到部位选择
-        if (formattedProfiles.length === 0 && this.data.currentStep === 1) {
-          // 延迟一下确保界面更新完成
-          setTimeout(() => {
-            this.setData({
-              showBodyPartPopup: true,
-              selectedBodyPart: this.data.bodyParts[0], // 默认左手
-              selectedPartType: 'hand'
-            });
-          }, 100);
-        }
       } else {
         console.warn('档案列表接口返回错误:', response)
         // 如果接口失败，显示空状态
         this.setData({ selectedUserProfiles: [] });
-        
-        // 检查是否有档案，如果没有且当前是第一步，自动跳转到部位选择
-        if (this.data.currentStep === 1) {
-          // 延迟一下确保界面更新完成
-          setTimeout(() => {
-            this.setData({
-              showBodyPartPopup: true,
-              selectedBodyPart: this.data.bodyParts[0], // 默认左手
-              selectedPartType: 'hand'
-            });
-          }, 100);
-        }
       }
     } catch (error) {
       console.error('加载用户档案失败:', error)
       // 如果接口失败，显示空状态
       this.setData({ selectedUserProfiles: [] });
-      
-      // 检查是否有档案，如果没有且当前是第一步，自动跳转到部位选择
-      if (this.data.currentStep === 1) {
-        // 延迟一下确保界面更新完成
-        setTimeout(() => {
-          this.setData({
-            showBodyPartPopup: true,
-            selectedBodyPart: this.data.bodyParts[0], // 默认左手
-            selectedPartType: 'hand'
-          });
-        }, 100);
-      }
     }
   },
 
@@ -732,10 +696,10 @@ Page({
   async selectDetailPart(e) {
     const part = e.currentTarget.dataset.part;
     const bodyPart = this.data.selectedBodyPart;
-    
+
     // 获取用户信息
     const selectedUser = this.data.selectedUser;
-    
+
     if (!selectedUser) {
       console.error('用户信息不存在')
       wx.showToast({
@@ -744,7 +708,7 @@ Page({
       });
       return;
     }
-    
+
     if (!selectedUser.id) {
       console.error('用户信息不完整，缺少用户ID:', selectedUser)
       wx.showToast({
@@ -756,16 +720,16 @@ Page({
 
     // 准备档案数据
     const archiveName = `${bodyPart.name}${part.name}`
-    
+
     // 使用当前选中的用户ID，而不是currentSubUser.id
     const subUserId = selectedUser.id
-    
+
     const archiveData = {
       subUserId: subUserId,
       archiveName: archiveName,
       bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
     }
-    
+
     // 创建档案
     let response
     try {
@@ -776,13 +740,13 @@ Page({
       // 只需要处理特殊的错误逻辑
       return;
     }
-    
+
     if (response && response.success && response.data) {
       const newArchive = response.data
-      
+
       // 根据实际返回的数据结构，档案信息在 archive 字段中
       const archiveData = newArchive.archive || newArchive
-      
+
       // 检查档案是否有ID，尝试不同的字段名
       const archiveId = archiveData.id || archiveData.archiveId || archiveData._id;
       if (!archiveId) {
@@ -793,13 +757,13 @@ Page({
         });
         return;
       }
-      
+
       // 重新加载档案列表
       await this.loadUserProfiles(selectedUser.id)
-      
+
       // 设置新创建的档案为选中状态
       const formattedArchive = this.formatArchives([archiveData])[0]
-      
+
       // 再次检查格式化后的档案是否有ID，尝试不同的字段名
       const formattedArchiveId = formattedArchive.id || formattedArchive.archiveId || formattedArchive._id;
       if (!formattedArchiveId) {
@@ -810,33 +774,34 @@ Page({
         });
         return;
       }
-      
+
       this.setData({
         selectedProfile: formattedArchive,
-        showDetailPartPopup: false
+        showDetailPartPopup: false,
+        showBodyPartPopup: false
       })
-      
+
       // 显示成功提示
       wx.showToast({
         title: '档案创建成功',
         icon: 'success'
       });
-      
+
       // 延迟跳转到拍照检测页面
       setTimeout(() => {
         // 构建跳转URL
         let url = `/pages/photo-detection/photo-detection?profile=${encodeURIComponent(JSON.stringify(formattedArchive))}`
-        
+
         // 如果有图片路径，也要传递过去
         if (this.data.photoPath) {
           url += `&photoPath=${encodeURIComponent(this.data.photoPath)}`
         }
-        
+
         wx.navigateTo({
           url: url
         });
       }, 1500);
-      
+
     } else if (response) {
       console.error('创建档案失败，响应:', response)
       // 使用服务器返回的错误消息
@@ -1335,10 +1300,33 @@ Page({
           
           // 重新加载用户列表以获取最新数据
           await this.loadUsers()
-          
-          // 显示用户选择器
-          this.setData({ showUserSelector: true })
-      
+
+          // 如果是完善信息模式，自动进入档案选择步骤
+          if (this.data.isCompleteMode) {
+            // 获取当前用户
+            const currentUser = this.data.selectedUser
+
+            if (currentUser && currentUser.id) {
+              // 加载档案列表
+              await this.loadUserProfiles(currentUser.id)
+
+              // 进入第二步
+              this.setData({ currentStep: 2 })
+
+              // 如果没有档案，自动打开部位选择弹窗
+              if (this.data.selectedUserProfiles.length === 0) {
+                this.setData({
+                  showBodyPartPopup: true,
+                  selectedBodyPart: this.data.bodyParts[0], // 默认左手
+                  selectedPartType: 'hand'
+                })
+              }
+            }
+          } else {
+            // 非完善模式，显示用户选择器
+            this.setData({ showUserSelector: true })
+          }
+
         } else {
           throw new Error(response.message || '更新用户信息失败')
         }
@@ -1470,10 +1458,146 @@ Page({
 
   prevStep() {
     if (this.data.currentStep > 1) {
-      this.setData({ 
+      this.setData({
         currentStep: this.data.currentStep - 1,
         selectedProfile: null
       });
     }
+  },
+
+  // 编辑档案
+  async onEditProfile(e) {
+    const profileId = e.currentTarget.dataset.id
+    const profile = e.currentTarget.dataset.profile
+
+    console.log('编辑档案:', profileId, profile)
+
+    if (!profileId) {
+      wx.showToast({
+        title: '档案信息错误',
+        icon: 'none'
+      })
+      return
+    }
+
+    // 显示确认弹窗,说明编辑会删除旧档案并创建新档案
+    wx.showModal({
+      title: '编辑档案',
+      content: `编辑档案将删除原档案"${profile.name}"并创建新档案。是否继续?`,
+      confirmText: '继续',
+      cancelText: '取消',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            // 先删除旧档案
+            wx.showLoading({
+              title: '准备编辑...',
+              mask: true
+            })
+
+            const deleteResponse = await api.profile.delete(profileId)
+
+            if (!deleteResponse.success) {
+              wx.hideLoading()
+              wx.showToast({
+                title: deleteResponse.message || '删除旧档案失败',
+                icon: 'none'
+              })
+              return
+            }
+
+            wx.hideLoading()
+
+            // 重新加载档案列表
+            if (this.data.selectedUser && this.data.selectedUser.id) {
+              await this.loadUserProfiles(this.data.selectedUser.id)
+            }
+
+            // 打开部位选择弹窗,让用户重新选择部位创建新档案
+            this.setData({
+              showBodyPartPopup: true,
+              selectedBodyPart: this.data.bodyParts[0], // 默认左手
+              selectedPartType: 'hand'
+            })
+
+            wx.showToast({
+              title: '请选择新的部位',
+              icon: 'none'
+            })
+          } catch (error) {
+            wx.hideLoading()
+            console.error('编辑档案准备失败:', error)
+            wx.showToast({
+              title: '编辑失败,请重试',
+              icon: 'none'
+            })
+          }
+        }
+      }
+    })
+  },
+
+  // 删除档案
+  async onDeleteProfile(e) {
+    const profileId = e.currentTarget.dataset.id
+    const profileName = e.currentTarget.dataset.name
+
+    console.log('删除档案:', profileId, profileName)
+
+    if (!profileId) {
+      wx.showToast({
+        title: '档案信息错误',
+        icon: 'none'
+      })
+      return
+    }
+
+    // 显示确认弹窗
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除档案"${profileName}"吗？删除后无法恢复。`,
+      confirmText: '删除',
+      confirmColor: '#ff4757',
+      cancelText: '取消',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            wx.showLoading({
+              title: '删除中...',
+              mask: true
+            })
+
+            // 调用删除接口
+            const response = await api.profile.delete(profileId)
+
+            wx.hideLoading()
+
+            if (response.success) {
+              wx.showToast({
+                title: '删除成功',
+                icon: 'success'
+              })
+
+              // 重新加载档案列表
+              if (this.data.selectedUser && this.data.selectedUser.id) {
+                await this.loadUserProfiles(this.data.selectedUser.id)
+              }
+            } else {
+              wx.showToast({
+                title: response.message || '删除失败',
+                icon: 'none'
+              })
+            }
+          } catch (error) {
+            wx.hideLoading()
+            console.error('删除档案失败:', error)
+            wx.showToast({
+              title: '删除失败，请重试',
+              icon: 'none'
+            })
+          }
+        }
+      }
+    })
   }
 }) 

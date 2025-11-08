@@ -119,6 +119,11 @@ const userApi = {
   // 更新子用户信息
   updateSubUser(id, data) {
     return request.put(`${config.api.user.updateSubUser}/${id}`, data)
+  },
+
+  // 删除子用户
+  deleteSubUser(id) {
+    return request.delete(`${config.api.user.deleteSubUser}/${id}`)
   }
 }
 
@@ -456,6 +461,23 @@ const feedbackApi = {
   // 获取反馈详情（使用查询参数）
   getDetailByQuery(id) {
     return request.get(config.api.feedback.detail, { id })
+  },
+
+  // 获取未读反馈数量
+  getUnreadCount() {
+    // 检查用户是否已登录
+    const storage = require('./storage.js')
+    const userInfo = storage.getUserInfo()
+    const openId = storage.getOpenId()
+
+    if (!userInfo || !openId) {
+      return Promise.resolve({
+        success: true,
+        data: { unreadCount: 0, count: 0 }
+      })
+    }
+
+    return request.get(config.api.feedback.unreadCount)
   }
 }
 

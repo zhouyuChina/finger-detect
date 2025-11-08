@@ -101,14 +101,14 @@
               />
             </view>
             
-            <view class="feedback-status" wx:if="{{item.status}}">
+            <!-- <view class="feedback-status" wx:if="{{item.status}}">
               <t-tag 
                 theme="{{item.status === 'pending' ? 'warning' : item.status === 'processing' ? 'primary' : item.status === 'completed' ? 'success' : 'danger'}}" 
                 size="small"
               >
                 {{item.statusText || (item.status === 'pending' ? '待处理' : item.status === 'processing' ? '处理中' : item.status === 'completed' ? '已完成' : item.status === 'rejected' ? '已拒绝' : '未知状态')}}
               </t-tag>
-            </view>
+            </view> -->
           </view>
         </view>
 

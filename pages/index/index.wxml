@@ -81,4 +81,42 @@
     <text class="empty-desc">请稍后再试或检查网络连接</text>
   </view>
 
+  <!-- 授权弹窗 - 底部弹出 -->
+  <t-popup
+    visible="{{showAuthPopup}}"
+    placement="bottom"
+    close-on-overlay-click="{{false}}"
+  >
+    <view class="auth-popup-content">
+      <!-- 弹窗头部 -->
+      <view class="auth-popup-header">
+        <view class="auth-icon-wrapper">
+          <image class="auth-logo" src="/images/logo.png" mode="aspectFit"></image>
+        </view>
+        <text class="auth-popup-title">欢迎使用</text>
+        <text class="auth-popup-subtitle">手指专业检测</text>
+      </view>
+
+      <!-- 授权说明 -->
+      <!-- <view class="auth-description">
+        <text class="desc-text">点击开始使用，后续将完善您的个人信息</text>
+      </view> -->
+
+      <!-- 授权按钮 -->
+      <view class="auth-actions">
+        <t-button
+          theme="primary"
+          size="large"
+          block
+          bindtap="handleAuth"
+          loading="{{authLoading}}"
+          disabled="{{authLoading}}"
+          style="background: linear-gradient(135deg, #009966 0%, #00BC7D 100%);"
+        >
+          {{authLoading ? '注册中...' : '开始使用'}}
+        </t-button>
+      </view>
+    </view>
+  </t-popup>
+
 </view>

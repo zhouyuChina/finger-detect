@@ -120,8 +120,8 @@ class Storage {
   // 获取用户信息缓存
   getUserInfo() {
     const userInfo = this.get('userInfo')
-    // 如果用户信息过期或无效，返回 null
-    if (!userInfo || !userInfo.openid) {
+    // 如果用户信息过期，返回 null
+    if (!userInfo) {
       return null
     }
     return userInfo
@@ -267,9 +267,10 @@ class Storage {
   isUserLoggedIn() {
     const userInfo = this.getUserInfo()
     const openId = this.getOpenId()
-    
+
     // 必须同时有有效的用户信息和openId
-    return !!(userInfo && openId && userInfo.openid)
+    // openId可以来自userInfo.openid或独立的openId存储
+    return !!(userInfo && openId)
   }
 
   // 强制清除所有过期数据

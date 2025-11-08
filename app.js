@@ -213,18 +213,20 @@ App({
           // 保存openId（从user.openid获取）
           if (user.openid) {
             storage.setOpenId(user.openid)
+            // 确保userInfo对象中也包含openid
+            user.openid = user.openid
           }
-          
-          // 保存用户信息（使用user对象）
+
+          // 保存用户信息（使用user对象，确保包含openid）
           storage.setUserInfo(user)
           this.globalData.userInfo = user
           this.globalData.isLoggedIn = true
-          
+
           // 保存子用户列表
           if (user.subUsers) {
             storage.setSubUsers(user.subUsers)
           }
-          
+
           // 保存当前子用户
           if (user.currentSubUser) {
             storage.setCurrentSubUser(user.currentSubUser)
@@ -435,10 +437,11 @@ App({
 
       const api = require('./utils/api.js')
 
-      // 获取文章未读数量和系统消息未读数量
-      const [articleUnreadRes, systemUnreadRes] = await Promise.all([
+      // 获取文章未读数量和系统消息未读数量（留言反馈未读数量暂时注释，等待接口）
+      const [articleUnreadRes, systemUnreadRes/*, feedbackUnreadRes*/] = await Promise.all([
         api.message.getUnreadCount().catch(() => ({ data: { count: 0 } })),
         api.systemMessages.getUnreadCount().catch(() => ({ data: { unreadCount: 0 } }))
+        // api.feedback.getUnreadCount().catch(() => ({ data: { unreadCount: 0 } }))
       ])
 
       // 文章未读数量
@@ -446,6 +449,10 @@ App({
 
       // 系统消息未读数量
       const systemUnread = systemUnreadRes?.data?.unreadCount || systemUnreadRes?.data?.count || 0
+
+      // 留言反馈未读数量（暂时注释，等待接口）
+      // const feedbackUnread = feedbackUnreadRes?.data?.unreadCount || feedbackUnreadRes?.data?.count || 0
+      const feedbackUnread = 0
 
       // 处理消息中心Tab（index: 2）- 对应文章未读
       if (articleUnread > 0) {
@@ -466,8 +473,9 @@ App({
         })
       }
 
-      // 处理"我的"Tab（index: 3）- 对应系统消息未读
-      if (systemUnread > 0) {
+      // 处理"我的"Tab（index: 3）- 对应留言反馈未读（系统消息未读也会显示红点）
+      const totalUnreadForProfile = systemUnread + feedbackUnread
+      if (totalUnreadForProfile > 0) {
         wx.showTabBarRedDot({
           index: 3,
           success: () => {

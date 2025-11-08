@@ -1,56 +1,60 @@
 <!--auth.wxml-->
 <view class="container">
-  <!-- 授权蒙版 -->
-  <view class="auth-overlay" wx:if="{{showAuth}}">
-    <view class="auth-content">
-      <!-- Logo区域 -->
-      <view class="logo-section">
-        <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
-        <text class="app-name">手指专业检测</text>
-        <text class="app-desc">专业 AI 分析平台</text>
+  <!-- 背景页面 -->
+  <view class="background-page">
+    <view class="background-content">
+      <image class="background-logo" src="/images/logo.png" mode="aspectFit"></image>
+      <text class="background-title">手指专业检测</text>
+      <text class="background-subtitle">专业 AI 分析平台</text>
+    </view>
+  </view>
+
+  <!-- 授权弹窗 - 底部弹出 -->
+  <t-popup
+    visible="{{showAuth}}"
+    placement="bottom"
+    close-on-overlay-click="{{false}}"
+  >
+    <view class="auth-popup-content">
+      <!-- 弹窗头部 -->
+      <view class="auth-popup-header">
+        <view class="auth-icon-wrapper">
+          <image class="auth-logo" src="/images/logo.png" mode="aspectFit"></image>
+        </view>
+        <text class="auth-popup-title">欢迎使用</text>
+        <text class="auth-popup-subtitle">手指专业检测</text>
       </view>
 
       <!-- 授权说明 -->
-      <view class="auth-section">
-        <view class="auth-title">
-          <text class="title-text">欢迎使用</text>
-        </view>
-
-        <view class="auth-desc">
-          <text class="desc-text">点击开始使用，后续将完善您的个人信息</text>
-        </view>
-      </view>
+      <!-- <view class="auth-description">
+        <text class="desc-text">点击开始使用，后续将完善您的个人信息</text>
+      </view> -->
 
       <!-- 授权按钮 -->
-      <view class="auth-buttons">
-        <button
-          class="auth-btn primary"
+      <view class="auth-actions">
+        <t-button
+          theme="primary"
+          size="large"
+          block
           bindtap="getUserProfile"
           loading="{{loading}}"
           disabled="{{loading}}"
+          style="background: linear-gradient(135deg, #009966 0%, #00BC7D 100%);"
         >
           {{loading ? '注册中...' : '开始使用'}}
-        </button>
+        </t-button>
       </view>
 
       <!-- 隐私说明 -->
-      <view class="privacy-section">
+      <!-- <view class="auth-privacy">
         <text class="privacy-text">
-          授权即表示您同意我们的
+          点击即表示您同意我们的
           <text class="privacy-link">《用户协议》</text>
           和
           <text class="privacy-link">《隐私政策》</text>
         </text>
-      </view>
+      </view> -->
     </view>
-  </view>
+  </t-popup>
 
-  <!-- 成功页面 -->
-  <view class="success-page" wx:if="{{!showAuth}}">
-    <view class="success-content">
-      <view class="success-icon">✅</view>
-      <text class="success-title">注册成功</text>
-      <text class="success-desc">正在跳转到完善信息页面...</text>
-    </view>
-  </view>
 </view> 

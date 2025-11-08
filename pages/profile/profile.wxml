@@ -19,15 +19,18 @@
         <!-- <text class="user-type">普通用户</text> -->
       </view>
     </view>
-    <t-button
-      theme=""
-      bindtap="onFeedback"
-      size="small"
-      class="feedback-btn"
-      style="background-color: #009966; width: 160rpx; color: #fff;"
-    >
-      留言反馈
-    </t-button>
+    <view class="feedback-btn-wrapper">
+      <t-button
+        theme=""
+        bindtap="onFeedback"
+        size="small"
+        class="feedback-btn"
+        style="background-color: #009966; width: 160rpx; color: #fff;"
+      >
+        留言反馈
+      </t-button>
+      <view class="feedback-badge" wx:if="{{stats.unreadFeedback > 0}}"></view>
+    </view>
   </view>
 
   <!-- 统计信息 -->

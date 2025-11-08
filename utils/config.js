@@ -62,7 +62,8 @@ const config = {
       getUsers: '/miniprogram/users', // 获取子用户列表
       createSubUser: '/miniprogram/users', // 创建子用户
       getSubUser: '/miniprogram/subusers', // 获取单个子用户信息
-      updateSubUser: '/miniprogram/subusers' // 更新子用户信息
+      updateSubUser: '/miniprogram/subusers', // 更新子用户信息
+      deleteSubUser: '/miniprogram/subusers' // 删除子用户
     },
 
     // 检测相关
@@ -143,7 +144,8 @@ const config = {
     feedback: {
       list: '/miniprogram/feedback', // 获取反馈列表
       submit: '/miniprogram/feedback', // 提交反馈
-      detail: '/miniprogram/feedback' // 获取反馈详情
+      detail: '/miniprogram/feedback', // 获取反馈详情
+      unreadCount: '/miniprogram/feedback/unread-count' // 获取未读反馈数量
     }
   },
 

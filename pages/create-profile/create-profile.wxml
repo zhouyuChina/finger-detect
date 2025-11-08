@@ -69,21 +69,41 @@
       
       <!-- 档案列表 -->
       <view class="profile-list" wx:if="{{selectedUserProfiles.length > 0}}">
-        <view 
-          class="profile-item" 
-          wx:for="{{selectedUserProfiles}}" 
+        <view
+          class="profile-item"
+          wx:for="{{selectedUserProfiles}}"
           wx:key="id"
-          bindtap="selectProfile"
-          data-profile="{{item}}"
-          data-index="{{index}}"
         >
-          <view class="profile-info">
+          <view class="profile-info" bindtap="selectProfile" data-profile="{{item}}" data-index="{{index}}">
             <view class="profile-name">{{item.name}}</view>
             <view class="profile-meta">
               <text class="meta-item">检测次数: {{item.photoCount}}次</text>
             </view>
           </view>
-          <view class="profile-arrow">></view>
+          <view class="profile-actions">
+            <t-button
+              size="small"
+              variant="outline"
+              bindtap="onEditProfile"
+              data-id="{{item.id}}"
+              data-profile="{{item}}"
+              catchtap="onEditProfile"
+              style="color: #00BC7D;"
+            >
+              编辑
+            </t-button>
+            <t-button
+              size="small"
+              theme="danger"
+              variant="outline"
+              bindtap="onDeleteProfile"
+              data-id="{{item.id}}"
+              data-name="{{item.name}}"
+              catchtap="onDeleteProfile"
+            >
+              删除
+            </t-button>
+          </view>
         </view>
       </view>
 
