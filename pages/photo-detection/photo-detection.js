@@ -27,14 +27,13 @@ Page({
     }
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     
     // 获取传递的档案信息
     if (options.profile) {
       try {
         const profile = JSON.parse(decodeURIComponent(options.profile))
         
-        // 检查档案是否有ID
         if (!profile || !profile.id) {
           console.error('档案信息缺失或缺少ID:', profile)
           this.handleError('档案ID缺失')
@@ -43,24 +42,34 @@ Page({
         
         this.setData({ profile })
         
-        // 检查档案是否有报告
-        this.checkProfileReports(profile.id)
+        try {
+          await this.refreshProfileDetail(profile.id, profile.subUserId, profile.name)
+        } catch (error) {
+          console.warn('刷新档案信息失败，使用传入数据继续。', error)
+        }
+        
+        await this.checkProfileReports(profile.id)
       } catch (error) {
         console.error('解析档案信息失败:', error)
         this.handleError('档案信息获取失败')
       }
-    } else if (options.subUserId && options.archiveId && options.archiveName) {
-      // 从record-gallery页面跳转过来的情况
+    } else if (options.subUserId && options.archiveId) {
+      // 从其他页面跳转，仅携带ID的情况
       const profile = {
         id: options.archiveId,
-        name: decodeURIComponent(options.archiveName),
+        name: options.archiveName ? decodeURIComponent(options.archiveName) : '',
         subUserId: options.subUserId,
         photoCount: 0 // 初始化为0，需要重新获取真实数据
       }
       this.setData({ profile })
       
-      // 需要重新检查档案的真实检测数量
-      this.checkProfileReports(profile.id)
+      try {
+        await this.refreshProfileDetail(profile.id, profile.subUserId, profile.name)
+      } catch (error) {
+        console.warn('刷新档案信息失败，使用传入数据继续。', error)
+      }
+      
+      await this.checkProfileReports(profile.id)
     } else {
       // 没有档案信息的情况（未登录用户或直接访问）
       
@@ -78,15 +87,12 @@ Page({
         })
       } else {
         // 已登录但没有档案信息
-        // 如果没有照片路径参数，跳转到档案选择页面
-        // 如果有照片路径参数，说明是拍照后返回，允许继续
         if (!options.photoPath) {
           wx.redirectTo({
             url: '/pages/create-profile/create-profile'
           })
           return
         } else {
-          // 有照片但没有档案，设置加载完成状态
           this.setData({ 
             loading: false,
             profile: null 
@@ -101,7 +107,54 @@ Page({
         photoTaken: true,
         photoPath: decodeURIComponent(options.photoPath)
       })
-    } else {
+    }
+  },
+
+  async refreshProfileDetail(archiveId, fallbackSubUserId = '', fallbackName = '') {
+    if (!archiveId) {
+      return null
+    }
+    
+    try {
+      const response = await api.profile.getDetail(archiveId)
+      
+      if (response.success && response.data) {
+        const archive = response.data.archive || response.data
+        const normalizedProfile = this.normalizeArchiveProfile(archive, fallbackName, fallbackSubUserId)
+        
+        this.setData({
+          profile: {
+            ...this.data.profile,
+            ...normalizedProfile
+          }
+        })
+        
+        return normalizedProfile
+      }
+      
+      throw new Error(response.message || '获取档案详情失败')
+    } catch (error) {
+      console.error('加载档案详情失败:', error)
+      wx.showToast({
+        title: error.message || '档案信息获取失败',
+        icon: 'none'
+      })
+      throw error
+    }
+  },
+
+  normalizeArchiveProfile(archive = {}, fallbackName = '', fallbackSubUserId = '') {
+    const currentProfile = this.data.profile || {}
+    
+    return {
+      id: archive.id || archive.archiveId || archive._id || currentProfile.id,
+      name: archive.archiveName || archive.name || fallbackName || currentProfile.name || '',
+      subUserId: archive.subUserId || archive.userId || fallbackSubUserId || currentProfile.subUserId || '',
+      bodyPart: archive.bodyPart || archive.body_part || currentProfile.bodyPart || currentProfile.originalData?.bodyPart || '',
+      detailPart: archive.detailPart || archive.detail_part || currentProfile.detailPart || currentProfile.originalData?.detailPart || '',
+      photoCount: archive.photoCount || archive.totalDetections || archive.detectionCount || currentProfile.photoCount || 0,
+      username: archive.subUserName || archive.username || currentProfile.username || '',
+      originalData: Object.keys(archive || {}).length ? archive : currentProfile.originalData
     }
   },
 
@@ -230,6 +283,15 @@ Page({
         return
       }
       
+      if (!profile.subUserId) {
+        console.warn('子用户ID缺失，无法查询检测记录')
+        this.setData({ 
+          hasReports: false,
+          loading: false
+        })
+        return
+      }
+      
       // 获取档案的真实检测数量
       const response = await api.profile.getArchiveDetections({
         subUserId: profile.subUserId,
@@ -242,8 +304,9 @@ Page({
       let hasReports = false
       let actualPhotoCount = 0
       
-      if (response.success && response.data && response.data.images) {
-        actualPhotoCount = response.data.images.length
+      if (response.success && response.data) {
+        const records = response.data.images || response.data.detections || []
+        actualPhotoCount = records.length
         hasReports = actualPhotoCount > 0
         
         // 更新档案的photoCount
@@ -646,7 +709,7 @@ Page({
       const saveData = {
         subUserId: profile.subUserId, // 子用户ID（必填）
         archiveId: profile.id, // 档案ID（必填）
-        detectionType: this.getDetectionType(profile.name), // 获取检测类型
+        detectionType: this.getDetectionType(profile), // 获取检测类型
         base64Image: base64Image, // base64图片数据（必填）
         remark: '仅保存图片' // 备注信息
       }
@@ -666,7 +729,7 @@ Page({
         // 延迟跳转到记录页面
         setTimeout(() => {
           wx.redirectTo({
-            url: `/pages/record-gallery/record-gallery?subUserId=${profile.subUserId}&archiveId=${profile.id}&archiveName=${encodeURIComponent(profile.name)}`
+            url: `/pages/record-gallery/record-gallery?subUserId=${profile.subUserId}&archiveId=${profile.id}`
           })
         }, 1500)
       } else {
@@ -717,7 +780,7 @@ Page({
         const detectionData = {
           subUserId: profile.subUserId, // 子用户ID（必填）
           archiveId: profile.id, // 档案ID（必填）
-          detectionType: this.getDetectionType(profile.name), // 获取检测类型
+          detectionType: this.getDetectionType(profile), // 获取检测类型
           base64Image: base64Image // base64图片数据（必填）
         }
 
@@ -832,12 +895,12 @@ Page({
       const base64Image = await this.convertImageToBase64(this.data.photoPath)
       
       // 准备检测数据
-      const detectionData = {
-        subUserId: profile.subUserId, // 子用户ID（必填）
-        archiveId: profile.id, // 档案ID（必填）
-        detectionType: this.getDetectionType(profile.name), // 检测类型
-        base64Image: base64Image // base64图片数据（必填）
-      }
+        const detectionData = {
+          subUserId: profile.subUserId, // 子用户ID（必填）
+          archiveId: profile.id, // 档案ID（必填）
+          detectionType: this.getDetectionType(profile), // 检测类型
+          base64Image: base64Image // base64图片数据（必填）
+        }
 
       
       // 调用检测接口
@@ -952,46 +1015,24 @@ Page({
   },
 
   // 获取检测类型
-  getDetectionType(archiveName) {
-    // 根据档案名称映射到检测类型
-    const detectionTypeMap = {
-      // 左手检测类型
-      '左手大拇指': 'left_hand_thumb',
-      '左手食指': 'left_hand_index',
-      '左手中指': 'left_hand_middle',
-      '左手无名指': 'left_hand_ring',
-      '左手小指': 'left_hand_little',
-      
-      // 右手检测类型
-      '右手大拇指': 'right_hand_thumb',
-      '右手食指': 'right_hand_index',
-      '右手中指': 'right_hand_middle',
-      '右手无名指': 'right_hand_ring',
-      '右手小指': 'right_hand_little',
-      
-      // 左脚检测类型
-      '左脚大脚趾': 'left_foot_big',
-      '左脚第二脚趾': 'left_foot_second',
-      '左脚第三脚趾': 'left_foot_third',
-      '左脚第四脚趾': 'left_foot_fourth',
-      '左脚小脚趾': 'left_foot_little',
-      
-      // 右脚检测类型
-      '右脚大脚趾': 'right_foot_big',
-      '右脚第二脚趾': 'right_foot_second',
-      '右脚第三脚趾': 'right_foot_third',
-      '右脚第四脚趾': 'right_foot_fourth',
-      '右脚小脚趾': 'right_foot_little'
-    }
-    
-    const detectionType = detectionTypeMap[archiveName]
-    
-    if (!detectionType) {
-      console.warn('未找到对应的检测类型，使用默认值 left_hand_thumb')
+  getDetectionType(profile) {
+    if (!profile) {
+      console.warn('档案信息缺失，使用默认检测类型 left_hand_thumb')
       return 'left_hand_thumb'
     }
     
-    return detectionType
+    const bodyPart = profile.bodyPart || profile.originalData?.bodyPart
+    if (bodyPart) {
+      return bodyPart
+    }
+    
+    const archiveName = profile.name || profile.archiveName
+    if (!archiveName) {
+      console.warn('档案缺少名称，使用默认检测类型 left_hand_thumb')
+      return 'left_hand_thumb'
+    }
+    
+    return this.getBodyPartValue(archiveName)
   },
 
   // 获取身体部位值（用于档案接口）

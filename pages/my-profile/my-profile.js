@@ -342,7 +342,7 @@ ${profile.updateTime}`;
             id: userData.id,
             name: name,
             gender: this.formatGenderText(userData.gender),
-            age: userData.age || '',
+            age: userData.age ? String(userData.age) : '',
             address: userData.address || '',
             relationship: this.getRelationshipFromUser(userData)
           },
@@ -354,7 +354,8 @@ ${profile.updateTime}`;
         this.setData({
           editingProfile: {
             ...profile,
-            gender: this.formatGenderText(profile.gender)
+            gender: this.formatGenderText(profile.gender),
+            age: profile.age ? String(profile.age) : ''
           },
           showEditPopup: true
         });
@@ -370,7 +371,8 @@ ${profile.updateTime}`;
       this.setData({
         editingProfile: {
           ...profile,
-          gender: this.formatGenderText(profile.gender)
+          gender: this.formatGenderText(profile.gender),
+          age: profile.age ? String(profile.age) : ''
         },
         showEditPopup: true
       });
@@ -435,18 +437,30 @@ ${profile.updateTime}`;
 
   // 编辑年龄
   editAge() {
+    console.log('=== 编辑年龄被调用 ===')
+    console.log('当前 editingProfile:', this.data.editingProfile)
+
+    // 确保 age 是字符串格式，避免 showModal 无法正常显示
+    const currentAge = this.data.editingProfile.age
+    const ageString = currentAge ? String(currentAge) : ''
+
+    console.log('当前年龄值:', currentAge, '转换后:', ageString)
+
     wx.showModal({
       title: '设置年龄',
       editable: true,
       placeholderText: '请输入年龄',
-      content: this.data.editingProfile.age,
+      content: ageString,
       success: (res) => {
-        if (res.confirm && res.content.trim()) {
+        console.log('Modal 回调:', res)
+        if (res.confirm && res.content && res.content.trim()) {
           const age = parseInt(res.content.trim());
+          console.log('解析的年龄:', age)
           if (age > 0 && age < 150) {
             this.setData({
               'editingProfile.age': age.toString()
             });
+            console.log('年龄更新成功:', age)
           } else {
             wx.showToast({
               title: '请输入有效年龄',

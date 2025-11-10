@@ -60,6 +60,7 @@
               bindtap="onEditProfile" 
               data-id="{{item.id}}"
               catchtap="onEditProfile"
+              style="color: #00BC7D;"
             >
               编辑
             </t-button>

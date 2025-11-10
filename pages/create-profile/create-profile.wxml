@@ -83,25 +83,16 @@
           <view class="profile-actions">
             <t-button
               size="small"
+              theme="primary"
               variant="outline"
               bindtap="onEditProfile"
-              data-id="{{item.id}}"
-              data-profile="{{item}}"
               catchtap="onEditProfile"
-              style="color: #00BC7D;"
-            >
-              编辑
-            </t-button>
-            <t-button
-              size="small"
-              theme="danger"
-              variant="outline"
-              bindtap="onDeleteProfile"
               data-id="{{item.id}}"
               data-name="{{item.name}}"
-              catchtap="onDeleteProfile"
+              data-profile="{{item}}"
+              style="color: #00BC7D;"
             >
-              删除
+              修改
             </t-button>
           </view>
         </view>
@@ -439,12 +430,12 @@
     bind:close="closeBodyPartPopup"
     customStyle="width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; top: 0; left: 0;"
   >
-    <view class="popup-content new-design fullscreen">
-      <view class="popup-header fullscreen-header">
-        <view class="header-left"></view>
-        <text class="popup-title">选择部位类型</text>
-        <text class="popup-close" bindtap="closeBodyPartPopup">✕</text>
-      </view>
+      <view class="popup-content new-design fullscreen">
+        <view class="popup-header fullscreen-header">
+          <view class="header-left"></view>
+          <text class="popup-title">{{isEditingArchive ? '修改档案部位' : '选择部位类型'}}</text>
+          <text class="popup-close" bindtap="closeBodyPartPopup">✕</text>
+        </view>
 
       <view class="body-part-section">
         <!-- 手部/脚部选择 -->
@@ -611,7 +602,9 @@
           </view>
         </view>
 
-        <view class="instruction-text">为照片选择对应的{{selectedPartType === 'hand' ? '手指' : '脚趾'}}</view>
+        <view class="instruction-text">
+          {{isEditingArchive ? '为档案重新选择' : '为照片选择对应的'}}{{selectedPartType === 'hand' ? '手指' : '脚趾'}}
+        </view>
       </view>
     </view>
   </t-popup>

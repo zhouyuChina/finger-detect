@@ -379,7 +379,7 @@ Page({
     if (record) {
       // 跳转到档案图片墙页面
       wx.navigateTo({
-        url: `/pages/record-gallery/record-gallery?subUserId=${record.subUserId || ''}&archiveName=${encodeURIComponent(record.name)}&archiveId=${id}`
+        url: `/pages/record-gallery/record-gallery?subUserId=${record.subUserId || ''}&archiveId=${id}`
       })
     }
   },

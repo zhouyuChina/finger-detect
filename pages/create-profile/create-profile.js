@@ -32,6 +32,9 @@ Page({
     
     // 档案相关
     selectedProfile: null, // 当前选择的档案
+    isEditingArchive: false, // 是否处于档案编辑模式
+    editingArchiveId: '', // 正在编辑的档案ID
+    editingArchiveOriginalName: '', // 编辑前的档案名称
 
     // 弹窗控制
     showUserSelector: false,
@@ -364,10 +367,14 @@ Page({
     }
 
     return archives.map(archive => {
+      const totalDetections = this.getArchiveDetectionCountFromData(archive)
+
       return {
         id: archive.id,
         name: archive.archiveName,
-        photoCount: archive.photoCount || 0,
+        bodyPart: archive.bodyPart || archive.body_part || '',
+        detailPart: archive.detailPart || archive.detail_part || '',
+        photoCount: typeof totalDetections === 'number' ? totalDetections : 0,
         detectionTime: archive.detectionTime,
         createdAt: archive.createdAt,
         updatedAt: archive.updatedAt,
@@ -434,6 +441,103 @@ Page({
       'rightFoot': 'fingerprint'
     }
     return valueMap[bodyPart] || 'fingerprint'
+  },
+
+  getArchiveDetectionCountFromData(archiveData = {}) {
+    if (!archiveData || typeof archiveData !== 'object') {
+      return null
+    }
+
+    const candidates = [
+      archiveData.totalDetections,
+      archiveData.photoCount,
+      archiveData.detectionCount,
+      archiveData.recordCount,
+      archiveData.statistics?.totalDetections
+    ]
+
+    for (const value of candidates) {
+      if (typeof value === 'number' && !Number.isNaN(value)) {
+        return value
+      }
+    }
+    return null
+  },
+
+  // 根据档案信息推断部位选择
+  getArchiveSelectionFromProfile(profile = {}) {
+    const archiveName = profile.name || profile.archiveName || ''
+    const selectionByName = this.parseArchiveNameSelection(archiveName)
+    if (selectionByName) {
+      return selectionByName
+    }
+
+    const bodyPartValue = profile.bodyPart || profile.body_part || profile.originalData?.bodyPart
+    const detailValue = profile.detailPart || profile.detail_part || profile.originalData?.detailPart
+    const selectionByValue = this.parseArchiveBodyValueSelection(bodyPartValue, detailValue)
+    if (selectionByValue) {
+      return selectionByValue
+    }
+
+    // 默认返回左手大拇指
+    const defaultBodyPart = this.data.bodyParts[0]
+    return {
+      bodyPart: defaultBodyPart,
+      partType: 'hand',
+      detailPart: this.data.fingerParts[0]
+    }
+  },
+
+  parseArchiveNameSelection(archiveName = '') {
+    if (!archiveName) return null
+
+    const { bodyParts, fingerParts, toeParts } = this.data
+    for (const candidate of bodyParts) {
+      if (archiveName.startsWith(candidate.name)) {
+        const partType = candidate.value.includes('Hand') ? 'hand' : 'foot'
+        const detailList = partType === 'hand' ? fingerParts : toeParts
+        const detailName = archiveName.slice(candidate.name.length)
+        const detailPart = detailList.find(item => item.name && detailName.includes(item.name)) || detailList[0]
+        return {
+          bodyPart: candidate,
+          partType,
+          detailPart
+        }
+      }
+    }
+    return null
+  },
+
+  parseArchiveBodyValueSelection(bodyPartValue = '', detailValue = '') {
+    if (!bodyPartValue) return null
+
+    const lowerValue = bodyPartValue.toLowerCase()
+    let matchedBodyPart = null
+
+    if (lowerValue.includes('left_hand')) {
+      matchedBodyPart = this.data.bodyParts[0]
+    } else if (lowerValue.includes('right_hand')) {
+      matchedBodyPart = this.data.bodyParts[1]
+    } else if (lowerValue.includes('left_foot')) {
+      matchedBodyPart = this.data.bodyParts[2]
+    } else if (lowerValue.includes('right_foot')) {
+      matchedBodyPart = this.data.bodyParts[3]
+    }
+
+    if (!matchedBodyPart) {
+      return null
+    }
+
+    const partType = matchedBodyPart.value.includes('Hand') ? 'hand' : 'foot'
+    const detailList = partType === 'hand' ? this.data.fingerParts : this.data.toeParts
+    const detailKey = detailValue || lowerValue.split('_').pop()
+    const detailPart = detailList.find(item => item.value === detailKey) || detailList[0]
+
+    return {
+      bodyPart: matchedBodyPart,
+      partType,
+      detailPart
+    }
   },
 
   // 处理错误
@@ -605,13 +709,19 @@ Page({
     this.setData({
       showBodyPartPopup: true,
       selectedBodyPart: this.data.bodyParts[0], // 左手
-      selectedPartType: 'hand'
+      selectedPartType: 'hand',
+      isEditingArchive: false,
+      editingArchiveId: '',
+      editingArchiveOriginalName: ''
     });
   },
 
   // 为档案列表加载检测次数
-  async loadDetectionCounts(profiles) {
+  async loadDetectionCounts(profiles = []) {
     try {
+      if (!Array.isArray(profiles) || profiles.length === 0) {
+        return
+      }
       
       const selectedUser = this.data.selectedUser
       if (!selectedUser || !selectedUser.id) {
@@ -619,48 +729,42 @@ Page({
         return
       }
       
-      // 一次性获取所有检测记录，然后按档案名称分组统计
-      try {
-        // 使用当前选中的用户ID，而不是currentSubUser.id
-        const subUserId = selectedUser.id
-        
-        const detectionResponse = await api.detection.getList({
-          subUserId: subUserId
-        })
-        
-        
-        if (detectionResponse.success && detectionResponse.data) {
-          const detections = detectionResponse.data.detections || detectionResponse.data || []
-          
-          // 按档案名称统计检测次数
-          const detectionCounts = {}
-          detections.forEach(detection => {
-            const archiveName = detection.archiveName
-            if (archiveName) {
-              detectionCounts[archiveName] = (detectionCounts[archiveName] || 0) + 1
-            }
-          })
-          
-          
-          // 更新每个档案的检测次数
-          profiles.forEach((profile, index) => {
-            const count = detectionCounts[profile.name] || 0
-            profiles[index].photoCount = count
-          })
-        } else {
-          console.warn('获取检测记录失败:', detectionResponse)
-          // 如果获取失败，所有档案的检测次数设为0
-          profiles.forEach((profile, index) => {
-            profiles[index].photoCount = 0
-          })
+      const subUserId = selectedUser.id
+      
+      const countTasks = profiles.map(async (profile, index) => {
+        if (!profile || !profile.id) {
+          return
         }
-      } catch (error) {
-        console.error('获取检测记录出错:', error)
-        // 如果出错，所有档案的检测次数设为0
-        profiles.forEach((profile, index) => {
-          profiles[index].photoCount = 0
-        })
-      }
+        
+        const cachedCount = this.getArchiveDetectionCountFromData(profile.originalData)
+        if (typeof cachedCount === 'number') {
+          profiles[index].photoCount = cachedCount
+          return
+        }
+        
+        try {
+          const response = await api.profile.getArchiveDetections({
+            subUserId: subUserId,
+            archiveId: profile.id,
+            page: 1,
+            limit: 1
+          })
+          
+          if (response.success && response.data) {
+            const totalDetections = (
+              response.data.statistics?.totalDetections ??
+              response.data.pagination?.total ??
+              (Array.isArray(response.data.images) ? response.data.images.length : null)
+            )
+            
+            profiles[index].photoCount = typeof totalDetections === 'number' ? totalDetections : (profiles[index].photoCount || 0)
+          }
+        } catch (error) {
+          console.error(`获取档案 ${profile.name} 的检测次数失败:`, error)
+        }
+      })
+      
+      await Promise.all(countTasks)
       
     } catch (error) {
       console.error('加载检测次数失败:', error)
@@ -697,6 +801,14 @@ Page({
     const part = e.currentTarget.dataset.part;
     const bodyPart = this.data.selectedBodyPart;
 
+    if (!bodyPart) {
+      wx.showToast({
+        title: '请先选择左右部位',
+        icon: 'none'
+      })
+      return
+    }
+
     // 获取用户信息
     const selectedUser = this.data.selectedUser;
 
@@ -720,14 +832,71 @@ Page({
 
     // 准备档案数据
     const archiveName = `${bodyPart.name}${part.name}`
+    const bodyPartValue = this.getBodyPartValueFromArchiveName(archiveName)
 
     // 使用当前选中的用户ID，而不是currentSubUser.id
     const subUserId = selectedUser.id
 
+    if (this.data.isEditingArchive && this.data.editingArchiveId) {
+      if (archiveName === this.data.editingArchiveOriginalName) {
+        wx.showToast({
+          title: '档案名称未变化',
+          icon: 'none'
+        })
+        return
+      }
+
+      try {
+        wx.showLoading({
+          title: '保存中...',
+          mask: true
+        })
+
+        const response = await api.profile.update(this.data.editingArchiveId, {
+          archiveName,
+          bodyPart: bodyPartValue
+        })
+
+        wx.hideLoading()
+
+        if (response.success) {
+          wx.showToast({
+            title: '修改成功',
+            icon: 'success'
+          })
+
+          if (this.data.selectedUser && this.data.selectedUser.id) {
+            await this.loadUserProfiles(this.data.selectedUser.id)
+          }
+
+          this.setData({
+            isEditingArchive: false,
+            editingArchiveId: '',
+            editingArchiveOriginalName: '',
+            showBodyPartPopup: false,
+            showDetailPartPopup: false
+          })
+        } else {
+          wx.showToast({
+            title: response.message || '修改失败',
+            icon: 'none'
+          })
+        }
+      } catch (error) {
+        wx.hideLoading()
+        console.error('修改档案失败:', error)
+        wx.showToast({
+          title: '修改失败，请重试',
+          icon: 'none'
+        })
+      }
+      return
+    }
+
     const archiveData = {
       subUserId: subUserId,
       archiveName: archiveName,
-      bodyPart: this.getBodyPartValueFromArchiveName(archiveName)
+      bodyPart: bodyPartValue
     }
 
     // 创建档案
@@ -778,7 +947,10 @@ Page({
       this.setData({
         selectedProfile: formattedArchive,
         showDetailPartPopup: false,
-        showBodyPartPopup: false
+        showBodyPartPopup: false,
+        isEditingArchive: false,
+        editingArchiveId: '',
+        editingArchiveOriginalName: ''
       })
 
       // 显示成功提示
@@ -1423,7 +1595,12 @@ Page({
   },
 
   closeBodyPartPopup() {
-    this.setData({ showBodyPartPopup: false });
+    this.setData({ 
+      showBodyPartPopup: false,
+      isEditingArchive: false,
+      editingArchiveId: '',
+      editingArchiveOriginalName: ''
+    });
   },
 
   closeDetailPartPopup() {
@@ -1468,11 +1645,10 @@ Page({
   // 编辑档案
   async onEditProfile(e) {
     const profileId = e.currentTarget.dataset.id
-    const profile = e.currentTarget.dataset.profile
+    const profile = e.currentTarget.dataset.profile ||
+      this.data.selectedUserProfiles.find(item => item.id === profileId)
 
-    console.log('编辑档案:', profileId, profile)
-
-    if (!profileId) {
+    if (!profileId || !profile) {
       wx.showToast({
         title: '档案信息错误',
         icon: 'none'
@@ -1480,60 +1656,23 @@ Page({
       return
     }
 
-    // 显示确认弹窗,说明编辑会删除旧档案并创建新档案
-    wx.showModal({
-      title: '编辑档案',
-      content: `编辑档案将删除原档案"${profile.name}"并创建新档案。是否继续?`,
-      confirmText: '继续',
-      cancelText: '取消',
-      success: async (res) => {
-        if (res.confirm) {
-          try {
-            // 先删除旧档案
-            wx.showLoading({
-              title: '准备编辑...',
-              mask: true
-            })
+    const selection = this.getArchiveSelectionFromProfile(profile)
+    const detailParts = selection.partType === 'hand' ? this.data.fingerParts : this.data.toeParts
 
-            const deleteResponse = await api.profile.delete(profileId)
+    this.setData({
+      isEditingArchive: true,
+      editingArchiveId: profileId,
+      editingArchiveOriginalName: profile.name || profile.archiveName || '',
+      selectedBodyPart: selection.bodyPart,
+      selectedPartType: selection.partType,
+      detailParts,
+      showBodyPartPopup: true,
+      showDetailPartPopup: false
+    })
 
-            if (!deleteResponse.success) {
-              wx.hideLoading()
-              wx.showToast({
-                title: deleteResponse.message || '删除旧档案失败',
-                icon: 'none'
-              })
-              return
-            }
-
-            wx.hideLoading()
-
-            // 重新加载档案列表
-            if (this.data.selectedUser && this.data.selectedUser.id) {
-              await this.loadUserProfiles(this.data.selectedUser.id)
-            }
-
-            // 打开部位选择弹窗,让用户重新选择部位创建新档案
-            this.setData({
-              showBodyPartPopup: true,
-              selectedBodyPart: this.data.bodyParts[0], // 默认左手
-              selectedPartType: 'hand'
-            })
-
-            wx.showToast({
-              title: '请选择新的部位',
-              icon: 'none'
-            })
-          } catch (error) {
-            wx.hideLoading()
-            console.error('编辑档案准备失败:', error)
-            wx.showToast({
-              title: '编辑失败,请重试',
-              icon: 'none'
-            })
-          }
-        }
-      }
+    wx.showToast({
+      title: '请选择新的部位',
+      icon: 'none'
     })
   },
 

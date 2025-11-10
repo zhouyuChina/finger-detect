@@ -33,25 +33,40 @@ Page({
 
   onLoad(options) {
     const { subUserId, archiveId, archiveName } = options
+    const decodedName = archiveName ? decodeURIComponent(archiveName) : ''
     
     this.setData({
       subUserId: subUserId || '',
       archiveId: archiveId || '',
-      archiveName: decodeURIComponent(archiveName || '')
+      archiveName: decodedName
     })
     
-    // 设置导航栏标题
-    wx.setNavigationBarTitle({
-      title: `${decodeURIComponent(archiveName || '')} - 检测历史`
-    })
+    this.updateNavigationTitle(decodedName)
+    
+    if (!archiveId) {
+      common.showError('缺少档案ID，无法加载检测记录')
+      return
+    }
+    
+    if (!subUserId) {
+      common.showError('缺少用户信息，无法加载检测记录')
+      return
+    }
     
     // 加载档案检测记录
     this.loadArchiveDetections()
   },
 
   onShow() {
-    // 页面显示时刷新数据
-    this.loadArchiveDetections()
+    if (this.data.archiveId && this.data.subUserId) {
+      this.loadArchiveDetections()
+    }
+  },
+
+  // 更新导航栏标题
+  updateNavigationTitle(name) {
+    const title = name ? `${name} - 检测历史` : '检测历史'
+    wx.setNavigationBarTitle({ title })
   },
 
   // 加载档案检测记录
@@ -59,9 +74,16 @@ Page({
     try {
       this.setData({ loading: true })
       
+      const { archiveId, subUserId } = this.data
+      if (!archiveId || !subUserId) {
+        common.showError('档案信息不完整，无法获取检测记录')
+        this.setData({ loading: false })
+        return
+      }
+      
       const params = {
-        subUserId: this.data.subUserId,
-        archiveId: this.data.archiveId,
+        subUserId,
+        archiveId,
         page: this.data.pagination.page,
         limit: this.data.pagination.limit
       }
@@ -70,11 +92,11 @@ Page({
       const response = await api.profile.getArchiveDetections(params)
       
       if (response.success && response.data) {
-        const { report, images, pagination, subUser } = response.data
-        
+        const { report, pagination, subUser } = response.data
+        const rawDetections = response.data.images || response.data.detections || []
         
         // 格式化检测记录
-        const formattedDetections = this.formatDetections(images)
+        const formattedDetections = this.formatDetections(rawDetections)
         
         
         // 设置首次检测图片数据（按时间排序，获取最早的检测记录）
@@ -89,15 +111,24 @@ Page({
         const firstDetectionImage = firstDetection ? firstDetection.imagePath : ''
         const firstDetectionDate = firstDetection ? firstDetection.uploadTime : ''
         
+        const archiveInfo = report?.archive || report || {}
+        const resolvedArchiveId = archiveInfo.id || archiveInfo.archiveId || archiveInfo._id || this.data.archiveId
+        const resolvedArchiveName = archiveInfo.archiveName || archiveInfo.name || this.data.archiveName
+        const resolvedSubUserId = archiveInfo.subUserId || archiveInfo.userId || subUser?.id || this.data.subUserId
         
         this.setData({
-          archive: report || {},
+          archive: archiveInfo,
+          archiveId: resolvedArchiveId,
+          archiveName: resolvedArchiveName,
+          subUserId: resolvedSubUserId,
           detections: sortedDetections,  // 使用排序后的检测记录
           firstDetectionImage: firstDetectionImage,
           firstDetectionDate: firstDetectionDate,
           pagination: pagination || this.data.pagination,
           currentIndex: Math.max(0, sortedDetections.length - 1) // 默认显示最后一张图片
         })
+        
+        this.updateNavigationTitle(resolvedArchiveName)
         
         // 如果有检测记录，滚动到最后一张图片的位置
         if (sortedDetections.length > 0) {
@@ -261,16 +292,17 @@ Page({
   onNewPhoto() {
     // 跳转到拍照检测页面
     wx.navigateTo({
-      url: `/pages/photo-detection/photo-detection?subUserId=${this.data.subUserId}&archiveId=${this.data.archiveId}&archiveName=${encodeURIComponent(this.data.archiveName)}`
+      url: `/pages/photo-detection/photo-detection?subUserId=${this.data.subUserId}&archiveId=${this.data.archiveId}`
     })
   },
 
   // 分享给朋友
   onShareAppMessage() {
     const { archiveName, detections } = this.data
+    const title = archiveName ? `${archiveName} - 检测历史` : '检测历史'
     return {
-      title: `${archiveName} - 检测历史`,
-      path: `/pages/record-gallery/record-gallery?subUserId=${this.data.subUserId}&archiveName=${encodeURIComponent(archiveName)}&archiveId=${this.data.archiveId}`,
+      title,
+      path: `/pages/record-gallery/record-gallery?subUserId=${this.data.subUserId}&archiveId=${this.data.archiveId}`,
       imageUrl: detections.length > 0 ? detections[0].imagePath : ''
     }
   },
@@ -279,7 +311,7 @@ Page({
   onShareTimeline() {
     const { archiveName, detections } = this.data
     return {
-      title: `${archiveName} - 检测历史`,
+      title: archiveName ? `${archiveName} - 检测历史` : '检测历史',
       imageUrl: detections.length > 0 ? detections[0].imagePath : ''
     }
   },
