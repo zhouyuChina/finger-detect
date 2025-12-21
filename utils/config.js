@@ -1,15 +1,15 @@
 // 环境配置 - 可以在这里切换环境
 const ENV_CONFIG = {
   LOCAL: {
-    baseUrl: 'localhost:4000',
+    baseUrl: 'blkmedical.com.cn',
     name: '本地环境'
   },
   TEST: {
-    baseUrl: 'test.yiloud.com',
+    baseUrl: 'blkmedical.com.cn',
     name: '测试环境'
   },
   PRODUCTION: {
-    baseUrl: 'nail.yiloud.com',
+    baseUrl: 'blkmedical.com.cn',
     name: '生产环境'
   }
 }
