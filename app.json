@@ -59,6 +59,14 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.camera": {
+      "desc": "用于拍摄指甲照片进行健康检测"
+    },
+    "scope.userLocation": {
+      "desc": "用于自动获取当前位置并快速填写省市区信息"
+    }
+  },
   "__usePrivacyCheck__": true,
   "requiredPrivateInfos": [
     "chooseLocation"
