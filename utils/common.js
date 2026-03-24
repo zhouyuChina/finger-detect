@@ -6,6 +6,8 @@ const formatTime = (date, format = 'YYYY-MM-DD HH:mm:ss') => {
   if (!date) return ''
 
   const d = new Date(date)
+  if (isNaN(d.getTime())) return ''
+
   const year = d.getFullYear()
   const month = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
@@ -29,6 +31,7 @@ const formatTimeRelative = (timeStr) => {
 
   try {
     const date = new Date(timeStr)
+    if (isNaN(date.getTime())) return ''
     const now = new Date()
     const diff = now - date
 
@@ -85,6 +88,7 @@ const formatTimeShort = (timeStr) => {
 
   try {
     const date = new Date(timeStr)
+    if (isNaN(date.getTime())) return ''
     const now = new Date()
     const diff = now - date
 
@@ -123,6 +127,7 @@ const formatTimeChinese = (timeStr, includeTime = true) => {
 
   try {
     const date = new Date(timeStr)
+    if (isNaN(date.getTime())) return ''
     const year = date.getFullYear()
     const month = date.getMonth() + 1
     const day = date.getDate()
@@ -150,6 +155,7 @@ const formatTimeLocale = (timeStr, options = {}) => {
 
   try {
     const date = new Date(timeStr)
+    if (isNaN(date.getTime())) return ''
     const defaultOptions = {
       year: 'numeric',
       month: '2-digit',
@@ -167,6 +173,7 @@ const formatTimeLocale = (timeStr, options = {}) => {
 
 // 格式化数字
 const formatNumber = n => {
+  if (n === null || n === undefined) return '00'
   n = n.toString()
   return n[1] ? n : `0${n}`
 }
@@ -198,16 +205,18 @@ const throttle = (func, limit = 300) => {
   }
 }
 
-// 深拷贝
-const deepClone = (obj) => {
+// 深拷贝（支持循环引用检测）
+const deepClone = (obj, _visited = new WeakSet()) => {
   if (obj === null || typeof obj !== 'object') return obj
+  if (_visited.has(obj)) throw new Error('Circular reference detected')
+  _visited.add(obj)
   if (obj instanceof Date) return new Date(obj.getTime())
-  if (obj instanceof Array) return obj.map(item => deepClone(item))
+  if (obj instanceof Array) return obj.map(item => deepClone(item, _visited))
   if (typeof obj === 'object') {
     const clonedObj = {}
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        clonedObj[key] = deepClone(obj[key])
+        clonedObj[key] = deepClone(obj[key], _visited)
       }
     }
     return clonedObj
@@ -239,7 +248,7 @@ const validateIdCard = (idCard) => {
 
 // 获取文件大小格式化
 const formatFileSize = (bytes) => {
-  if (bytes === 0) return '0 B'
+  if (!bytes || bytes <= 0) return '0 B'
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))

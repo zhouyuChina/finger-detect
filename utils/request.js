@@ -10,6 +10,7 @@ class Request {
     this.requestQueue = [] // 请求队列
     this.isRefreshing = false // 是否正在刷新token
     this.isGettingToken = false // 是否正在获取token
+    this._tokenPromise = null // 共享的 token 获取 Promise
   }
 
   // 获取请求头
@@ -20,13 +21,13 @@ class Request {
 
     // 添加token（只有在有token时才添加）
     const token = storage.getToken()
-    if (token && token !== 'undefined' && token !== 'null') {
+    if (token && typeof token === 'string' && token !== 'undefined' && token !== 'null') {
       headers['Authorization'] = `Bearer ${token}`
     }
 
     // 添加openId（只有在有openId时才添加）
     const openId = storage.getOpenId()
-    if (openId && openId !== 'undefined' && openId !== 'null') {
+    if (openId && typeof openId === 'string' && openId !== 'undefined' && openId !== 'null') {
       headers['X-Openid'] = openId
     }
 
@@ -38,26 +39,25 @@ class Request {
     return !!storage.getToken()
   }
 
-  // 获取小程序token
+  // 获取小程序token（使用 Promise 队列替代忙等待轮询）
   async getToken() {
-    if (this.isGettingToken) {
-      // 如果正在获取token，等待完成
-      return new Promise((resolve, reject) => {
-        const checkToken = () => {
-          if (this.hasToken()) {
-            resolve()
-          } else if (!this.isGettingToken) {
-            reject(new Error('获取token失败'))
-          } else {
-            setTimeout(checkToken, 100)
-          }
-        }
-        checkToken()
-      })
+    if (this._tokenPromise) {
+      return this._tokenPromise
     }
 
     this.isGettingToken = true
+    this._tokenPromise = this._fetchToken()
 
+    try {
+      await this._tokenPromise
+    } finally {
+      this.isGettingToken = false
+      this._tokenPromise = null
+    }
+  }
+
+  // 实际的 token 获取逻辑
+  async _fetchToken() {
     try {
       const response = await new Promise((resolve, reject) => {
         wx.request({
@@ -71,36 +71,24 @@ class Request {
 
       if (response.statusCode === 200) {
         const data = response.data
-        
+        let token = null
+
         // 检查响应格式
         if (data.success) {
-          // 成功格式：{success: true, data: {...}, message: "xxx"}
-          if (data.data && data.data.token) {
-            const token = data.data.token
-            storage.setToken(token)
-          } else if (data.data && data.data.access_token) {
-            // 有些接口使用access_token字段
-            const token = data.data.access_token
-            storage.setToken(token)
-          }
+          token = (data.data && data.data.token) || (data.data && data.data.access_token)
         } else if (data.code === config.errorCodes.SUCCESS) {
-          // 标准格式：{code: 200, data: {...}, message: "xxx"}
-          if (data.data && data.data.token) {
-            const token = data.data.token
-            storage.setToken(token)
-          } else if (data.data && data.data.access_token) {
-            const token = data.data.access_token
-            storage.setToken(token)
-          }
+          token = (data.data && data.data.token) || (data.data && data.data.access_token)
+        }
+
+        // 校验 token 格式后再存储
+        if (typeof token === 'string' && token.length > 0) {
+          storage.setToken(token)
         }
       } else {
         throw new Error(`HTTP ${response.statusCode}: ${response.data?.message || '获取token失败'}`)
       }
     } catch (error) {
       console.error('获取token失败:', error)
-      // 不再静默处理，让调用方知道获取失败
-    } finally {
-      this.isGettingToken = false
     }
   }
 
@@ -175,7 +163,7 @@ class Request {
     try {
       // 尝试获取新token
       await this.getToken()
-      
+
       // 获取成功，重试队列中的请求
       this.requestQueue.forEach(({ resolve, reject }) => {
         resolve()
@@ -189,17 +177,17 @@ class Request {
       })
       this.requestQueue = []
       this.isRefreshing = false
-      
+
       // 清除本地存储
       wx.removeStorageSync('token')
       wx.removeStorageSync('userInfo')
-      
+
       console.error('Token获取失败，请重新登录')
       this.showError('登录已过期，请重新登录')
     }
   }
 
-  // 刷新token
+  // 刷新token（遗留方法，当前未被使用，保留以备后续 refreshToken 机制接入）
   refreshToken() {
     return new Promise((resolve, reject) => {
       const refreshToken = wx.getStorageSync('refreshToken')
@@ -233,7 +221,7 @@ class Request {
 
   // 发送请求
   async request(options) {
-    const { url, method = 'GET', data = {}, showLoading = true, retry = 0, needToken = true, showError = true } = options
+    const { url, method = 'GET', data = {}, showLoading = false, retry = 0, needToken = true, showError = true } = options
 
     // 如果需要token但没有token，先获取token
     if (needToken && !this.hasToken()) {
@@ -372,7 +360,7 @@ class Request {
           if (showLoading) {
             this.hideLoading()
           }
-          
+
           try {
             const data = JSON.parse(response.data)
             this.handleResponse({
@@ -399,4 +387,4 @@ class Request {
 // 创建单例实例
 const request = new Request()
 
-module.exports = request 
+module.exports = request

@@ -1,6 +1,23 @@
 // API接口封装
 const request = require('./request.js')
 const config = require('./config.js')
+const storage = require('./storage.js')
+
+// 认证检查辅助函数：未登录时返回统一的失败响应，已登录时返回 null
+function requireAuth(fallbackData = null) {
+  const userInfo = storage.getUserInfo()
+  const openId = storage.getOpenId()
+
+  if (!userInfo || !openId) {
+    return {
+      success: false,
+      code: 401,
+      message: '用户未登录',
+      data: fallbackData
+    }
+  }
+  return null
+}
 
 // 用户相关API
 const userApi = {
@@ -26,20 +43,8 @@ const userApi = {
 
   // 获取用户信息
   getProfile() {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-    
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: false,
-        code: 401,
-        message: '用户未登录',
-        data: null
-      })
-    }
-    
+    const authFail = requireAuth(null)
+    if (authFail) return Promise.resolve(authFail)
     return request.get(config.api.user.profile)
   },
 
@@ -70,39 +75,15 @@ const userApi = {
 
   // 获取用户统计信息
   getStats() {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-    
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: false,
-        code: 401,
-        message: '用户未登录',
-        data: null
-      })
-    }
-    
+    const authFail = requireAuth(null)
+    if (authFail) return Promise.resolve(authFail)
     return request.get(config.api.user.stats)
   },
 
   // 获取子用户列表
   getUsers() {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-    
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: false,
-        code: 401,
-        message: '用户未登录',
-        data: null
-      })
-    }
-    
+    const authFail = requireAuth(null)
+    if (authFail) return Promise.resolve(authFail)
     return request.get(config.api.user.getUsers)
   },
 
@@ -214,7 +195,7 @@ const messageApi = {
 
   // 全部标记为已读
   markAllRead() {
-    return request.put(config.api.message.markAllRead)
+    return request.post(config.api.message.markAllRead)
   },
 
   // 删除消息
@@ -224,18 +205,8 @@ const messageApi = {
 
   // 获取未读消息数量
   getUnreadCount() {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-    
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: true,
-        data: { count: 0, unreadCount: 0 }
-      })
-    }
-    
+    const authFail = requireAuth({ count: 0, unreadCount: 0 })
+    if (authFail) return Promise.resolve({ ...authFail, success: true })
     return request.get(config.api.message.unreadCount)
   },
 
@@ -247,16 +218,6 @@ const messageApi = {
   // 标记单个资讯已读
   markArticleRead(articleId) {
     return request.post(config.api.message.markArticleRead, { articleId })
-  },
-
-  // 一键标记所有已读
-  markAllRead() {
-    return request.post(config.api.message.markAllRead)
-  },
-
-  // 获取未读数量
-  getUnreadCount() {
-    return request.get(config.api.message.unreadCount)
   }
 }
 
@@ -305,18 +266,8 @@ const systemMessagesApi = {
 
   // 获取未读系统消息数量
   getUnreadCount() {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-    
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: true,
-        data: { unreadCount: 0, count: 0 }
-      })
-    }
-    
+    const authFail = requireAuth({ unreadCount: 0, count: 0 })
+    if (authFail) return Promise.resolve({ ...authFail, success: true })
     return request.get(config.api.systemMessages.unreadCount)
   },
 
@@ -372,28 +323,16 @@ const profileApi = {
 
   // 获取所有档案列表（包括本人和其他用户）
   getAllArchives(params = {}) {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-    
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: false,
-        code: 401,
-        message: '用户未登录',
-        data: {
-          ownArchives: [],
-          otherArchives: [],
-          totalOwn: 0,
-          totalOthers: 0,
-          totalAll: 0,
-          subUsers: [],
-          ownSubUserId: ''
-        }
-      })
-    }
-    
+    const authFail = requireAuth({
+      ownArchives: [],
+      otherArchives: [],
+      totalOwn: 0,
+      totalOthers: 0,
+      totalAll: 0,
+      subUsers: [],
+      ownSubUserId: ''
+    })
+    if (authFail) return Promise.resolve(authFail)
     return request.get(config.api.profile.allArchives, params)
   },
 
@@ -465,18 +404,8 @@ const feedbackApi = {
 
   // 获取未读反馈数量
   getUnreadCount() {
-    // 检查用户是否已登录
-    const storage = require('./storage.js')
-    const userInfo = storage.getUserInfo()
-    const openId = storage.getOpenId()
-
-    if (!userInfo || !openId) {
-      return Promise.resolve({
-        success: true,
-        data: { unreadCount: 0, count: 0 }
-      })
-    }
-
+    const authFail = requireAuth({ unreadCount: 0, count: 0 })
+    if (authFail) return Promise.resolve({ ...authFail, success: true })
     return request.get(config.api.feedback.unreadCount)
   }
 }

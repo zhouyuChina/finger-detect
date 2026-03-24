@@ -1,6 +1,8 @@
 // 本地存储工具类
 const config = require('./config.js')
 
+const MAX_CACHE_SIZE = 100
+
 class Storage {
   constructor() {
     this.cache = new Map() // 内存缓存
@@ -14,7 +16,11 @@ class Storage {
       expireTime: expireTime
     }
 
-    // 设置内存缓存
+    // 设置内存缓存（超过上限时清理最早的条目）
+    if (this.cache.size >= MAX_CACHE_SIZE && !this.cache.has(key)) {
+      const firstKey = this.cache.keys().next().value
+      this.cache.delete(firstKey)
+    }
     this.cache.set(key, data)
 
     // 设置本地存储
@@ -153,8 +159,8 @@ class Storage {
   }
 
   // 设置系统配置缓存
-  setSystemConfig(config) {
-    this.set('systemConfig', config, config.cache.expireTime.config)
+  setSystemConfig(systemConfigData) {
+    this.set('systemConfig', systemConfigData, config.cache.expireTime.config)
   }
 
   // 获取系统配置缓存
@@ -277,8 +283,16 @@ class Storage {
   clearExpiredData() {
     const keys = ['userInfo', 'token', 'refreshToken', 'openId', 'subUsers', 'currentSubUser']
     keys.forEach(key => {
-      const data = this.get(key)
-      if (data && this.isExpired(data)) {
+      // 直接读取原始存储包装对象（含 timestamp/expireTime）
+      let rawData = this.cache.get(key)
+      if (!rawData) {
+        try {
+          rawData = wx.getStorageSync(key)
+        } catch (e) {
+          return
+        }
+      }
+      if (rawData && this.isExpired(rawData)) {
         this.remove(key)
       }
     })
